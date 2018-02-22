@@ -9,7 +9,7 @@
 		<link rel="icon"  type="image/x-icon" href="<%=request.getContextPath()%>/resources/image/favicon.ico">
 		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 		<link type="text/css" rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/main-small.css" />
-		<title>Simple ABC Library - Aktualizacja Danych Użytkownika</title>
+		<title>Simple ABC Library - Aktualizacja Danych Książki</title>
 	</head>
 	<body>
 		
