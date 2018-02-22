@@ -1,0 +1,213 @@
+html {
+  height: 120%;
+}
+/* padding top right bottom left*/
+body {
+  height: 100%;
+  background-image:  linear-gradient(to left top, #7bb7ef 0%, #4894ea 100%);
+  font-family: Verdana, Geneva, sans-serif;
+  position: relative;
+}
+.wrapper {
+  margin-top: 8px;
+  margin-bottom: 80px;
+}
+.container{
+  max-width: 600px;
+  padding: ;
+  margin: 0 auto;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 10px 20px 5px;
+  border-radius: 15px;
+}
+header{
+  max-width: 400px;
+  margin: 0 auto;
+  margin-top: 40px;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 15px;
+  padding: 4px 20px 4px;
+}
+.big-button{
+	display: inline-block;
+	width:49%;
+	margin-bottom: 10px;
+	padding: 10px 16px;
+	font-size: 18px;
+	line-height: 1.33;
+	border-radius: 6px;
+	border: 1px solid transparent;
+	color: #fff;
+	background-color: #428bca;
+	border-color: #357ebd;
+}
+.header-button{
+	display: inline-block;
+	width: 129px;
+	font-size: 14px;
+	line-height:1.33;
+	border-radius: 6px;
+	border: 1px solid transparent;
+	color: #fff;
+	background-color: #428bca;
+	border-color: #357ebd;	
+}
+.small-button{
+	display: block;
+	margin: auto;
+	margin-bottom: 5px;
+	margin-top: 5px;
+	padding: 4px 4px;
+	font-size: 10px;
+	line-height:1.33;
+	border-radius: 6px;
+	border: 1px solid transparent;
+	color: #fff;
+	background-color: #428bca;
+	border-color: #357ebd;	
+}
+#big-logo{
+  max-width: 60%;
+  margin-top: 5px;
+  margin-bottom: 20px;
+  margin-left: 20%;
+}
+.h3-heading{
+	margin-top: -20px;
+	margin-bottom: 10px;
+  	text-align: left;
+}
+.system-message-container{
+  max-width: 600px;
+  padding: ;
+  margin: 0 auto;
+  margin-top: 5px;
+  margin-bottom: -4px;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 10px 20px 5px;
+  border-radius: 15px;
+}
+#header-td{
+	font-size: 16px;
+	font-weight: bold;
+	background-color: #428bca;
+    color: #fff;
+}
+.user-details-table th{
+	padding-left: 5px;
+	padding-top: 4px;
+    padding-bottom: 4px;
+    text-align: left;
+    font-size: 14px;
+    margin-left: 5px;
+    margin-right: 5px;
+    word-wrap:break-word;
+
+    
+}
+.user-details-table td{
+	padding-left: 5px;
+	padding-top: 4px;
+    padding-bottom: 4px;
+    text-align: left;
+    font-size: 14px;
+    margin-left: 5px;
+    margin-right: 5px;
+    word-wrap:break-word;
+}
+.user-details-table {
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: -8px;
+	margin-bottom: 10px;
+	table-layout: fixed;
+
+}
+tr:nth-child(even){
+	background-color: #f2f2f2;
+}
+.reservation-table{
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-collapse: collapse;
+	margin-top: 8px;
+	margin-bottom: 10px;
+}
+.reservation-table td{
+	padding-left: 5px;
+	padding-top: 4px;
+    padding-bottom: 4px;
+    text-align: left;
+    font-size: 12px;
+    margin-left: 5px;
+    margin-right: 5px;
+    word-wrap:break-word;
+}
+.reservation-table th{
+	padding-left: 5px;
+	padding-top: 4px;
+    padding-bottom: 4px;
+    text-align: left;
+    font-size: 14px;
+    margin-left: 5px;
+    margin-right: 5px;
+    background-color: #428bca;
+    color: #fff;
+    word-wrap:break-word;
+}
+#action-column{
+	column-width: 45px;
+	text-align: center;
+}
+#date-column{
+	column-width: 100px;
+}
+#title-column{
+	column-width: 280px;
+}
+#author-column{
+	column-width: 220px;
+}
+#borrowred-book-table-title-column{
+	column-width: 300px;
+}
+#borrowred-book-table-author-column{
+	column-width: 250px;
+}
+#borrowred-book-table-date-column{
+	column-width: 100px;
+}
+.return-button{
+	display: block;
+	width: 25%;
+	margin-left: 37%;
+	margin-bottom: 5px;
+	margin-top: -5px;
+	padding: 4px 8px 4px 8px;
+	font-size: 14px;
+	line-height:1.33;
+	border-radius: 6px;
+	border: 1px solid transparent;
+	color: #fff;
+	background-color: #428bca;
+	border-color: #357ebd;	
+}
+#system-message{
+	font-size:12px;
+	font-weight: bold;
+	margin-top: -8px;
+	margin-bottom: -4px;
+}
+.system-message-container{
+  max-width: 600px;
+  margin: 0 auto;
+  margin-top: 5px;
+  margin-bottom: -4px;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 10px 20px 5px;
+  border-radius: 15px;
+}
