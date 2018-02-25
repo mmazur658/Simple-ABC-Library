@@ -16,7 +16,7 @@ public class BarcodeGenerator {
 
 	public static byte[] generateBarcode(String barcodeValue) {
 
-		final int dpi = 60; // height of barcode
+		final int dpi = 60; 
 		Code39Bean code39Bean = new Code39Bean();
 		code39Bean.setModuleWidth(UnitConv.in2mm(2.0f / dpi)); // width of barcode
 		code39Bean.setWideFactor(3);

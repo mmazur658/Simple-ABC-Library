@@ -485,6 +485,16 @@ public class UserController {
 			HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
+		
+		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
+				(String) session.getAttribute("userLastName"))) {
+			session.invalidate();
+			return "redirect:/user/login-page";
+		}
+		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
+			session.invalidate();
+			return "redirect:/user/login-page";
+		}		
 
 		if (userDetailsUserId != null)
 			session.setAttribute("userDetailsUserId", userDetailsUserId);

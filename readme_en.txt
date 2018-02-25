@@ -1,4 +1,4 @@
-Simple ABC Library – Simple Java web application with Maven, Spring and Hibernate using to manage a library. 
+Simple ABC Library – Simple Java web application with Maven, Spring and Hibernate used to manage a library. 
 This application contains three sections: Customer, Employee and Administrator. As Customer, you can check the 
 books in the bookstore, reserve books, update your personal data, change password and use messaging service. 
 As Employee you can do more than Customer: add, delete or update books; borrow and return books, manage reservations 
