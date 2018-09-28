@@ -32,6 +32,7 @@ import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.PdfService;
 import pl.mazur.simpleabclibrary.service.ReservationService;
 import pl.mazur.simpleabclibrary.service.UserService;
+import pl.mazur.simpleabclibrary.utils.ForbiddenWords;
 import pl.mazur.simpleabclibrary.utils.LoginAndAccessLevelCheck;
 
 @Controller
@@ -53,6 +54,9 @@ public class BorrowBookController {
 
 	@Autowired
 	ReservationService reservationService;
+	
+	@Autowired
+	ForbiddenWords forbiddenWords;
 
 	@RequestMapping("/borrow-book-choose-user")
 	public String borrowBook(
@@ -104,6 +108,12 @@ public class BorrowBookController {
 		userSearchParameters[2] = (borrowBookLastName == null) ? "" : borrowBookLastName.trim();
 		userSearchParameters[3] = (borrowBookEmail == null) ? "" : borrowBookEmail.trim();
 		userSearchParameters[4] = (borrowBookPesel == null) ? "" : borrowBookPesel.trim();
+		
+		for (String word:userSearchParameters) {
+			if(forbiddenWords.findForbiddenWords(word)) {
+				return "redirect:/error";
+			}
+		}
 
 		List<User> usersList;
 		long amountOfResults;
@@ -262,6 +272,12 @@ public class BorrowBookController {
 		searchParameters[3] = "";
 		searchParameters[4] = "";
 		searchParameters[5] = (bookId == null) ? "" : bookId.trim();
+		
+		for (String word:searchParameters) {
+			if(forbiddenWords.findForbiddenWords(word)) {
+				return "redirect:/error";
+			}
+		}
 
 		List<Book> booksList;
 		long amountOfResults;

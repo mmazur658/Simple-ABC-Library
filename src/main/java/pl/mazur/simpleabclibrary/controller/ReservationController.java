@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pl.mazur.simpleabclibrary.entity.Reservation;
 import pl.mazur.simpleabclibrary.service.ReservationService;
+import pl.mazur.simpleabclibrary.utils.ForbiddenWords;
 import pl.mazur.simpleabclibrary.utils.LoginAndAccessLevelCheck;
 
 @Controller
@@ -27,6 +28,9 @@ public class ReservationController {
 
 	@Autowired
 	ReservationService reservationService;
+	
+	@Autowired
+	ForbiddenWords forbiddenWords;
 
 	@RequestMapping("/reservation-management")
 	public String reservationPage(@RequestParam(required = false, name = "systemMessage") String systemMessage,
@@ -84,6 +88,12 @@ public class ReservationController {
 		reservationSearchParameters[3] = (customerPesel == null) ? "" : customerPesel;
 		reservationSearchParameters[4] = (bookId == null) ? "" : bookId;
 		reservationSearchParameters[5] = (bookTitle == null) ? "" : bookTitle;
+		
+		for (String word:reservationSearchParameters) {
+			if(forbiddenWords.findForbiddenWords(word)) {
+				return "redirect:/error";
+			}
+		}
 
 		List<Reservation> reservationList;
 		long amountOfResults;

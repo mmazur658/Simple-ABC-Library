@@ -23,7 +23,7 @@ public class BookDAOImpl implements BookDAO {
 	private SessionFactory sessionFactory;
 
 	@Autowired
-	ReservationDAO reservationDAO;
+	private ReservationDAO reservationDAO;
 
 	@Override
 	public List<Book> getAllBooks(int startResult) {

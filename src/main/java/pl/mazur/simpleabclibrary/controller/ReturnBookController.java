@@ -24,11 +24,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pl.mazur.simpleabclibrary.entity.Book;
-import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.entity.BookBorrowing;
+import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.PdfService;
 import pl.mazur.simpleabclibrary.service.UserService;
+import pl.mazur.simpleabclibrary.utils.ForbiddenWords;
 import pl.mazur.simpleabclibrary.utils.LoginAndAccessLevelCheck;
 
 @Controller
@@ -47,6 +48,9 @@ public class ReturnBookController {
 
 	@Autowired
 	LoginAndAccessLevelCheck loginAndAccessLevelCheck;
+	
+	@Autowired
+	ForbiddenWords forbiddenWords;
 
 	@RequestMapping("/return-book-choose-user")
 	public String borrowBook(
@@ -98,6 +102,13 @@ public class ReturnBookController {
 		userSearchParameters[2] = (returnBookLastName == null) ? "" : returnBookLastName.trim();
 		userSearchParameters[3] = (returnBookEmail == null) ? "" : returnBookEmail.trim();
 		userSearchParameters[4] = (returnBookPesel == null) ? "" : returnBookPesel.trim();
+		
+		for (String word:userSearchParameters) {
+			if(forbiddenWords.findForbiddenWords(word)) {
+				return "redirect:/error";
+			}
+		}
+
 
 		if (returnBookStartResult == null)
 			returnBookStartResult = (Integer) session.getAttribute("returnBookStartResult");

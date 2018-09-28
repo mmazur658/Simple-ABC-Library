@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.InputStreamResource;
@@ -17,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -30,6 +30,7 @@ import pl.mazur.simpleabclibrary.service.MessageService;
 import pl.mazur.simpleabclibrary.service.PdfService;
 import pl.mazur.simpleabclibrary.service.ReservationService;
 import pl.mazur.simpleabclibrary.service.UserService;
+import pl.mazur.simpleabclibrary.utils.ForbiddenWords;
 import pl.mazur.simpleabclibrary.utils.LoginAndAccessLevelCheck;
 import pl.mazur.simpleabclibrary.utils.PasswordValidator;
 
@@ -58,6 +59,9 @@ public class UserController {
 	
 	@Autowired
 	PasswordValidator passwordValidator;
+	
+	@Autowired
+	ForbiddenWords forbiddenWords;
 
 	@RequestMapping("/login-page")
 	public String loginPage(
@@ -74,7 +78,7 @@ public class UserController {
 		}
 	}
 
-	@PostMapping("/login")
+	@RequestMapping("/login")
 	public String loginVerifying(@RequestParam("email") String email,
 			@RequestParam("password") String thePasswordFromForm, HttpServletRequest request,
 			RedirectAttributes redirectAttributes) {
@@ -152,7 +156,7 @@ public class UserController {
 		return "create-user-form";
 	}
 
-	@PostMapping("/saveUser")
+	@RequestMapping("/saveUser")
 	public String saveUser(@ModelAttribute("user") User theUser, Model theModel, HttpServletRequest request, RedirectAttributes redirectAttributes) {
 
 		boolean isExist = userService.checkEmailIsExist(theUser.getEmail());
@@ -218,7 +222,7 @@ public class UserController {
 		return "user-update";
 	}
 
-	@PostMapping("/update-user")
+	@RequestMapping("/update-user")
 	public String updateUser(@ModelAttribute("user") User theUser, HttpServletRequest request, Model theModel,
 			RedirectAttributes redirectAttributes) {
 
@@ -290,7 +294,7 @@ public class UserController {
 
 	}
 
-	@PostMapping("/changePassword")
+	@RequestMapping("/changePassword")
 	public String changePassword(@RequestParam("old-password") String oldPassword,
 			@RequestParam("password") String newPassword,
 			@RequestParam("changePasswordFormUserId") Integer changePasswordUserId, HttpServletRequest request,
@@ -431,6 +435,13 @@ public class UserController {
 		userSearchParameters[2] = (userManagementLastName == null) ? "" : userManagementLastName.trim();
 		userSearchParameters[3] = (userManagementEmail == null) ? "" : userManagementEmail.trim();
 		userSearchParameters[4] = (userManagementPesel == null) ? "" : userManagementPesel.trim();
+		
+		for (String word:userSearchParameters) {
+			if(forbiddenWords.findForbiddenWords(word)) {
+				return "redirect:/error";
+			}
+		}
+
 
 		if (userManagementStartResult == null)
 			userManagementStartResult = (Integer) session.getAttribute("userManagementStartResult");
@@ -483,15 +494,27 @@ public class UserController {
 			@RequestParam(required = false, name = "userDetailsWayBack") String userDetailsWayBack,
 			@RequestParam(required = false, name = "systemMessage") String systemMessage, Model theModel,
 			HttpServletRequest request) {
+		
+		/*     usun to ponizej            */
+		System.out.println("userDetailsUserId"+userDetailsUserId);
 
 		HttpSession session = request.getSession();
 		
+		if(!session.getAttribute("userId").equals(userDetailsUserId)) {
+			if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
+					session.invalidate();
+				return "redirect:/user/login-page";
+			}	
+		}
+		
 		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
 				(String) session.getAttribute("userLastName"))) {
+			
 			session.invalidate();
 			return "redirect:/user/login-page";
 		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
+
+		if (!loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel"))) {
 			session.invalidate();
 			return "redirect:/user/login-page";
 		}		

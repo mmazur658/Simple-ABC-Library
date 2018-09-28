@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -26,12 +27,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pl.mazur.simpleabclibrary.entity.Book;
-import pl.mazur.simpleabclibrary.entity.Reservation;
 import pl.mazur.simpleabclibrary.entity.BookBorrowing;
+import pl.mazur.simpleabclibrary.entity.Reservation;
 import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.PdfService;
 import pl.mazur.simpleabclibrary.service.ReservationService;
 import pl.mazur.simpleabclibrary.service.UserService;
+import pl.mazur.simpleabclibrary.utils.ForbiddenWords;
+import pl.mazur.simpleabclibrary.utils.ForbiddenWordsImpl;
 import pl.mazur.simpleabclibrary.utils.LoginAndAccessLevelCheck;
 
 @Controller
@@ -54,6 +57,9 @@ public class BookController {
 	@Autowired
 	ReservationService reservationService;
 
+	@Autowired
+	ForbiddenWords forbiddenWords;
+	
 	@RequestMapping("/main-bookstore")
 	public String mainBookstore(HttpServletRequest request, Model theModel,
 			@RequestParam(required = false, name = "title") String title,
@@ -105,6 +111,12 @@ public class BookController {
 		searchParameters[3] = (isbn == null) ? "" : isbn.trim();
 		searchParameters[4] = "";
 		searchParameters[5] = (id == null) ? "" : id.trim();
+		
+		for (String word:searchParameters) {
+			if(forbiddenWords.findForbiddenWords(word)) {
+				return "redirect:/error";
+			}
+		}
 
 		List<Book> booksList;
 		long amountOfResults;
