@@ -8,6 +8,7 @@
 	<title>Simple ABC Library</title>
 </head>
 <body class="text-center">
+
     <form class="form-signin" action="login" method="post">
       <img class="mb-3" src="<%=request.getContextPath()%>/resources/image/ABC_new_mini_logo.png" alt="" width="200" height="200">
       <h1 class="h3 mb-3 font-weight-normal">Simple ABC Library</h1>

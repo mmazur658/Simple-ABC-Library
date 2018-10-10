@@ -12,7 +12,7 @@
 	<%@ include file="/resources/parts/nav.jsp" %> 
 		
 	
-	<div class="container">
+	<div class="container w-50" >
 	
 		<c:if test="${not empty systemMessage}">
 			<div class="alert alert-success mt-2 w-50" role="alert">
@@ -20,13 +20,13 @@
 		  	</div>
 		</c:if>	
 			
-		<table class="table table-borderedless w-50 mb-0" style="text-align: center;">
+		<table class="table table-borderedless w-75 mb-0" style="text-align: center;">
 			<tr>
 			<td><h1 class="h3 mb-0 font-weight-normal ">Twoje Dane</h1></td>
 			</tr>
 		</table>
 		
-		<table class="table table-bordered w-50">
+		<table class="table table-sm table-bordered w-75">
 		  <tbody>
 		    <tr>
 		      <th scope="row">Id: </th>
@@ -74,7 +74,7 @@
 		    </tr>	  
 		  </tbody>
 		</table>	
-		<a href="${pageContext.request.contextPath}/user/user-update-form" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true" >Aktualizaja Danych</a>
+		<a href="${pageContext.request.contextPath}/user/user-update-form" class="btn btn-sm btn-secondary btn-block w-75" role="button" aria-pressed="true" >Aktualizaja Danych</a>
 	</div>
 	
 	<%@ include file="/resources/parts/footer.jsp" %> 

@@ -152,7 +152,7 @@ public class ReservationController {
 		session.setAttribute("bookTitle", null);
 		session.setAttribute("reservationStartResult", null);
 
-		return "redirect:/return-book/return-book-choose-books";
+		return "redirect:/reservation/reservation-management";
 	}
 
 	@RequestMapping("/delete-reservation")

@@ -164,7 +164,7 @@ public class ReturnBookController {
 		session.setAttribute("returnBookEmail", null);
 		session.setAttribute("returnBookPesel", null);
 
-		return "redirect:/borrow-book/borrow-book-choose-books";
+		return "redirect:/return-book/return-book-choose-user";
 	}
 
 	@RequestMapping("/prepareForReturn")
@@ -348,5 +348,27 @@ public class ReturnBookController {
 
 		InputStreamResource isr = new InputStreamResource(new FileInputStream(tempFile));
 		return new ResponseEntity<InputStreamResource>(isr, responseHeaders, HttpStatus.OK);
+	}
+	
+	@RequestMapping("/cancel-book-returning")
+	public String cancelBookReturning(HttpServletRequest request) {
+
+		HttpSession session = request.getSession();
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
+
+		session.setAttribute("returnBookSelectedUserId", null);
+		session.setAttribute("returnBookFirstName", null);
+		session.setAttribute("returnBookLastName", null);
+		session.setAttribute("returnBookEmail", null);
+		session.setAttribute("returnBookPesel", null);
+		session.setAttribute("returnBookStartResult", null);
+		session.setAttribute("tempBookList", null);
+		session.setAttribute("selectedUserId", null);
+		session.setAttribute("userBorrowedBooksList", null);
+		session.setAttribute("tempReturnedBookList", null);
+
+		return "redirect:/user/main";
 	}
 }

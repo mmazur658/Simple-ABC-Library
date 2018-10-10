@@ -8,7 +8,6 @@
 	<title>Simple ABC Library - Zmiana Hasła</title>
 </head>
 <body>
-
 	<%@ include file="/resources/parts/nav.jsp" %>  
 
 	<div class="container">
@@ -19,7 +18,7 @@
 		  	</div>
 		</c:if>		
 	
-		<h1 class="jumbotron-heading">Zarezerwowane Książki</h1>
+		<h1 class="h3 mb-3 mt-3 font-weight-normal">Zarezerwowane Książki</h1>
 		<table class="table table-hover">
 			  <thead>
 			    <tr>
@@ -47,7 +46,7 @@
 			</tbody>
 		</table>
 		
-		<h1 class="jumbotron-heading">Wypożyczone Książki</h1>
+		<h1 class="h3 mb-3 mt-3 font-weight-normal">Wypożyczone Książki</h1>
 		<table class="table table-hover">
 			  <thead>
 			    <tr>
@@ -70,7 +69,7 @@
 		</table>		
 	</div>
 	
-	
 <%@ include file="/resources/parts/footer.jsp" %> 
+
 </body>
 </html>

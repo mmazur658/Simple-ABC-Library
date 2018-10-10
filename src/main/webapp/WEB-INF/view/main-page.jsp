@@ -8,8 +8,7 @@
 	<title>Simple ABC Library - Strona Główna</title>
 </head>
 <body>
-	<%@ include file="/resources/parts/nav.jsp" %>  
-		
+	<%@ include file="/resources/parts/nav.jsp" %>  		
 	
 	<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
 	  <div class="carousel-inner">

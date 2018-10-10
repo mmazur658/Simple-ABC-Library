@@ -11,14 +11,14 @@
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 
-	<div class="container">	
+	<div class="container w-25">	
 		<c:if test="${not empty systemMessage}">
-			<div class="alert alert-danger mt-2 w-25" role="alert">
+			<div class="alert alert-danger mt-2" role="alert">
 		    	<strong>${systemMessage}</strong>
 		  	</div>
 		</c:if>	
 		
-		<form:form class="form-signin w-25" action="update-user" modelAttribute="user" method="POST">
+		<form:form class="form-signin" action="update-user" modelAttribute="user" method="POST">
 			<h1 class="h3 m-2 font-weight-normal ">Aktualizacja Danych</h1>
 			<form:hidden class="form-control" path="id"/>
 			<form:input class="form-control" type="text" path="firstName" placeholder="Imię"/>
@@ -35,5 +35,6 @@
 	</div>
 
 	<%@ include file="/resources/parts/footer.jsp" %> 
+	
 </body>
 </html>

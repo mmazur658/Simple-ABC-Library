@@ -35,7 +35,6 @@
 		
 		<label for="inputConfirmPassword" class="sr-only">Hasło</label>
 		<form:input class="form-control" style="margin-top: -10px;" type="password" path="password" placeholder="Powtórz Hasło" required="required"/>
-	
 				
 		<button class="btn btn-lg btn-secondary btn-block" type="submit">Utwórz Nowe Konto</button>
 		<a href="${pageContext.request.contextPath}/user/login-page" class="btn btn-lg btn-secondary btn-block" role="button" aria-pressed="true">Powrót</a>
@@ -43,5 +42,6 @@
 	</form:form>
 		
 <%@ include file="/resources/parts/footer-starter.jsp" %> 	
+
 </body>
 </html>

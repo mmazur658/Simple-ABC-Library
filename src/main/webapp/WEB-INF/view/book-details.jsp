@@ -10,25 +10,25 @@
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
-	<div class="container">	
+	<div class="container w-50">	
 	
 		<c:if test="${not empty systemSuccessMessage}">
-			<div class="alert alert-success mt-2 w-50" role="alert">
+			<div class="alert alert-success mt-2" role="alert">
 		    	<strong>${systemSuccessMessage}</strong>
 		  	</div>
 		</c:if>	
 		<c:if test="${not empty systemErrorMessage}">
-			<div class="alert alert-danger mt-2 w-50" role="alert">
+			<div class="alert alert-danger mt-2" role="alert">
 		    	<strong>${systemErrorMessage}</strong>
 		  	</div>
 		</c:if>	
 	
-		<table class="table table-borderedless w-50 mb-0" style="text-align: center;">
+		<table class="table table-borderedless mb-0" style="text-align: center;">
 			<tr>
 			<td><h1 class="h3 mb-0 font-weight-normal ">Szczegóły Książki</h1></td>
 			</tr>
 		</table>
-		<table class="table table-bordered w-50">
+		<table class="table table-sm table-bordered">
 		  <tbody>
 		    <tr>
 		      <th scope="row">Id: </th>
@@ -81,14 +81,15 @@
 			<c:param name="bookId" value="${tempBook.id}"/>					
 		</c:url>
 		
-		<a href="${reservationLink}" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true" >Rezerwuj</a>
+		<a href="${reservationLink}" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true" >Rezerwuj</a>
 		<c:if test="${userAccessLevel eq 'Employee' or  userAccessLevel eq 'Administrator' }">	
-			<a href="${updateLink}" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true" >Aktualizacja</a>
-			<a href="${deleteLink}" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true" >Usuń</a>
-			<a href="${generateLabelLink}" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true" >Etykieta</a>
+			<a href="${updateLink}" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true" >Aktualizacja</a>
+			<a href="${deleteLink}" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true" >Usuń</a>
+			<a href="${generateLabelLink}" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true" >Etykieta</a>
 		</c:if>
 	</div>
 
 	<%@ include file="/resources/parts/footer.jsp" %> 
+	
 </body>
 </html>

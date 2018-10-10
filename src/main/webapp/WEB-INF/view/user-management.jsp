@@ -11,11 +11,13 @@
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
 	<div class="container">	
+	
 	<c:if test="${not empty systemMessage}">
 		<div class="alert alert-success" role="alert">
 	    	<strong>${systemMessage}</strong>
 	  	</div>
 	</c:if>
+	
 	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Użytkownicy</h1>
 	<button type="button" class="btn btn-sm btn-secondary float-right mt-4" data-toggle="modal" data-target="#userSearchModal" data-whatever="">Znajdź Użytkownika</button>
 	<form action ="clearUserSearchParameters" >
@@ -74,6 +76,7 @@
 
 		  </tbody>
 		</table>
+		
 		<nav aria-label="Page navigation example">
 			
 				<c:url var="showMoreLink" value="/user/user-management">					
@@ -88,9 +91,7 @@
 			    <li class="page-item"><p class="page-link text-dark" >${resultRange} z ${amountOfResults}</p></li>
 			    <li class="page-item"><a class="page-link text-dark" href="${showMoreLink}"> >>> </a></li>
 			  </ul>
-		</nav>
-	
-	
+		</nav>	
 	
 	</div>
 

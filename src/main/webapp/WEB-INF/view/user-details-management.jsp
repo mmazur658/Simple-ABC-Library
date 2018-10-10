@@ -10,17 +10,15 @@
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
-	<div class="container">	
-	
+	<div class="container w-50">		
 			
-		<table class="table table-borderedless w-50 mb-0" style="text-align: center;">
+		<table class="table table-borderedless w-75 mb-0" style="text-align: center;">
 			<tr>
-			<td><h1 class="h3 mb-0 font-weight-normal ">Dane Użytkownika</h1></td>
-			
+				<td><h1 class="h3 mb-0 font-weight-normal ">Dane Użytkownika</h1></td>			
 			</tr>
 		</table>
 		
-		<table class="table table-bordered w-50">
+		<table class="table table-sm table-bordered w-75">
 		  <tbody>
 		    <tr>
 		      <th scope="row">Id: </th>
@@ -73,10 +71,10 @@
 			<c:param name="userDetailsUserId" value="${theUser.id}"/>					
 		</c:url>
 	
-		<a href="${updateUserLink}" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true">Aktualizaja Danych</a>
-		<a href="#" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true">Resetuj Hasło</a>
-		<a href="#" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true">Książki</a>
-		<a href="#" class="btn btn-sm btn-secondary btn-block w-50 mb-5" role="button" aria-pressed="true">Zmiana Uprawnień</a>
+		<a href="${updateUserLink}" class="btn btn-sm btn-secondary btn-block w-75" role="button" aria-pressed="true">Aktualizaja Danych</a>
+		<a href="#" class="btn btn-sm btn-secondary btn-block w-75" role="button" aria-pressed="true">Resetuj Hasło</a>
+		<a href="#" class="btn btn-sm btn-secondary btn-block w-75" role="button" aria-pressed="true">Książki</a>
+		<a href="#" class="btn btn-sm btn-secondary btn-block w-75 mb-5" role="button" aria-pressed="true">Zmiana Uprawnień</a>
 	
 	</div>
 

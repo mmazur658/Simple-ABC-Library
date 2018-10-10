@@ -54,7 +54,7 @@ public class BorrowBookController {
 
 	@Autowired
 	ReservationService reservationService;
-	
+
 	@Autowired
 	ForbiddenWords forbiddenWords;
 
@@ -101,9 +101,9 @@ public class BorrowBookController {
 		userSearchParameters[2] = (borrowBookLastName == null) ? "" : borrowBookLastName.trim();
 		userSearchParameters[3] = (borrowBookEmail == null) ? "" : borrowBookEmail.trim();
 		userSearchParameters[4] = (borrowBookPesel == null) ? "" : borrowBookPesel.trim();
-		
-		for (String word:userSearchParameters) {
-			if(forbiddenWords.findForbiddenWords(word)) {
+
+		for (String word : userSearchParameters) {
+			if (forbiddenWords.findForbiddenWords(word)) {
 				return "redirect:/error";
 			}
 		}
@@ -178,8 +178,11 @@ public class BorrowBookController {
 	@RequestMapping("/borrow-book-choose-books")
 	public String borrowBookChooseBooks(@RequestParam(required = false, name = "selectedUserId") String selectedUserId,
 			@RequestParam(required = false, name = "title") String title,
+			@RequestParam(required = false, name = "errorMessage") String errorMessage,
 			@RequestParam(required = false, name = "bookId") String bookId,
 			@RequestParam(required = false, name = "author") String author,
+			@RequestParam(required = false, name = "publisher") String publisher,
+			@RequestParam(required = false, name = "isbn") String isbn,
 			@RequestParam(required = false, name = "systemMessage") String systemMessage,
 			@RequestParam(required = false, name = "isAbleToBorrow") boolean isAbleToBorrow,
 			@RequestParam(required = false, name = "extraMessage") String extraMessage,
@@ -231,11 +234,15 @@ public class BorrowBookController {
 		}
 
 		if (!(title == null))
-			session.setAttribute("title", title);
+			session.setAttribute("borrowBookSeachParamTitle", title);
 		if (!(bookId == null))
-			session.setAttribute("id", bookId);
+			session.setAttribute("borrowBookSeachParamId", bookId);
 		if (!(author == null))
-			session.setAttribute("author", author);
+			session.setAttribute("borrowBookSeachParamAuthor", author);
+		if (!(isbn == null))
+			session.setAttribute("borrowBookSeachParamIsbn", isbn);
+		if (!(publisher == null))
+			session.setAttribute("borrowBookSeachParamPublisher", publisher);
 
 		if ((title == null) && !(session.getAttribute("title") == null))
 			title = (String) session.getAttribute("title");
@@ -243,19 +250,22 @@ public class BorrowBookController {
 			bookId = (String) session.getAttribute("id");
 		if ((author == null) && !(session.getAttribute("author") == null))
 			author = (String) session.getAttribute("author");
+		if ((publisher == null) && !(session.getAttribute("publisher") == null))
+			publisher = (String) session.getAttribute("publisher");
+		if ((isbn == null) && !(session.getAttribute("isbn") == null))
+			isbn = (String) session.getAttribute("isbn");
 
 		String[] searchParameters = { "", "", "", "", "", "" };
 		searchParameters[0] = (title == null) ? "" : title.trim();
 		searchParameters[1] = (author == null) ? "" : author.trim();
-		searchParameters[2] = "";
-		searchParameters[3] = "";
+		searchParameters[2] = (publisher == null) ? "" : publisher.trim();
+		searchParameters[3] = (isbn == null) ? "" : isbn.trim();
 		searchParameters[4] = "";
 		searchParameters[5] = (bookId == null) ? "" : bookId.trim();
-		
-		for (String word:searchParameters) {
-			if(forbiddenWords.findForbiddenWords(word)) {
+
+		for (String word : searchParameters) {
+			if (forbiddenWords.findForbiddenWords(word))
 				return "redirect:/error";
-			}
 		}
 
 		List<Book> booksList;
@@ -265,8 +275,6 @@ public class BorrowBookController {
 			borrowBookChooseBookStartResult = (Integer) session.getAttribute("borrowBookChooseBookStartResult");
 		if (borrowBookChooseBookStartResult == null)
 			borrowBookChooseBookStartResult = 0;
-		
-		
 
 		if (!searchParameters[0].equals("") || !searchParameters[1].equals("") || !searchParameters[2].equals("")
 				|| !searchParameters[3].equals("") || !searchParameters[4].equals("")
@@ -309,7 +317,7 @@ public class BorrowBookController {
 		theModel.addAttribute("theUser", user);
 		theModel.addAttribute("systemMessage", systemMessage);
 		theModel.addAttribute("extraMessage", extraMessage);
-
+		theModel.addAttribute("errorMessage", errorMessage);
 		return "borrow-book-choose-books";
 	}
 
@@ -330,7 +338,8 @@ public class BorrowBookController {
 	}
 
 	@RequestMapping("/addBookToList")
-	public String addBookToList(@RequestParam("bookId") int bookId, HttpServletRequest request,
+	public String addBookToList(@RequestParam("bookId") int bookId,
+			@RequestParam("isAbleToBorrow") boolean isAbleToBorrow, HttpServletRequest request,
 			RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
@@ -338,56 +347,69 @@ public class BorrowBookController {
 				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
 			return "redirect:/user/logout";
 
+		if (isAbleToBorrow) {
+			List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
+			Book theBook = bookService.getBook(bookId);
+			boolean isAllreadyOnTheList = false;
 
-		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
-		Book theBook = bookService.getBook(bookId);
-		boolean isAllreadyOnTheList = false;
+			for (Book tempBook : tempBookList) {
+				if (tempBook.getId() == theBook.getId())
+					isAllreadyOnTheList = true;
+			}
 
-		for (Book tempBook : tempBookList) {
-			if (tempBook.getId() == theBook.getId())
-				isAllreadyOnTheList = true;
-		}
-
-		if (!isAllreadyOnTheList) {
-			tempBookList.add(theBook);
-			session.setAttribute("tempBookList", tempBookList);
-			redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka zosta³a dodana do listy. ");
-			return "redirect:/borrow-book/borrow-book-choose-books";
+			if (!isAllreadyOnTheList) {
+				tempBookList.add(theBook);
+				session.setAttribute("tempBookList", tempBookList);
+				redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka zosta³a dodana do listy. ");
+				return "redirect:/borrow-book/borrow-book-choose-books";
+			} else {
+				redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka ju¿ znajduje siê na liœcie. ");
+				return "redirect:/borrow-book/borrow-book-choose-books";
+			}
 		} else {
-			redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka ju¿ znajduje siê na liœcie. ");
+			redirectAttributes.addAttribute("errorMessage", "Nie mo¿na wypo¿yczyæ wiêcej ksi¹¿ek");
 			return "redirect:/borrow-book/borrow-book-choose-books";
 		}
+
 	}
 
 	@RequestMapping("/addReservedBookToList")
-	public String addReservedBookToList(@RequestParam("reservationId") int reservationId, HttpServletRequest request,
+	public String addReservedBookToList(@RequestParam("reservationId") int reservationId,
+			@RequestParam("isAbleToBorrow") boolean isAbleToBorrow, HttpServletRequest request,
 			RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
 		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
 				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
 			return "redirect:/user/logout";
+		
+		if(isAbleToBorrow) {
+			List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
+			Reservation reservation = reservationService.getReservation(reservationId);
+			Book theBook = reservation.getBook();
+			boolean isAllreadyOnTheList = false;
 
-		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
-		Reservation reservation = reservationService.getReservation(reservationId);
-		Book theBook = reservation.getBook();
-		boolean isAllreadyOnTheList = false;
+			for (Book tempBook : tempBookList) {
+				if (tempBook.getId() == theBook.getId())
+					isAllreadyOnTheList = true;
+			}
 
-		for (Book tempBook : tempBookList) {
-			if (tempBook.getId() == theBook.getId())
-				isAllreadyOnTheList = true;
-		}
-
-		if (!isAllreadyOnTheList) {
-			reservationService.deleteReservationInOrderToCreateBookBorrowing(reservation);
-			tempBookList.add(theBook);
-			session.setAttribute("tempBookList", tempBookList);
-			redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka zosta³a dodana do listy");
-			return "redirect:/borrow-book/borrow-book-choose-books";
+			if (!isAllreadyOnTheList) {
+				reservationService.deleteReservationInOrderToCreateBookBorrowing(reservation);
+				tempBookList.add(theBook);
+				session.setAttribute("tempBookList", tempBookList);
+				redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka zosta³a dodana do listy");
+				return "redirect:/borrow-book/borrow-book-choose-books";
+			} else {
+				redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka ju¿ znajduje siê na liœcie. ");
+				return "redirect:/borrow-book/borrow-book-choose-books";
+			}
 		} else {
-			redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka ju¿ znajduje siê na liœcie. ");
+			redirectAttributes.addAttribute("errorMessage", "Nie mo¿na wypo¿yczyæ wiêcej ksi¹¿ek");
 			return "redirect:/borrow-book/borrow-book-choose-books";
 		}
+		
+
 	}
 
 	@RequestMapping("/deleteBookFromList")
@@ -408,7 +430,7 @@ public class BorrowBookController {
 			}
 
 		}
-		
+
 		redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka zosta³a usuniêta z listy");
 
 		return "redirect:/borrow-book/borrow-book-choose-books";
@@ -423,7 +445,7 @@ public class BorrowBookController {
 			return "redirect:/user/logout";
 
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
-		
+
 		if (tempBookList.size() < 1) {
 			redirectAttributes.addAttribute("systemMessage", "Lista ksi¹¿ek do wypo¿yczenia jest pusta!!");
 			return "redirect:/borrow-book/borrow-book-choose-books";
@@ -465,7 +487,7 @@ public class BorrowBookController {
 			bookId = Integer.parseInt(st.nextToken());
 			bookList.add(bookService.getBook(bookId));
 		}
-		
+
 		Date expectedEndDate = bookService.getExpectedEndDate(tempUser, bookList.get(0));
 		String employeeName = session.getAttribute("userLastName") + " " + session.getAttribute("userFirstName");
 		File tempFile = pdfService.generateBookBorrowingConfirmation(bookList, tempUser, expectedEndDate, employeeName);

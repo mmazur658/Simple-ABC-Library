@@ -5,14 +5,14 @@
 <html lang="en">
 <head>
 	<%@ include file="/resources/parts/header.jsp" %>  
-	<title>Simple ABC Library - XXX</title>
+	<title>Simple ABC Library - XYZ</title>
 </head>
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
 	<div class="container">	
 	
-	
+	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Przykładowy Nagłówek</h1>
 	
 	
 	

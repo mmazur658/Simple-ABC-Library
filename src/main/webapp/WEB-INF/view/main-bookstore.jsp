@@ -12,9 +12,9 @@
 	<div class="container">	
 	
 		<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Księgozbiór</h1>
-		 <button type="button" class="btn btn-sm btn-secondary float-right mt-4" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Znajdź Książkę</button>
+		 <button type="button" class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Znajdź Książkę</button>
 		 <form action ="clearSearchParameters" >
-		 	<button class="btn btn-sm btn-secondary float-right mt-4 mr-1" type="submit">Wyczyść Dane Szukania</button>
+		 	<button class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 mr-1" type="submit">Wyczyść Dane Szukania</button>
 		 </form>
 		 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
 			  <div class="modal-dialog" role="document">
@@ -56,10 +56,6 @@
 						
 						<c:set var="isAvailable" value="${tempBook.isAvailable}"/>
 						
-						<c:url var="reservationLink" value="/book/reservation">					
-								<c:param name="bookId" value="${tempBook.id}"/>					
-						</c:url>
-						
 						<c:url var="bookDetailsLink" value="/book/book-details">					
 								<c:param name="bookId" value="${tempBook.id}"/>					
 						</c:url>
@@ -69,8 +65,8 @@
 							<td>${tempBook.title }</td>
 							<td>${tempBook.author }</td>
 							<c:choose>
-								<c:when test="${isAvailable}"> <td id="isAvailable-column">Dostępna</td> </c:when>
-								<c:otherwise> <td id="isAvailable-column">Niedostępna</td > </c:otherwise>
+								<c:when test="${isAvailable}"> <td>Dostępna</td> </c:when>
+								<c:otherwise> <td>Niedostępna</td > </c:otherwise>
 							</c:choose>
 							
 						</tr>			
