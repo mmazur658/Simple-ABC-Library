@@ -72,15 +72,9 @@ public class BookController {
 
 		HttpSession session = request.getSession();
 
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		if (!(title == null))
 			session.setAttribute("title", title);
@@ -180,16 +174,9 @@ public class BookController {
 	public String clearSearchParameters(HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		session.setAttribute("title", null);
 		session.setAttribute("id", null);
@@ -205,16 +192,9 @@ public class BookController {
 	public String addBookForm(Model theModel, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		Book tempBook = new Book();
 		theModel.addAttribute("book", tempBook);
@@ -227,16 +207,9 @@ public class BookController {
 			HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		bookService.saveBook(tempBook);
 
@@ -249,16 +222,9 @@ public class BookController {
 	public String confirmBookPage(@RequestParam("bookId") int bookId, Model theModel, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		Book tempBook = bookService.getBook(bookId);
 
@@ -273,20 +239,13 @@ public class BookController {
 			RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		int userReservationsCount = (int) session.getAttribute("userReservationsCount");
 		if (userReservationsCount >= 3) {
-			redirectAttributes.addAttribute("systemMessage", "Nie mo¿na zarezerwowaæ wiêcej jak 3 ksi¹¿ki");
+			redirectAttributes.addAttribute("systemErrorMessage", "Nie mo¿na zarezerwowaæ wiêcej jak 3 ksi¹¿ki");
 		} else {
 			int userId = (int) session.getAttribute("userId");
 			Book tempBook = bookService.getBook(bookId);
@@ -310,16 +269,16 @@ public class BookController {
 				String date = sdf.format(calendar.getTime());
 
 				reservation.setStatus("Rezerwacja wa¿na do " + date);
-				redirectAttributes.addAttribute("systemMessage", "Rezerwacja zosta³a dodana.");
-
+				redirectAttributes.addAttribute("systemSuccessMessage", "Rezerwacja zosta³a dodana.");
+				redirectAttributes.addAttribute("bookId", bookId);
 				reservationService.createReservation(reservation);
 
 			} else {
-				redirectAttributes.addAttribute("systemMessage", "Nie mo¿na zarezerwowaæ niedostêpnej ksi¹¿ki . . . ");
+				redirectAttributes.addAttribute("systemErrorMessage", "Nie mo¿na zarezerwowaæ niedostêpnej ksi¹¿ki . . . ");
+				redirectAttributes.addAttribute("bookId", bookId);
 			}
 		}
-
-		return "redirect:/book/main-bookstore";
+		return "redirect:/book/book-details";
 	}
 
 	@RequestMapping("/deleteReservation")
@@ -328,43 +287,28 @@ public class BookController {
 			HttpServletRequest request, RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		Reservation reservation = reservationService.getReservation(reservationId);
 		reservationService.deleteReservationByUser(reservation);
 
-		redirectAttributes.addAttribute("systemMessage", "Rezerwacja zosta³a usuniêta");
+		redirectAttributes.addAttribute("systemSuccessMessage", "Rezerwacja zosta³a usuniêta");
 
 		if (deleteReservationWayBack.equals("main-bookstore"))
 			return "redirect:/book/main-bookstore";
 		else
-			return "redirect:/user/user-details";
-
+			return "redirect:/user/users-books";
 	}
 
 	@RequestMapping("/updateBook")
 	public String updateBookForm(@RequestParam("bookId") int bookId, Model theModel, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		Book tempBook = bookService.getBook(bookId);
 		theModel.addAttribute("book", tempBook);
@@ -377,16 +321,9 @@ public class BookController {
 			HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		try {
 			bookService.updateBook(book);
@@ -405,16 +342,9 @@ public class BookController {
 			RedirectAttributes redirectAttributes, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		Book tempBook = bookService.getBook(bookId);
 
@@ -430,22 +360,19 @@ public class BookController {
 	}
 
 	@RequestMapping("/book-details")
-	public String bookDetails(@RequestParam("bookId") int bookId, Model theModel, HttpServletRequest request) {
+	public String bookDetails(@RequestParam("bookId") int bookId, Model theModel, HttpServletRequest request, 
+			@RequestParam(required=false, name="systemErrorMessage") String systemErrorMessage,
+			@RequestParam(required=false, name="systemSuccessMessage") String systemSuccessMessage) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		Book tempBook = bookService.getBook(bookId);
 		theModel.addAttribute("tempBook", tempBook);
+		theModel.addAttribute("systemErrorMessage",systemErrorMessage);
+		theModel.addAttribute("systemSuccessMessage",systemSuccessMessage);
 		
 		return "book-details";
 	}

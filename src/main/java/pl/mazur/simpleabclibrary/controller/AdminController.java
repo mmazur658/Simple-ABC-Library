@@ -20,5 +20,11 @@ public class AdminController {
 		
 		return "configuration";
 	}
+	
+	@RequestMapping("test-page")
+	public String testPage() {
+		
+		return "test-page";
+	}
 
 }

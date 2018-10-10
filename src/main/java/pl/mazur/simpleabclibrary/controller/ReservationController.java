@@ -44,16 +44,9 @@ public class ReservationController {
 			HttpServletRequest request, Model theModel) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		if (!(customerId == null))
 			session.setAttribute("customerId", customerId);
@@ -147,16 +140,9 @@ public class ReservationController {
 	public String clearReservationSearchParameters(HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		session.setAttribute("customerId", null);
 		session.setAttribute("customerFirstName", null);
@@ -174,16 +160,9 @@ public class ReservationController {
 			RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		reservationService.deleteReservationByEmployee(reservationId);
 		
@@ -199,16 +178,9 @@ public class ReservationController {
 			RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		reservationService.increaseExpirationDate(reservationId);
 		String systemMessage = "Czas rezerwacji wyd³u¿ony o 24h";

@@ -41,16 +41,9 @@ public class MessageController {
 			@RequestParam(required = false, name = "messageInboxStartResult") Integer messageInboxStartResult) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		int userId = (int) session.getAttribute("userId");
 
@@ -97,16 +90,9 @@ public class MessageController {
 			@RequestParam(required = false, name = "messageStartResult") Integer messageSentStartResult) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		int userId = (int) session.getAttribute("userId");
 
@@ -154,16 +140,9 @@ public class MessageController {
 			HttpServletRequest request, RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		messageService.deleteMessage(messageId, boxType);
 		if (boxType.equals("sent")) {
@@ -181,16 +160,9 @@ public class MessageController {
 			HttpServletRequest request, RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		messageService.changeReadStatus(messageId, boxType);
 
@@ -210,16 +182,9 @@ public class MessageController {
 			HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		Message message = messageService.getMessage(messageId);
 		messageService.setReadStatusTrue(messageId, boxType);
@@ -235,16 +200,9 @@ public class MessageController {
 			@RequestParam("boxType") String boxType, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		messageService.setReadStatusFalse(messageId, boxType);
 
@@ -255,16 +213,9 @@ public class MessageController {
 	public String createNewMessage(HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		return "create-new-message";
 
@@ -275,16 +226,9 @@ public class MessageController {
 			HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		Message message = messageService.getMessage(messageId);
 		
@@ -298,16 +242,9 @@ public class MessageController {
 			@RequestParam("textArea") String text, RedirectAttributes redirectAttributesa, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		try {
 			User recipient = userService.getUser(email);

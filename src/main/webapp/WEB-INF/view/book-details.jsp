@@ -1,97 +1,94 @@
 <%@ page pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix = "fmt" uri = "http://java.sun.com/jsp/jstl/fmt" %>
-
-<!DOCTYPE html >
-<html>
-	<head>
-		<link rel="icon"  type="image/x-icon" href="<%=request.getContextPath()%>/resources/image/favicon.ico">
-		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-		<link type="text/css" rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/details-style.css" />
-		<title>Simple ABC Library - Szczegóły Książki</title>
-	</head>
-	<body>
-
-		<c:url var="userDetailsLink" value="/user/user-details">
-			<c:param name="userDetailsUserId" value="${user.id}" />
-			<c:param name="userDetailsWayBack" value="main" />
-		</c:url>
-
-		<header>	
-			<button class="header-button" onclick="window.location.href='${userDetailsLink}'"> <%=session.getAttribute("userFirstName")%> <%=session.getAttribute("userLastName")%></button>
-			<button class="header-button" onclick="window.location.href='${pageContext.request.contextPath}/message-module/message-box-inbox'">MessageBox</button>
-			<button class="header-button" onclick="window.location.href='${pageContext.request.contextPath}/user/logout'">Wyloguj</button>
-		</header>
+<!doctype html>
+<html lang="en">
+<head>
+	<%@ include file="/resources/parts/header.jsp" %>  
+	<title>Simple ABC Library - Szczegóły Książki</title>
+</head>
+<body>
+	<%@ include file="/resources/parts/nav.jsp" %>  
 	
-		<c:if test="${not empty systemMessage}">
-			<div class="system-message-container">
-				<p id="system-message">Komunikat: ${systemMessage}</p>
-			</div>
+	<div class="container">	
+	
+		<c:if test="${not empty systemSuccessMessage}">
+			<div class="alert alert-success mt-2 w-50" role="alert">
+		    	<strong>${systemSuccessMessage}</strong>
+		  	</div>
+		</c:if>	
+		<c:if test="${not empty systemErrorMessage}">
+			<div class="alert alert-danger mt-2 w-50" role="alert">
+		    	<strong>${systemErrorMessage}</strong>
+		  	</div>
+		</c:if>	
+	
+		<table class="table table-borderedless w-50 mb-0" style="text-align: center;">
+			<tr>
+			<td><h1 class="h3 mb-0 font-weight-normal ">Szczegóły Książki</h1></td>
+			</tr>
+		</table>
+		<table class="table table-bordered w-50">
+		  <tbody>
+		    <tr>
+		      <th scope="row">Id: </th>
+		      <td>${tempBook.id}</td>	
+		    </tr>
+		    <tr>
+		      <th scope="row">Tytuł: </th>
+		      <td>${tempBook.title}</td>	
+		    </tr>
+		    <tr>
+		      <th scope="row">Autor: </th>
+		      <td>${tempBook.author}</td>	
+		    </tr>
+		    <tr>
+		      <th scope="row">Język: </th>
+		      <td>${tempBook.language}</td>	
+		    </tr>		   
+		    <tr>
+		      <th scope="row">Wydawca: </th>
+		      <td>${tempBook.publisher}</td>	
+		    </tr>		   
+		    <tr>
+		      <th scope="row">Strony: </th>
+		      <td>${tempBook.pages}</td>	
+		    </tr>	
+		    <tr>
+		      <th scope="row">ISBN: </th>
+		      <td>${tempBook.isbn}</td>	
+		    </tr>			    		   
+		    <tr>
+		      <th scope="row">Dostępność: </th>
+		      <c:choose>
+					<c:when test="${tempBook.isAvailable}"><td>Dostępna</td></c:when>
+					<c:otherwise> <td>Niedostępna</td> </c:otherwise>
+			</c:choose>		
+		    </tr>			    
+		  </tbody>
+		</table>	
+		
+		<c:url var="reservationLink" value="/book/reservation">					
+			<c:param name="bookId" value="${tempBook.id}"/>					
+		</c:url>
+		<c:url var="updateLink" value="/book/updateBook">					
+			<c:param name="bookId" value="${tempBook.id}"/>					
+		</c:url>							
+		<c:url var="deleteLink" value="/book/deleteBook">					
+			<c:param name="bookId" value="${tempBook.id}"/>					
+		</c:url>		
+		<c:url var="generateLabelLink" value="/book/generate-book-label">					
+			<c:param name="bookId" value="${tempBook.id}"/>					
+		</c:url>
+		
+		<a href="${reservationLink}" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true" >Rezerwuj</a>
+		<c:if test="${userAccessLevel eq 'Employee' or  userAccessLevel eq 'Administrator' }">	
+			<a href="${updateLink}" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true" >Aktualizacja</a>
+			<a href="${deleteLink}" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true" >Usuń</a>
+			<a href="${generateLabelLink}" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true" >Etykieta</a>
 		</c:if>
+	</div>
 
-		<div class="wrapper">
-			<div class="container">
-			
-				<a href="${pageContext.request.contextPath}/user/main"><img id="big-logo" src="<%=request.getContextPath()%>/resources/image/ABC_logo.png" alt="ABC Big Logo"></a>
-			
-				<table class="user-details-table">
-					<tr>
-						<td id="header-td" colspan="2">Dane Książki: </td>
-
-					</tr>
-				 		
-					<tr>
-						<th>Id:</th><td>${tempBook.id }</td>
-					</tr><tr>
-						<th>Tytuł:</th><td>${tempBook.title }</td>
-					</tr><tr>
-						<th>Autor:</th><td>${tempBook.author }</td>
-					</tr><tr>
-						<th>Język:</th><td>${tempBook.language }</td>
-					</tr><tr>
-						<th>Wydawnictwo:</th><td>${tempBook.publisher }</td>
-					</tr><tr>
-						<th>Strony:</th><td>${tempBook.pages }</td>
-					</tr><tr>
-						<th>ISBN:</th><td>${tempBook.isbn}</td>
-					</tr><tr>
-						<th>Dostępność:</th>
-						<c:choose>
-								<c:when test="${tempBook.isAvailable}"> <td>Dostępna</td> </c:when>
-								<c:otherwise> <td>Niedostępna</td> </c:otherwise>
-						</c:choose>						
-					</tr>
-				
-				</table>
-			
-				<c:url var="reservationLink" value="/book/reservation">					
-					<c:param name="bookId" value="${tempBook.id}"/>					
-				</c:url>
-				
-				<c:url var="updateLink" value="/book/updateBook">					
-					<c:param name="bookId" value="${tempBook.id}"/>					
-				</c:url>
-							
-				<c:url var="deleteLink" value="/book/deleteBook">					
-					<c:param name="bookId" value="${tempBook.id}"/>					
-				</c:url>
-				
-				<c:url var="generateLabelLink" value="/book/generate-book-label">					
-					<c:param name="bookId" value="${tempBook.id}"/>					
-				</c:url>
-			
-				<button class="big-button" onclick="window.location.href='${reservationLink}'">Rezerwuj</button>
-			
-				<c:if test="${userAccessLevel eq 'Employee' or  userAccessLevel eq 'Administrator' }">	
-					<button class="big-button" onclick="window.location.href='${updateLink}'">Aktualizuj</button>	
-					<button class="big-button" onclick="window.location.href='${deleteLink}'">Usuń </button>
-					<button class="big-button" onclick="window.location.href='${generateLabelLink}'">Etykieta</button>
-				</c:if>
-			
-				<button class="return-button" onclick="history.back()">Wróć</button>
-			
-			</div>
-		</div>
-
-	</body>
+	<%@ include file="/resources/parts/footer.jsp" %> 
+</body>
 </html>

@@ -69,16 +69,9 @@ public class BorrowBookController {
 			Model theModel, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		if (!(borrowBookSelectedUserId == null))
 			session.setAttribute("borrowBookSelectedUserId", borrowBookSelectedUserId);
@@ -168,16 +161,9 @@ public class BorrowBookController {
 	public String clearUserSearchParameters(HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		session.setAttribute("borrowBookSelectedUserId", null);
 		session.setAttribute("borrowBookFirstName", null);
@@ -201,16 +187,9 @@ public class BorrowBookController {
 			Model theModel, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		session.setAttribute("borrowBookStartResult", null);
 
@@ -338,16 +317,9 @@ public class BorrowBookController {
 	public String clearBookSearchParameters(HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		session.setAttribute("borrowBookChooseBookStartResult", null);
 		session.setAttribute("title", null);
@@ -362,16 +334,9 @@ public class BorrowBookController {
 			RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
@@ -399,16 +364,9 @@ public class BorrowBookController {
 			RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
 		Reservation reservation = reservationService.getReservation(reservationId);
@@ -437,16 +395,9 @@ public class BorrowBookController {
 			RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
 
@@ -467,16 +418,9 @@ public class BorrowBookController {
 	public String borrowBooks(HttpServletRequest request, RedirectAttributes redirectAttributes, Model theModel) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
 		
@@ -540,16 +484,9 @@ public class BorrowBookController {
 	public String cancelBookBorrowing(HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((String) session.getAttribute("userFirstName"),
-				(String) session.getAttribute("userLastName"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
-		if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) {
-			session.invalidate();
-			return "redirect:/user/login-page";
-		}
+		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
+				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+			return "redirect:/user/logout";
 
 		session.setAttribute("borrowBookSelectedUserId", null);
 		session.setAttribute("borrowBookFirstName", null);

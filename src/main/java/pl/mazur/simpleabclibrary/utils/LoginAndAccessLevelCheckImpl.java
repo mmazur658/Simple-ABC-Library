@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 public class LoginAndAccessLevelCheckImpl implements LoginAndAccessLevelCheck {
 
 	@Override
-	public boolean loginCheck(String firstName, String lastname) {
+	public boolean loginCheck(Integer userId) {
 
-		if (firstName != null && lastname != null)
+		if (userId != null)
 			return true;
 		else
 			return false;

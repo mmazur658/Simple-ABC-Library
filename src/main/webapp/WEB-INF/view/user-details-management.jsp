@@ -1,28 +1,22 @@
 <%@ page pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix = "fmt" uri = "http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <!doctype html>
 <html lang="en">
 <head>
 	<%@ include file="/resources/parts/header.jsp" %>  
-	<title>Simple ABC Library - Twoje Dane</title>
+	<title>Simple ABC Library - Szczegóły Użytkwonika</title>
 </head>
 <body>
-	<%@ include file="/resources/parts/nav.jsp" %> 
-		
+	<%@ include file="/resources/parts/nav.jsp" %>  
 	
-	<div class="container">
+	<div class="container">	
 	
-		<c:if test="${not empty systemMessage}">
-			<div class="alert alert-success mt-2 w-50" role="alert">
-		    	<strong>${systemMessage}</strong>
-		  	</div>
-		</c:if>	
 			
 		<table class="table table-borderedless w-50 mb-0" style="text-align: center;">
 			<tr>
-			<td><h1 class="h3 mb-0 font-weight-normal ">Twoje Dane</h1></td>
+			<td><h1 class="h3 mb-0 font-weight-normal ">Dane Użytkownika</h1></td>
+			
 			</tr>
 		</table>
 		
@@ -74,9 +68,18 @@
 		    </tr>	  
 		  </tbody>
 		</table>	
-		<a href="${pageContext.request.contextPath}/user/user-update-form" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true" >Aktualizaja Danych</a>
-	</div>
+		
+		<c:url var="updateUserLink" value="/user/user-management-update-form">					
+			<c:param name="userDetailsUserId" value="${theUser.id}"/>					
+		</c:url>
 	
+		<a href="${updateUserLink}" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true">Aktualizaja Danych</a>
+		<a href="#" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true">Resetuj Hasło</a>
+		<a href="#" class="btn btn-sm btn-secondary btn-block w-50" role="button" aria-pressed="true">Książki</a>
+		<a href="#" class="btn btn-sm btn-secondary btn-block w-50 mb-5" role="button" aria-pressed="true">Zmiana Uprawnień</a>
+	
+	</div>
+
 	<%@ include file="/resources/parts/footer.jsp" %> 
 </body>
 </html>
