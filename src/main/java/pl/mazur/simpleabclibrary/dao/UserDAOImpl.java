@@ -24,7 +24,7 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	public void saveUser(User theUser) {
-		
+
 		Session session = sessionFactory.getCurrentSession();
 
 		theUser.setActive(true);
@@ -38,11 +38,11 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	public User getUser(int theId) {
-		
+
 		Session session = sessionFactory.getCurrentSession();
-		
+
 		User tempUser = session.get(User.class, theId);
-		
+
 		return tempUser;
 	}
 
@@ -50,7 +50,7 @@ public class UserDAOImpl implements UserDAO {
 	public User getUser(String email) {
 
 		Session session = sessionFactory.getCurrentSession();
-		
+
 		String hql = "select id from User where email=:email";
 		Query theQuery = session.createQuery(hql);
 		theQuery.setParameter("email", email.trim());
@@ -141,7 +141,7 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	public List<User> getAllUsers(int startResult) {
-		
+
 		Session session = sessionFactory.getCurrentSession();
 
 		List<User> usersList = new ArrayList<>();
@@ -161,7 +161,7 @@ public class UserDAOImpl implements UserDAO {
 		List<User> userList = new ArrayList<>();
 
 		sb.append("from User where ");
-		
+
 		if (!userSearchParameters[0].equals("")) {
 			sb.append("id like '%" + userSearchParameters[0] + "%'");
 			isContent = true;
@@ -223,20 +223,18 @@ public class UserDAOImpl implements UserDAO {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
-
 		}
-
 	}
 
 	@Override
 	public long getAmountOfSearchResult(String[] userSearchParameters) {
-		
+
 		boolean isContent = false;
 		StringBuilder sb = new StringBuilder();
 		List<User> userList = new ArrayList<>();
 
 		sb.append("SELECT COUNT(*) FROM User where ");
-		
+
 		if (!userSearchParameters[0].equals("")) {
 			sb.append("id like '%" + userSearchParameters[0] + "%'");
 			isContent = true;
@@ -296,18 +294,18 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	public long getAmountOfAllBooks() {
-		
+
 		Session session = sessionFactory.getCurrentSession();
-		
+
 		Query theQuery = session.createQuery("select count(*) from User WHERE isActive = true ORDER BY id ASC");
 		Long count = (Long) theQuery.uniqueResult();
-		
+
 		return count;
 	}
 
 	@Override
 	public void increaseUserAccessLevel(User theUser) {
-		
+
 		Session session = sessionFactory.getCurrentSession();
 		session.update(theUser);
 
@@ -315,7 +313,7 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	public void decreaseUserAccessLevel(User theUser) {
-		
+
 		Session session = sessionFactory.getCurrentSession();
 		session.update(theUser);
 

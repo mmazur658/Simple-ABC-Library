@@ -33,8 +33,8 @@ public class ReservationServiceImpl implements ReservationService {
 
 	@Override
 	@Transactional
-	public void deleteReservationInOrderToCreateBookBorrowing(Reservation reservation) {
-		reservationDAO.deleteReservationInOrderToCreateBookBorrowing(reservation);
+	public void deleteReservationInOrderToCreateBorrowedBook(Reservation reservation) {
+		reservationDAO.deleteReservationInOrderToCreateBorrowedBook(reservation);
 		bookDAO.setBookActive(reservation.getBook());
 	}
 

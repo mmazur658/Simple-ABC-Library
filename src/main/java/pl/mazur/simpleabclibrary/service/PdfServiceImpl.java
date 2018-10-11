@@ -32,9 +32,9 @@ public class PdfServiceImpl implements PdfService {
 	}
 
 	@Override
-	public File generateBookBorrowingConfirmation(List<Book> bookList, User tempUser, Date expectedEndDate,
+	public File generateBorrowedBookConfirmation(List<Book> bookList, User tempUser, Date expectedEndDate,
 			String employeeName) {
-		return pdfDocumentGenerator.generateBookBorrowingConfirmation(bookList, tempUser, expectedEndDate,
+		return pdfDocumentGenerator.generateBorrowedBookConfirmation(bookList, tempUser, expectedEndDate,
 				employeeName);
 	}
 

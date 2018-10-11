@@ -11,7 +11,7 @@ public interface ReservationDAO {
 
 	Reservation getReservation(int reservationId);
 
-	void deleteReservationInOrderToCreateBookBorrowing(Reservation reservation);
+	void deleteReservationInOrderToCreateBorrowedBook(Reservation reservation);
 
 	List<Reservation> getAllReservation(boolean isActive);
 

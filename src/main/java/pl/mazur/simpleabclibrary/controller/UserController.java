@@ -22,7 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import pl.mazur.simpleabclibrary.entity.BookBorrowing;
+import com.itextpdf.text.log.SysoCounter;
+
+import pl.mazur.simpleabclibrary.entity.BorrowedBook;
 import pl.mazur.simpleabclibrary.entity.Reservation;
 import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.service.BookService;
@@ -112,7 +114,6 @@ public class UserController {
 
 		} else {
 			redirectAttributes.addAttribute("incorrectPasswordMessage", "Nieprawid³owe dane logowania");
-
 			return "redirect:/user/login-page";
 		}
 	}
@@ -152,15 +153,14 @@ public class UserController {
 	@RequestMapping("/saveUser")
 	public String saveUser(@ModelAttribute("user") User theUser, Model theModel, HttpServletRequest request,
 			RedirectAttributes redirectAttributes) {
-
+		
 		boolean isExist = userService.checkEmailIsExist(theUser.getEmail());
 
 		if (!passwordValidator.validate(theUser.getPassword())) {
-
 			redirectAttributes.addAttribute("systemMessage", "Has³o nie spe³nia wymagañ");
 			return "redirect:/user/create-user-form";
-
 		}
+		
 		if (isExist) {
 			theModel.addAttribute("isExist", isExist);
 			return "confirm-page";
@@ -238,8 +238,7 @@ public class UserController {
 		}
 
 		boolean isPeselCorrect;
-		if (theUser.getPesel() == null || theUser.getPesel().equals("")) {
-		} else {
+		if (theUser.getPesel() != null || !theUser.getPesel().equals("")) {
 			isPeselCorrect = userService.validatePesel(theUser.getPesel());
 			if (!isPeselCorrect) {
 				redirectAttributes.addAttribute("systemMessage", "Nieprawid³owy PESEL!!");
@@ -355,26 +354,26 @@ public class UserController {
 				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
 			return "redirect:/user/logout";
 
-		if (!(userManagementUserId == null))
+		if (userManagementUserId != null)
 			session.setAttribute("userManagementUserId", userManagementUserId);
-		if (!(userManagementFirstName == null))
+		if (userManagementFirstName != null)
 			session.setAttribute("userManagementFirstName", userManagementFirstName);
-		if (!(userManagementLastName == null))
+		if (userManagementLastName != null)
 			session.setAttribute("userManagementLastName", userManagementLastName);
-		if (!(userManagementEmail == null))
+		if (userManagementEmail != null)
 			session.setAttribute("userManagementEmail", userManagementEmail);
-		if (!(userManagementPesel == null))
+		if (userManagementPesel != null)
 			session.setAttribute("userManagementPesel", userManagementPesel);
 
-		if ((userManagementUserId == null) && !(session.getAttribute("userManagementUserId") == null))
+		if ((userManagementUserId == null) && (session.getAttribute("userManagementUserId") != null))
 			userManagementUserId = String.valueOf(session.getAttribute("userManagementUserId"));
-		if ((userManagementFirstName == null) && !(session.getAttribute("userManagementFirstName") == null))
+		if ((userManagementFirstName == null) && (session.getAttribute("userManagementFirstName") != null))
 			userManagementFirstName = String.valueOf(session.getAttribute("userManagementFirstName"));
-		if ((userManagementLastName == null) && !(session.getAttribute("userManagementLastName") == null))
+		if ((userManagementLastName == null) && (session.getAttribute("userManagementLastName") != null))
 			userManagementLastName = String.valueOf(session.getAttribute("userManagementLastName"));
-		if ((userManagementEmail == null) && !(session.getAttribute("userManagementEmail") == null))
+		if ((userManagementEmail == null) && (session.getAttribute("userManagementEmail") != null))
 			userManagementEmail = String.valueOf(session.getAttribute("userManagementEmail"));
-		if ((userManagementPesel == null) && !(session.getAttribute("userManagementPesel") == null))
+		if ((userManagementPesel == null) && (session.getAttribute("userManagementPesel") != null))
 			userManagementPesel = String.valueOf(session.getAttribute("userManagementPesel"));
 
 		String[] userSearchParameters = { "", "", "", "", "", "", "", "" };
@@ -424,7 +423,6 @@ public class UserController {
 			showLessLinkValue = userManagementStartResult - 10;
 		}
 
-		// session.setAttribute("returnBookStartResult", userManagementStartResult);
 		theModel.addAttribute("userManagementStartResult", userManagementStartResult);
 		theModel.addAttribute("amountOfResults", amountOfResults);
 		theModel.addAttribute("showMoreLinkValue", showMoreLinkValue);
@@ -492,11 +490,11 @@ public class UserController {
 		int theUserId = (Integer) session.getAttribute("userId");
 
 		List<Reservation> reservationList = reservationService.getUserReservations(theUserId);
-		List<BookBorrowing> bookBorrowingList = bookService.getUserBookBorrowing(theUserId);
+		List<BorrowedBook> borrowedBookList = bookService.getUserBorrowedBookList(theUserId);
 		
 		theModel.addAttribute("systemSuccessMessage",systemSuccessMessage);
 		theModel.addAttribute("reservationList", reservationList);
-		theModel.addAttribute("bookBorrowingList", bookBorrowingList);
+		theModel.addAttribute("borrowedBookList", borrowedBookList);
 
 		return "users-books";
 	}

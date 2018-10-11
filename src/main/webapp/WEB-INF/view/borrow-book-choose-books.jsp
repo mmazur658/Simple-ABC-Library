@@ -141,7 +141,7 @@
 <!--  tablica z wybranymi książkami, po kliknięciu usuwa -->	
 	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Wybrane Książki</h1>
 		
-	<form action="cancel-book-borrowing">
+	<form action="cancel-borrowed-book">
 		<button class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4"  type="submit">Anuluj Wydanie</button>	
 	</form>
 	

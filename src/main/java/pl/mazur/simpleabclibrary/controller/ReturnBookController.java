@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pl.mazur.simpleabclibrary.entity.Book;
-import pl.mazur.simpleabclibrary.entity.BookBorrowing;
+import pl.mazur.simpleabclibrary.entity.BorrowedBook;
 import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.PdfService;
@@ -176,7 +176,7 @@ public class ReturnBookController {
 				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
 			return "redirect:/user/logout";
 
-		List<BookBorrowing> userBorrowedBooksList = bookService.getUserBookBorrowing(selectedUserId);
+		List<BorrowedBook> userBorrowedBooksList = bookService.getUserBorrowedBookList(selectedUserId);
 		List<Book> tempReturnedBookList = new ArrayList<>();
 		session.setAttribute("tempReturnedBookList", tempReturnedBookList);
 		session.setAttribute("userBorrowedBooksList", userBorrowedBooksList);
@@ -197,7 +197,7 @@ public class ReturnBookController {
 
 		int theUserId = (int) session.getAttribute("selectedUserId");
 		User theUser = userService.getUser(theUserId);
-		List<BookBorrowing> userBorrowedBooksList = (List<BookBorrowing>) session.getAttribute("userBorrowedBooksList");
+		List<BorrowedBook> userBorrowedBooksList = (List<BorrowedBook>) session.getAttribute("userBorrowedBooksList");
 		List<Book> tempReturnedBookList = (List<Book>) session.getAttribute("tempReturnedBookList");
 
 		theModel.addAttribute("theUser", theUser);
@@ -217,13 +217,13 @@ public class ReturnBookController {
 				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
 			return "redirect:/user/logout";
 
-		List<BookBorrowing> userBorrowedBooksList = (List<BookBorrowing>) session.getAttribute("userBorrowedBooksList");
+		List<BorrowedBook> userBorrowedBooksList = (List<BorrowedBook>) session.getAttribute("userBorrowedBooksList");
 		List<Book> tempReturnedBookList = (List<Book>) session.getAttribute("tempReturnedBookList");
 
 		for (int index = 0; index < tempReturnedBookList.size(); index++) {
 			if (tempReturnedBookList.get(index).getId() == bookId) {
 				tempReturnedBookList.remove(index);
-				userBorrowedBooksList.add(bookService.getBookBorrowing(bookId));
+				userBorrowedBooksList.add(bookService.getBorrowedBook(bookId));
 				break;
 			}
 		}
@@ -243,7 +243,7 @@ public class ReturnBookController {
 				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
 			return "redirect:/user/logout";
 
-		List<BookBorrowing> userBorrowedBooksList = (List<BookBorrowing>) session.getAttribute("userBorrowedBooksList");
+		List<BorrowedBook> userBorrowedBooksList = (List<BorrowedBook>) session.getAttribute("userBorrowedBooksList");
 		List<Book> tempReturnedBookList = (List<Book>) session.getAttribute("tempReturnedBookList");
 
 		for (int index = 0; index < userBorrowedBooksList.size(); index++) {
@@ -268,7 +268,7 @@ public class ReturnBookController {
 				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
 			return "redirect:/user/logout";
 
-		List<BookBorrowing> userBorrowedBooksList = (List<BookBorrowing>) session.getAttribute("userBorrowedBooksList");
+		List<BorrowedBook> userBorrowedBooksList = (List<BorrowedBook>) session.getAttribute("userBorrowedBooksList");
 		List<Book> tempReturnedBookList = (List<Book>) session.getAttribute("tempReturnedBookList");
 
 		for (int index = 0; index < userBorrowedBooksList.size(); index++) {
@@ -303,7 +303,7 @@ public class ReturnBookController {
 			sb.append(" ");
 
 			for (Book book : tempReturnedBookList) {
-				bookService.closeBookBorrowing(book);
+				bookService.closeBorrowedBook(book);
 				bookService.returnBook(book);
 				sb.append(book.getId());
 				sb.append(" ");

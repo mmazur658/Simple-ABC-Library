@@ -57,12 +57,12 @@
 			    </tr>
 			  </thead>
 			  <tbody>			  
-			 	<c:forEach var="tempBookBorrowing" items="${bookBorrowingList}">
+			 	<c:forEach var="tempBorrowedBook" items="${borrowedBookList}">
 					<tr>
-						<td>${tempBookBorrowing.book.id}</td>
-						<td>${tempBookBorrowing.book.title}</td>
-						<td>${tempBookBorrowing.book.author }</td>
-						<td><fmt:formatDate value="${tempBookBorrowing.expectedEndDate}" pattern="hh:mm dd-MM"/></td>		
+						<td>${tempBorrowedBook.book.id}</td>
+						<td>${tempBorrowedBook.book.title}</td>
+						<td>${tempBorrowedBook.book.author }</td>
+						<td><fmt:formatDate value="${tempBorrowedBook.expectedEndDate}" pattern="hh:mm dd-MM"/></td>		
 					</tr>
 				</c:forEach>	
 			</tbody>

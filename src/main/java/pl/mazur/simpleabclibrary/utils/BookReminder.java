@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import pl.mazur.simpleabclibrary.entity.BookBorrowing;
+import pl.mazur.simpleabclibrary.entity.BorrowedBook;
 import pl.mazur.simpleabclibrary.entity.Message;
 import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.MessageService;
@@ -34,24 +34,24 @@ public class BookReminder {
 		Long currentTimeMillis = System.currentTimeMillis();
 		Long expTimeMillis;
 		Message message;
-		List<BookBorrowing> bookBorrowingList = bookService.getAllBookBorrowing();
+		List<BorrowedBook> borrowedBookList = bookService.getAllBorrowedBookList();
 
-		for (BookBorrowing bookBorrowing : bookBorrowingList) {
-			expTimeMillis = bookBorrowing.getExpectedEndDate().getTime();
+		for (BorrowedBook borrowedBook : borrowedBookList) {
+			expTimeMillis = borrowedBook.getExpectedEndDate().getTime();
 
 			if (expTimeMillis - (1000 * 60 * 60 * 24) < currentTimeMillis
 					&& expTimeMillis - (1000 * 60 * 60 * 23) > currentTimeMillis) {
 
 				message = new Message();
-				message.setRecipient(bookBorrowing.getUser());
+				message.setRecipient(borrowedBook.getUser());
 				message.setRecipientIsActive(true);
 				message.setRecipientIsRead(false);
 				message.setSender(userService.getUser(1));
 				message.setSenderIsActive(false);
 				message.setSenderIsRead(true);
 				message.setStartDate(new Date());
-				message.setSubject("Przypomnienie o zwrocie ksi¹¿ki: " + bookBorrowing.getBook().getTitle());
-				message.setText("Pozosta³o mniej ni¿ 24h na zwrot ksi¹¿ki: " + bookBorrowing.getBook().getTitle()
+				message.setSubject("Przypomnienie o zwrocie ksi¹¿ki: " + borrowedBook.getBook().getTitle());
+				message.setText("Pozosta³o mniej ni¿ 24h na zwrot ksi¹¿ki: " + borrowedBook.getBook().getTitle()
 						+ ". Prosimy o terminowy zwrot.");
 				messageService.sendMessage(message);
 			}
@@ -64,24 +64,24 @@ public class BookReminder {
 		Long currentTimeMillis = System.currentTimeMillis();
 		Long expTimeMillis;
 		Message message;
-		List<BookBorrowing> bookBorrowingList = bookService.getAllBookBorrowing();
+		List<BorrowedBook> borrowedBookList = bookService.getAllBorrowedBookList();
 
-		for (BookBorrowing bookBorrowing : bookBorrowingList) {
-			expTimeMillis = bookBorrowing.getExpectedEndDate().getTime();
+		for (BorrowedBook borrowedBook : borrowedBookList) {
+			expTimeMillis = borrowedBook.getExpectedEndDate().getTime();
 
 			if (expTimeMillis - (1000 * 60 * 60 * 6) < currentTimeMillis
 					&& expTimeMillis - (1000 * 60 * 60 * 5) > currentTimeMillis) {
 
 				message = new Message();
-				message.setRecipient(bookBorrowing.getUser());
+				message.setRecipient(borrowedBook.getUser());
 				message.setRecipientIsActive(true);
 				message.setRecipientIsRead(false);
 				message.setSender(userService.getUser(1));
 				message.setSenderIsActive(false);
 				message.setSenderIsRead(true);
 				message.setStartDate(new Date());
-				message.setSubject("Przypomnienie o zwrocie ksi¹¿ki: " + bookBorrowing.getBook().getTitle());
-				message.setText("Pozosta³o mniej ni¿ 6h na zwrot ksi¹¿ki: " + bookBorrowing.getBook().getTitle()
+				message.setSubject("Przypomnienie o zwrocie ksi¹¿ki: " + borrowedBook.getBook().getTitle());
+				message.setText("Pozosta³o mniej ni¿ 6h na zwrot ksi¹¿ki: " + borrowedBook.getBook().getTitle()
 						+ ". Prosimy o terminowy zwrot.");
 				messageService.sendMessage(message);
 
@@ -96,24 +96,24 @@ public class BookReminder {
 		Long expTimeMillis;
 		Message message;
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		List<BookBorrowing> bookBorrowingList = bookService.getAllBookBorrowing();
+		List<BorrowedBook> borrowedBookList = bookService.getAllBorrowedBookList();
 
-		for (BookBorrowing bookBorrowing : bookBorrowingList) {
-			expTimeMillis = bookBorrowing.getExpectedEndDate().getTime();
+		for (BorrowedBook borrowedBook : borrowedBookList) {
+			expTimeMillis = borrowedBook.getExpectedEndDate().getTime();
 
 			if (expTimeMillis < currentTimeMillis) {
 
 				message = new Message();
-				message.setRecipient(bookBorrowing.getUser());
+				message.setRecipient(borrowedBook.getUser());
 				message.setRecipientIsActive(true);
 				message.setRecipientIsRead(false);
 				message.setSender(userService.getUser(1));
 				message.setSenderIsActive(false);
 				message.setSenderIsRead(true);
 				message.setStartDate(new Date());
-				message.setSubject("Przypomnienie o zwrocie ksi¹¿ki: " + bookBorrowing.getBook().getTitle());
+				message.setSubject("Przypomnienie o zwrocie ksi¹¿ki: " + borrowedBook.getBook().getTitle());
 				message.setText("Posiadasz ksi¹¿kê, która powinna zostaæ zwrócona do "
-						+ sdf.format(bookBorrowing.getExpectedEndDate())
+						+ sdf.format(borrowedBook.getExpectedEndDate())
 						+ ". Prosimy o mo¿liwie najszybszy zwrot ksi¹¿ki.");
 				messageService.sendMessage(message);
 			}

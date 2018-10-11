@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 import pl.mazur.simpleabclibrary.entity.Book;
 import pl.mazur.simpleabclibrary.entity.Reservation;
 import pl.mazur.simpleabclibrary.entity.User;
-import pl.mazur.simpleabclibrary.entity.BookBorrowing;
+import pl.mazur.simpleabclibrary.entity.BorrowedBook;
 
 @Repository
 public class BookDAOImpl implements BookDAO {
@@ -170,17 +170,17 @@ public class BookDAOImpl implements BookDAO {
 
 		Session session = sessionFactory.getCurrentSession();
 
-		BookBorrowing bookBorrowing = new BookBorrowing();
-		bookBorrowing.setBook(tempBook);
-		bookBorrowing.setUser(tempUser);
-		bookBorrowing.setStartDate(new Date());
+		BorrowedBook borrowedBook = new BorrowedBook();
+		borrowedBook.setBook(tempBook);
+		borrowedBook.setUser(tempUser);
+		borrowedBook.setStartDate(new Date());
 
 		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(bookBorrowing.getStartDate());
+		calendar.setTime(borrowedBook.getStartDate());
 		calendar.add(Calendar.DATE, 14);
 
-		bookBorrowing.setExpectedEndDate(calendar.getTime());
-		session.save(bookBorrowing);
+		borrowedBook.setExpectedEndDate(calendar.getTime());
+		session.save(borrowedBook);
 
 		tempBook.setIsAvailable(false);
 		session.update(tempBook);
@@ -188,17 +188,17 @@ public class BookDAOImpl implements BookDAO {
 	}
 
 	@Override
-	public List<BookBorrowing> getUserBookBorrowing(int userId) {
+	public List<BorrowedBook> getUserBorrowedBookList(int userId) {
 
 		Session session = sessionFactory.getCurrentSession();
 
-		List<BookBorrowing> userBookBorrowingList = new ArrayList<>();
+		List<BorrowedBook> userBorrowedBookList = new ArrayList<>();
 		Query theQuery = session
-				.createQuery("from BookBorrowing where user.id=:id AND stopDate = null ORDER BY id ASC");
+				.createQuery("from BorrowedBook where user.id=:id AND stopDate = null ORDER BY id ASC");
 		theQuery.setParameter("id", userId);
-		userBookBorrowingList = theQuery.getResultList();
+		userBorrowedBookList = theQuery.getResultList();
 
-		return userBookBorrowingList;
+		return userBorrowedBookList;
 
 	}
 
@@ -213,24 +213,24 @@ public class BookDAOImpl implements BookDAO {
 	}
 
 	@Override
-	public void closeBoorowingBook(Book book) {
+	public void closeBorrowedBook(Book book) {
 
 		Session session = sessionFactory.getCurrentSession();
 
 		Query theQuery = session
-				.createQuery("from BookBorrowing where book.id=:id and stopDate = null ORDER BY id ASC");
+				.createQuery("from BorrowedBook where book.id=:id and stopDate = null ORDER BY id ASC");
 		theQuery.setParameter("id", book.getId());
-		BookBorrowing bookBorrowing = (BookBorrowing) theQuery.getSingleResult();
-		bookBorrowing.setStopDate(new Date());
-		session.update(bookBorrowing);
+		BorrowedBook borrowedBook = (BorrowedBook) theQuery.getSingleResult();
+		borrowedBook.setStopDate(new Date());
+		session.update(borrowedBook);
 
 	}
 
 	@Override
-	public BookBorrowing getBookBorrowing(int bookBorrowingId) {
+	public BorrowedBook getBorrowedBook(int borrowedBookId) {
 		Session session = sessionFactory.getCurrentSession();
-		BookBorrowing bookBorrowing = session.get(BookBorrowing.class, bookBorrowingId);
-		return bookBorrowing;
+		BorrowedBook borrowedBook = session.get(BorrowedBook.class, borrowedBookId);
+		return borrowedBook;
 	}
 
 	@Override
@@ -239,12 +239,12 @@ public class BookDAOImpl implements BookDAO {
 		Session session = sessionFactory.getCurrentSession();
 
 		Query theQuery = session.createQuery(
-				"from BookBorrowing where book.id=:id and user.id=:userid and stopDate = null ORDER BY id ASC");
+				"from BorrowedBook where book.id=:id and user.id=:userid and stopDate = null ORDER BY id ASC");
 		theQuery.setParameter("id", book.getId());
 		theQuery.setParameter("userid", tempUser.getId());
-		BookBorrowing bookBorrowing = (BookBorrowing) theQuery.getSingleResult();
+		BorrowedBook borrowedBook = (BorrowedBook) theQuery.getSingleResult();
 
-		return bookBorrowing.getExpectedEndDate();
+		return borrowedBook.getExpectedEndDate();
 	}
 
 	@Override
@@ -332,14 +332,14 @@ public class BookDAOImpl implements BookDAO {
 	}
 
 	@Override
-	public List<BookBorrowing> getAllBookBorrowing() {
+	public List<BorrowedBook> getAllBorrowedBookList() {
 
 		Session session = sessionFactory.getCurrentSession();
-		List<BookBorrowing> bookBorrowingList = new ArrayList<>();
-		Query theQuery = session.createQuery("FROM BookBorrowing WHERE stopDate = null ORDER BY id ASC");
-		bookBorrowingList = theQuery.getResultList();
+		List<BorrowedBook> borrowedBookList = new ArrayList<>();
+		Query theQuery = session.createQuery("FROM BorrowedBook WHERE stopDate = null ORDER BY id ASC");
+		borrowedBookList = theQuery.getResultList();
 
-		return bookBorrowingList;
+		return borrowedBookList;
 	}
 
 	@Override

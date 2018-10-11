@@ -69,7 +69,7 @@ public class ReservationDAOImpl implements ReservationDAO {
 	}
 
 	@Override
-	public void deleteReservationInOrderToCreateBookBorrowing(Reservation reservation) {
+	public void deleteReservationInOrderToCreateBorrowedBook(Reservation reservation) {
 
 		Session session = sessionFactory.getCurrentSession();
 		

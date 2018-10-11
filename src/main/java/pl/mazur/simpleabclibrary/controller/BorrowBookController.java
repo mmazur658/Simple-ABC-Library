@@ -27,7 +27,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.mazur.simpleabclibrary.entity.Book;
 import pl.mazur.simpleabclibrary.entity.Reservation;
 import pl.mazur.simpleabclibrary.entity.User;
-import pl.mazur.simpleabclibrary.entity.BookBorrowing;
+import pl.mazur.simpleabclibrary.entity.BorrowedBook;
 import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.PdfService;
 import pl.mazur.simpleabclibrary.service.ReservationService;
@@ -206,7 +206,7 @@ public class BorrowBookController {
 			theUserId = Integer.valueOf(selectedUserId);
 
 		User user = userService.getUser(theUserId);
-		List<BookBorrowing> borrowedBookList = bookService.getUserBookBorrowing(user.getId());
+		List<BorrowedBook> borrowedBookList = bookService.getUserBorrowedBookList(user.getId());
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
 		List<Reservation> tempReservationList = reservationService.getUserReservations(theUserId);
 
@@ -221,9 +221,9 @@ public class BorrowBookController {
 		}
 
 		if (isAbleToBorrow) {
-			for (BookBorrowing borrowingBook : borrowedBookList) {
+			for (BorrowedBook borrowedBook : borrowedBookList) {
 				Long currentTimeMillis = System.currentTimeMillis();
-				Long expTimeMillis = borrowingBook.getExpectedEndDate().getTime();
+				Long expTimeMillis = borrowedBook.getExpectedEndDate().getTime();
 
 				if (currentTimeMillis > expTimeMillis) {
 					isAbleToBorrow = false;
@@ -395,7 +395,7 @@ public class BorrowBookController {
 			}
 
 			if (!isAllreadyOnTheList) {
-				reservationService.deleteReservationInOrderToCreateBookBorrowing(reservation);
+				reservationService.deleteReservationInOrderToCreateBorrowedBook(reservation);
 				tempBookList.add(theBook);
 				session.setAttribute("tempBookList", tempBookList);
 				redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka zosta³a dodana do listy");
@@ -461,9 +461,9 @@ public class BorrowBookController {
 				sb.append(tempBook.getId());
 				sb.append(" ");
 			}
-			String bookBorrowingInfo = sb.toString();
+			String borrowedBookInfo = sb.toString();
 
-			theModel.addAttribute("bookBorrowingInfo", bookBorrowingInfo);
+			theModel.addAttribute("borrowedBookInfo", borrowedBookInfo);
 			session.setAttribute("isUserAbleToBorrow", false);
 			session.setAttribute("tempBookList", null);
 
@@ -471,15 +471,15 @@ public class BorrowBookController {
 		}
 	}
 
-	@RequestMapping("/generate-book-borrowing-confirmation")
-	public ResponseEntity<InputStreamResource> generateBookBorrowingConfirmation(
-			@RequestParam("bookBorrowingInfo") String bookBorrowingInfo, HttpServletRequest request)
+	@RequestMapping("/generate-borrowed-book-confirmation")
+	public ResponseEntity<InputStreamResource> generateBorrowedBookConfirmation(
+			@RequestParam("borrowedBookInfo") String borrowedBookInfo, HttpServletRequest request)
 			throws FileNotFoundException {
 
 		HttpSession session = request.getSession();
 
 		int bookId;
-		StringTokenizer st = new StringTokenizer(bookBorrowingInfo);
+		StringTokenizer st = new StringTokenizer(borrowedBookInfo);
 		List<Book> bookList = new ArrayList<>();
 		User tempUser = userService.getUser(Integer.valueOf(st.nextToken()));
 
@@ -490,7 +490,7 @@ public class BorrowBookController {
 
 		Date expectedEndDate = bookService.getExpectedEndDate(tempUser, bookList.get(0));
 		String employeeName = session.getAttribute("userLastName") + " " + session.getAttribute("userFirstName");
-		File tempFile = pdfService.generateBookBorrowingConfirmation(bookList, tempUser, expectedEndDate, employeeName);
+		File tempFile = pdfService.generateBorrowedBookConfirmation(bookList, tempUser, expectedEndDate, employeeName);
 
 		HttpHeaders responseHeaders = new HttpHeaders();
 		responseHeaders.setContentType(MediaType.APPLICATION_PDF);
@@ -502,8 +502,8 @@ public class BorrowBookController {
 
 	}
 
-	@RequestMapping("/cancel-book-borrowing")
-	public String cancelBookBorrowing(HttpServletRequest request) {
+	@RequestMapping("/cancel-borrowed-book")
+	public String cancelBorrowedBook(HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
 		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))

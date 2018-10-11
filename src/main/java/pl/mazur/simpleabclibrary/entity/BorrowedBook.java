@@ -12,8 +12,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "borrowing")
-public class BookBorrowing {
+@Table(name = "borrowed_books")
+public class BorrowedBook {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -85,7 +85,7 @@ public class BookBorrowing {
 		this.expectedEndDate = expectedEndDate;
 	}
 
-	public BookBorrowing(Book book, User user, Date startDate, Date stopDate, Date expectedEndDate) {
+	public BorrowedBook(Book book, User user, Date startDate, Date stopDate, Date expectedEndDate) {
 		this.book = book;
 		this.user = user;
 		this.startDate = startDate;
@@ -93,13 +93,13 @@ public class BookBorrowing {
 		this.expectedEndDate = expectedEndDate;
 	}
 
-	public BookBorrowing() {
+	public BorrowedBook() {
 
 	}
 
 	@Override
 	public String toString() {
-		return "BookBorrowing [id=" + id + ", book=" + book + ", user=" + user + ", startDate=" + startDate
+		return "BorrowedBook [id=" + id + ", book=" + book + ", user=" + user + ", startDate=" + startDate
 				+ ", stopDate=" + stopDate + ", expectedEndDate=" + expectedEndDate + "]";
 	}
 

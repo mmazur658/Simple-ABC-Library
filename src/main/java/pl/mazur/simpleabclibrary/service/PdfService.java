@@ -13,7 +13,7 @@ public interface PdfService {
 
 	File generateCreatedAccountConfirmation(User theUser);
 
-	File generateBookBorrowingConfirmation(List<Book> bookList, User tempUser, Date expectedEndDate,
+	File generateBorrowedBookConfirmation(List<Book> bookList, User tempUser, Date expectedEndDate,
 			String employeeName);
 
 	File generateReturnBookConfirmation(User tempUser, String employeeName, List<Book> bookList);

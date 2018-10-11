@@ -5,7 +5,7 @@ import java.util.List;
 
 import pl.mazur.simpleabclibrary.entity.Book;
 import pl.mazur.simpleabclibrary.entity.User;
-import pl.mazur.simpleabclibrary.entity.BookBorrowing;
+import pl.mazur.simpleabclibrary.entity.BorrowedBook;
 
 public interface BookService {
 
@@ -23,13 +23,13 @@ public interface BookService {
 
 	public void borrowBook(Book tempBook, User tempUser);
 
-	public List<BookBorrowing> getUserBookBorrowing(int userId);
+	public List<BorrowedBook> getUserBorrowedBookList(int userId);
 
 	public void returnBook(Book book);
 
-	public void closeBookBorrowing(Book book);
+	public void closeBorrowedBook(Book book);
 
-	public BookBorrowing getBookBorrowing(int bookBorrowingId);
+	public BorrowedBook getBorrowedBook(int borrowedBookId);
 
 	public Date getExpectedEndDate(User tempUser, Book book);
 
@@ -37,6 +37,6 @@ public interface BookService {
 
 	public long getAmountOfAllBooks();
 
-	public List<BookBorrowing> getAllBookBorrowing();
+	public List<BorrowedBook> getAllBorrowedBookList();
 
 }

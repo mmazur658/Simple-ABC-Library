@@ -10,7 +10,7 @@ public interface ReservationService {
 
 	public List<Reservation> getUserReservations(int userId);
 
-	public void deleteReservationInOrderToCreateBookBorrowing(Reservation reservation);
+	public void deleteReservationInOrderToCreateBorrowedBook(Reservation reservation);
 
 	public Reservation getReservation(int reservationId);
 

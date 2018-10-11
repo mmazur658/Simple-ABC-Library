@@ -123,7 +123,7 @@ public class PdfDocumentGeneratorImpl implements PdfDocumentGenerator {
 	}
 
 	@Override
-	public File generateBookBorrowingConfirmation(List<Book> bookList, User theUser, Date expectedEndDate,
+	public File generateBorrowedBookConfirmation(List<Book> bookList, User theUser, Date expectedEndDate,
 			String employeeName) {
 
 		File tempFile = null;

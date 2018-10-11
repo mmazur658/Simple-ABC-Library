@@ -30,7 +30,7 @@
 	    <form:input type="text" id="inputEmail" class="form-control" path="email" placeholder="Email" required="required" />		
 				
 		<label for="inputPassword" class="sr-only">Hasło</label>
-	    <input type="password" id="inputPassword" class="form-control" name="password" placeholder="Hasło" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" 
+	    <input type="password" id="inputPassword" class="form-control" name="passwordOne" placeholder="Hasło" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" 
 					   title="Twoje hasło musi zawierać conajmniej jedną cyfrę, jedną dużą i małą literę i musi mieć 8 albo więcej znaków" required >
 		
 		<label for="inputConfirmPassword" class="sr-only">Hasło</label>

@@ -11,7 +11,7 @@ import pl.mazur.simpleabclibrary.dao.BookDAO;
 import pl.mazur.simpleabclibrary.dao.ReservationDAO;
 import pl.mazur.simpleabclibrary.entity.Book;
 import pl.mazur.simpleabclibrary.entity.User;
-import pl.mazur.simpleabclibrary.entity.BookBorrowing;
+import pl.mazur.simpleabclibrary.entity.BorrowedBook;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -69,8 +69,8 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	@Transactional
-	public List<BookBorrowing> getUserBookBorrowing(int userId) {
-		return bookDAO.getUserBookBorrowing(userId);
+	public List<BorrowedBook> getUserBorrowedBookList(int userId) {
+		return bookDAO.getUserBorrowedBookList(userId);
 	}
 
 	@Override
@@ -81,14 +81,14 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	@Transactional
-	public void closeBookBorrowing(Book book) {
-		bookDAO.closeBoorowingBook(book);
+	public void closeBorrowedBook(Book book) {
+		bookDAO.closeBorrowedBook(book);
 	}
 
 	@Override
 	@Transactional
-	public BookBorrowing getBookBorrowing(int bookBorrowingId) {
-		return bookDAO.getBookBorrowing(bookBorrowingId);
+	public BorrowedBook getBorrowedBook(int borrowedBookId) {
+		return bookDAO.getBorrowedBook(borrowedBookId);
 	}
 
 	@Override
@@ -111,8 +111,8 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	@Transactional
-	public List<BookBorrowing> getAllBookBorrowing() {
-		return bookDAO.getAllBookBorrowing();
+	public List<BorrowedBook> getAllBorrowedBookList() {
+		return bookDAO.getAllBorrowedBookList();
 	}
 
 }

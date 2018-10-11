@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pl.mazur.simpleabclibrary.entity.Book;
-import pl.mazur.simpleabclibrary.entity.BookBorrowing;
+import pl.mazur.simpleabclibrary.entity.BorrowedBook;
 import pl.mazur.simpleabclibrary.entity.Reservation;
 import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.PdfService;
@@ -152,7 +152,7 @@ public class BookController {
 
 		int userId = (int) session.getAttribute("userId");
 		List<Reservation> userReservationList = reservationService.getUserReservations(userId);
-		List<BookBorrowing> userBookBorrowingList = bookService.getUserBookBorrowing(userId);
+		List<BorrowedBook> userBorrowedBookList = bookService.getUserBorrowedBookList(userId);
 
 		session.setAttribute("userReservationsCount", userReservationList.size());
 		theModel.addAttribute("amountOfResults", amountOfResults);
@@ -161,7 +161,7 @@ public class BookController {
 		theModel.addAttribute("showLessLinkValue", showLessLinkValue);
 		theModel.addAttribute("startResult", startResult);
 		theModel.addAttribute("userReservationList", userReservationList);
-		theModel.addAttribute("userBookBorrowingList", userBookBorrowingList);
+		theModel.addAttribute("userBorrowedBookList", userBorrowedBookList);
 		theModel.addAttribute("booksList", booksList);
 		theModel.addAttribute("userAccessLevel", session.getAttribute("userAccessLevel"));
 		theModel.addAttribute("systemMessage", systemMessage);
