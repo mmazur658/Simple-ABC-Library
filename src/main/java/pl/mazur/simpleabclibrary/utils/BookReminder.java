@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import pl.mazur.simpleabclibrary.entity.BorrowedBook;
 import pl.mazur.simpleabclibrary.entity.Message;
+import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.MessageService;
 import pl.mazur.simpleabclibrary.service.UserService;
@@ -28,62 +29,72 @@ public class BookReminder {
 	@Autowired
 	UserService userService;
 
+	public void createAndSendNewMessage(User theUser, String bookTitle, int hourLimit, Date expectedEndDate) {
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Message theMessage = new Message();
+
+		theMessage.setRecipient(theUser);
+		theMessage.setRecipientIsActive(true);
+		theMessage.setRecipientIsRead(false);
+		theMessage.setSender(userService.getUser(1));
+		theMessage.setSenderIsActive(false);
+		theMessage.setSenderIsRead(true);
+		theMessage.setStartDate(new Date());
+		theMessage.setSubject("Przypomnienie o zwrocie ksi¹¿ki: " + bookTitle);
+		if (hourLimit == 0) {
+			theMessage.setText("Posiadasz ksi¹¿kê, która powinna zostaæ zwrócona do " + sdf.format(expectedEndDate)
+					+ ". Prosimy o mo¿liwie najszybszy zwrot ksi¹¿ki.");
+		} else {
+			theMessage.setText("Pozosta³o mniej ni¿ " + hourLimit + "h na zwrot ksi¹¿ki: " + bookTitle
+					+ ". Prosimy o terminowy zwrot.");
+		}
+		messageService.sendMessage(theMessage);
+	}
+
+	public boolean isBorrowedBookExpired(Date getExpectedEndDate, int hourLimit) {
+
+		Long currentTimeMillis = System.currentTimeMillis();
+		Long expTimeMillis = getExpectedEndDate.getTime();
+
+		if (hourLimit == 0) {
+			if (expTimeMillis < currentTimeMillis)
+				return true;
+			else
+				return false;
+		}
+
+		if (expTimeMillis - (1000 * 60 * 60 * hourLimit) < currentTimeMillis
+				&& expTimeMillis - (1000 * 60 * 60 * (hourLimit - 1)) > currentTimeMillis)
+			return true;
+		else
+			return false;
+	}
+
 	@Scheduled(fixedRate = 1000 * 60 * 60) // 1 hour
 	public void twentyFourHoursToReturnBookReminder() {// 24h
 
-		Long currentTimeMillis = System.currentTimeMillis();
-		Long expTimeMillis;
-		Message message;
 		List<BorrowedBook> borrowedBookList = bookService.getAllBorrowedBookList();
 
 		for (BorrowedBook borrowedBook : borrowedBookList) {
-			expTimeMillis = borrowedBook.getExpectedEndDate().getTime();
 
-			if (expTimeMillis - (1000 * 60 * 60 * 24) < currentTimeMillis
-					&& expTimeMillis - (1000 * 60 * 60 * 23) > currentTimeMillis) {
+			if (isBorrowedBookExpired(borrowedBook.getExpectedEndDate(), 24))
+				createAndSendNewMessage(borrowedBook.getUser(), borrowedBook.getBook().getTitle(), 24,
+						borrowedBook.getExpectedEndDate());
 
-				message = new Message();
-				message.setRecipient(borrowedBook.getUser());
-				message.setRecipientIsActive(true);
-				message.setRecipientIsRead(false);
-				message.setSender(userService.getUser(1));
-				message.setSenderIsActive(false);
-				message.setSenderIsRead(true);
-				message.setStartDate(new Date());
-				message.setSubject("Przypomnienie o zwrocie ksi¹¿ki: " + borrowedBook.getBook().getTitle());
-				message.setText("Pozosta³o mniej ni¿ 24h na zwrot ksi¹¿ki: " + borrowedBook.getBook().getTitle()
-						+ ". Prosimy o terminowy zwrot.");
-				messageService.sendMessage(message);
-			}
 		}
 	}
 
 	@Scheduled(fixedRate = 1000 * 60 * 60) // 1 hour
 	public void sixHoursToReturnBookReminder() { // 6h
 
-		Long currentTimeMillis = System.currentTimeMillis();
-		Long expTimeMillis;
-		Message message;
 		List<BorrowedBook> borrowedBookList = bookService.getAllBorrowedBookList();
 
 		for (BorrowedBook borrowedBook : borrowedBookList) {
-			expTimeMillis = borrowedBook.getExpectedEndDate().getTime();
 
-			if (expTimeMillis - (1000 * 60 * 60 * 6) < currentTimeMillis
-					&& expTimeMillis - (1000 * 60 * 60 * 5) > currentTimeMillis) {
-
-				message = new Message();
-				message.setRecipient(borrowedBook.getUser());
-				message.setRecipientIsActive(true);
-				message.setRecipientIsRead(false);
-				message.setSender(userService.getUser(1));
-				message.setSenderIsActive(false);
-				message.setSenderIsRead(true);
-				message.setStartDate(new Date());
-				message.setSubject("Przypomnienie o zwrocie ksi¹¿ki: " + borrowedBook.getBook().getTitle());
-				message.setText("Pozosta³o mniej ni¿ 6h na zwrot ksi¹¿ki: " + borrowedBook.getBook().getTitle()
-						+ ". Prosimy o terminowy zwrot.");
-				messageService.sendMessage(message);
+			if (isBorrowedBookExpired(borrowedBook.getExpectedEndDate(), 6)) {
+				createAndSendNewMessage(borrowedBook.getUser(), borrowedBook.getBook().getTitle(), 6,
+						borrowedBook.getExpectedEndDate());
 
 			}
 		}
@@ -92,30 +103,12 @@ public class BookReminder {
 	@Scheduled(fixedRate = 1000 * 60 * 60 * 24)
 	public void expiredBookReminder() {
 
-		Long currentTimeMillis = System.currentTimeMillis();
-		Long expTimeMillis;
-		Message message;
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		List<BorrowedBook> borrowedBookList = bookService.getAllBorrowedBookList();
 
 		for (BorrowedBook borrowedBook : borrowedBookList) {
-			expTimeMillis = borrowedBook.getExpectedEndDate().getTime();
-
-			if (expTimeMillis < currentTimeMillis) {
-
-				message = new Message();
-				message.setRecipient(borrowedBook.getUser());
-				message.setRecipientIsActive(true);
-				message.setRecipientIsRead(false);
-				message.setSender(userService.getUser(1));
-				message.setSenderIsActive(false);
-				message.setSenderIsRead(true);
-				message.setStartDate(new Date());
-				message.setSubject("Przypomnienie o zwrocie ksi¹¿ki: " + borrowedBook.getBook().getTitle());
-				message.setText("Posiadasz ksi¹¿kê, która powinna zostaæ zwrócona do "
-						+ sdf.format(borrowedBook.getExpectedEndDate())
-						+ ". Prosimy o mo¿liwie najszybszy zwrot ksi¹¿ki.");
-				messageService.sendMessage(message);
+			if (isBorrowedBookExpired(borrowedBook.getExpectedEndDate(), 0)) {
+				createAndSendNewMessage(borrowedBook.getUser(), borrowedBook.getBook().getTitle(), 0,
+						borrowedBook.getExpectedEndDate());
 			}
 		}
 	}
