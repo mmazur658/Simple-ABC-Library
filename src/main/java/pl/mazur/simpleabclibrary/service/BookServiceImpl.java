@@ -4,6 +4,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -255,4 +257,135 @@ public class BookServiceImpl implements BookService {
 		return bookDAO.getAllBorrowedBookList();
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public void addAllBorrowedBookToLiest(HttpSession session) {
+
+		List<BorrowedBook> userBorrowedBooksList = (List<BorrowedBook>) session.getAttribute("userBorrowedBooksList");
+		List<Book> tempReturnedBookList = (List<Book>) session.getAttribute("tempReturnedBookList");
+
+		for (int index = 0; index < userBorrowedBooksList.size(); index++) {
+			tempReturnedBookList.add(userBorrowedBooksList.get(index).getBook());
+		}
+		userBorrowedBooksList.clear();
+
+		session.setAttribute("tempReturnedBookList", tempReturnedBookList);
+		session.setAttribute("userBorrowedBooksList", userBorrowedBooksList);
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void addReturnedBookToList(HttpSession session, int bookId) {
+
+		List<BorrowedBook> userBorrowedBooksList = (List<BorrowedBook>) session.getAttribute("userBorrowedBooksList");
+		List<Book> tempReturnedBookList = (List<Book>) session.getAttribute("tempReturnedBookList");
+
+		for (int index = 0; index < userBorrowedBooksList.size(); index++) {
+			if (userBorrowedBooksList.get(index).getBook().getId() == bookId) {
+				tempReturnedBookList.add(userBorrowedBooksList.get(index).getBook());
+				userBorrowedBooksList.remove(index);
+				break;
+			}
+		}
+		session.setAttribute("tempReturnedBookList", tempReturnedBookList);
+		session.setAttribute("userBorrowedBooksList", userBorrowedBooksList);
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public void deleteReturnedBookFromList(HttpSession session, int bookId) {
+
+		List<BorrowedBook> userBorrowedBooksList = (List<BorrowedBook>) session.getAttribute("userBorrowedBooksList");
+		List<Book> tempReturnedBookList = (List<Book>) session.getAttribute("tempReturnedBookList");
+
+		for (int index = 0; index < tempReturnedBookList.size(); index++) {
+			if (tempReturnedBookList.get(index).getId() == bookId) {
+				tempReturnedBookList.remove(index);
+				userBorrowedBooksList.add(bookDAO.getBorrowedBook(bookId));
+				break;
+			}
+		}
+		session.setAttribute("tempReturnedBookList", tempReturnedBookList);
+		session.setAttribute("userBorrowedBooksList", userBorrowedBooksList);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public String returnBooks(HttpSession session) {
+
+		List<Book> tempReturnedBookList = (List<Book>) session.getAttribute("tempReturnedBookList");
+
+		StringBuilder sb = new StringBuilder();
+		sb.append((int) session.getAttribute("selectedUserId"));
+		sb.append(" ");
+
+		for (Book book : tempReturnedBookList) {
+			bookDAO.closeBorrowedBook(book);
+			book.setIsAvailable(true);
+			bookDAO.updateBook(book);
+			sb.append(book.getId());
+			sb.append(" ");
+		}
+
+		return sb.toString();
+	}
+
+	@Override
+	public void cancelBookReturning(HttpSession session) {
+
+		session.setAttribute("returnBookSelectedUserId", null);
+		session.setAttribute("returnBookFirstName", null);
+		session.setAttribute("returnBookLastName", null);
+		session.setAttribute("returnBookEmail", null);
+		session.setAttribute("returnBookPesel", null);
+		session.setAttribute("returnBookStartResult", null);
+		session.setAttribute("tempBookList", null);
+		session.setAttribute("selectedUserId", null);
+		session.setAttribute("userBorrowedBooksList", null);
+		session.setAttribute("tempReturnedBookList", null);
+
+	}
+
+	@Override
+	public void clearBookSearchParameters(HttpSession session) {
+		session.setAttribute("borrowBookChooseBookStartResult", null);
+		session.setAttribute("title", null);
+		session.setAttribute("id", null);
+		session.setAttribute("author", null);
+
+	}
+
+	@Override
+	public void cancelBorrowedBook(HttpSession session) {
+		session.setAttribute("borrowBookSelectedUserId", null);
+		session.setAttribute("borrowBookFirstName", null);
+		session.setAttribute("borrowBookLastName", null);
+		session.setAttribute("borrowBookEmail", null);
+		session.setAttribute("borrowBookPesel", null);
+		session.setAttribute("borrowBookStartResult", null);
+		session.setAttribute("borrowBookStartResult", null);
+		session.setAttribute("tempBookList", null);
+		session.setAttribute("borrowBookChooseBookStartResult", null);
+		session.setAttribute("title", null);
+		session.setAttribute("id", null);
+		session.setAttribute("author", null);
+		session.setAttribute("isUserAbleToBorrow", false);
+
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void deleteBookFromList(HttpSession session, int bookId) {
+		
+		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
+		for (int index = 0; index < tempBookList.size(); index++) {
+			if (tempBookList.get(index).getId() == bookId) {
+				tempBookList.remove(index);
+				break;
+			}
+		}		
+	}
 }

@@ -3,6 +3,8 @@ package pl.mazur.simpleabclibrary.service;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import pl.mazur.simpleabclibrary.entity.Book;
 import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.entity.BorrowedBook;
@@ -38,5 +40,21 @@ public interface BookService {
 	public long getAmountOfAllBooks();
 
 	public List<BorrowedBook> getAllBorrowedBookList();
+
+	public void addAllBorrowedBookToLiest(HttpSession session);
+
+	public void addReturnedBookToList(HttpSession session, int bookId);
+
+	public void deleteReturnedBookFromList(HttpSession session, int bookId);
+
+	public String returnBooks(HttpSession session);
+
+	public void cancelBookReturning(HttpSession session);
+
+	public void clearBookSearchParameters(HttpSession session);
+
+	public void cancelBorrowedBook(HttpSession session);
+
+	public void deleteBookFromList(HttpSession session, int bookId);
 
 }

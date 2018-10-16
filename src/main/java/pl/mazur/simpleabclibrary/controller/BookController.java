@@ -28,6 +28,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pl.mazur.simpleabclibrary.entity.Book;
 import pl.mazur.simpleabclibrary.entity.BorrowedBook;
+import pl.mazur.simpleabclibrary.entity.LoggedInUser;
 import pl.mazur.simpleabclibrary.entity.Reservation;
 import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.PdfService;
@@ -35,7 +36,7 @@ import pl.mazur.simpleabclibrary.service.ReservationService;
 import pl.mazur.simpleabclibrary.service.UserService;
 import pl.mazur.simpleabclibrary.utils.ForbiddenWords;
 import pl.mazur.simpleabclibrary.utils.ForbiddenWordsImpl;
-import pl.mazur.simpleabclibrary.utils.LoginAndAccessLevelCheck;
+import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
 
 @Controller
 @Scope("session")
@@ -52,7 +53,7 @@ public class BookController {
 	PdfService pdfService;
 
 	@Autowired
-	LoginAndAccessLevelCheck loginAndAccessLevelCheck;
+	AccessLevelControl accessLevelControl;
 
 	@Autowired
 	ReservationService reservationService;
@@ -71,9 +72,7 @@ public class BookController {
 			@RequestParam(required = false, name = "startResult") Integer startResult) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+		if(!accessLevelControl.isCustomer((LoggedInUser)session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		if (!(title == null))
@@ -174,8 +173,7 @@ public class BookController {
 	public String clearSearchParameters(HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+		if(!accessLevelControl.isCustomer((LoggedInUser)session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		session.setAttribute("title", null);
@@ -192,8 +190,7 @@ public class BookController {
 	public String addBookForm(Model theModel, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+		if(!accessLevelControl.isEmployee((LoggedInUser)session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		Book tempBook = new Book();
@@ -207,8 +204,7 @@ public class BookController {
 			HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+		if(!accessLevelControl.isEmployee((LoggedInUser)session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		bookService.saveBook(tempBook);
@@ -222,10 +218,8 @@ public class BookController {
 	public String confirmBookPage(@RequestParam("bookId") int bookId, Model theModel, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+		if(!accessLevelControl.isEmployee((LoggedInUser)session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
-
 		Book tempBook = bookService.getBook(bookId);
 
 		theModel.addAttribute("tempBook", tempBook);
@@ -239,8 +233,7 @@ public class BookController {
 			RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+		if(!accessLevelControl.isCustomer((LoggedInUser)session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		int userReservationsCount = (int) session.getAttribute("userReservationsCount");
@@ -287,8 +280,7 @@ public class BookController {
 			HttpServletRequest request, RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+		if(!accessLevelControl.isCustomer((LoggedInUser)session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		Reservation reservation = reservationService.getReservation(reservationId);
@@ -306,8 +298,7 @@ public class BookController {
 	public String updateBookForm(@RequestParam("bookId") int bookId, Model theModel, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+		if(!accessLevelControl.isEmployee((LoggedInUser)session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		Book tempBook = bookService.getBook(bookId);
@@ -321,8 +312,7 @@ public class BookController {
 			HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+		if(!accessLevelControl.isEmployee((LoggedInUser)session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		try {
@@ -342,8 +332,7 @@ public class BookController {
 			RedirectAttributes redirectAttributes, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+		if(!accessLevelControl.isEmployee((LoggedInUser)session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		Book tempBook = bookService.getBook(bookId);
@@ -365,8 +354,7 @@ public class BookController {
 			@RequestParam(required=false, name="systemSuccessMessage") String systemSuccessMessage) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+		if(!accessLevelControl.isCustomer((LoggedInUser)session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		Book tempBook = bookService.getBook(bookId);

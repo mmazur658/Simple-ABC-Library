@@ -3,12 +3,16 @@ package pl.mazur.simpleabclibrary.service;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import pl.mazur.simpleabclibrary.dao.UserDAO;
 import pl.mazur.simpleabclibrary.entity.User;
+import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
+import pl.mazur.simpleabclibrary.utils.ForbiddenWords;
 import pl.mazur.simpleabclibrary.utils.PasswordUtils;
 import pl.mazur.simpleabclibrary.utils.PeselValidator;
 
@@ -23,6 +27,12 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private PasswordUtils passwordUtils;
+
+	@Autowired
+	private AccessLevelControl loginAndAccessLevelCheck;
+
+	@Autowired
+	ForbiddenWords forbiddenWords;
 
 	@Override
 	@Transactional
@@ -176,20 +186,141 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public long getAmountOfAllBooks() {
-		return userDAO.getAmountOfAllBooks();
+	public long getAmountOfAllUsers() {
+		return userDAO.getAmountOfAllUsers();
 	}
 
 	@Override
 	@Transactional
-	public void increaseUserAccessLevel(User theUser) {
-		userDAO.increaseUserAccessLevel(theUser);
+	public String increaseUserAccessLevel(Integer increaseAccessLevelUserId) {
+
+		User theUser = userDAO.getUser(increaseAccessLevelUserId);
+		String systemMessage;
+
+		if (!theUser.isAdmin() && !theUser.isEmployee()) {
+			theUser.setEmployee(true);
+			systemMessage = "Zwiêkszono uprawnienia do poziomu: Pracownik";
+		} else if (!theUser.isAdmin() && theUser.isEmployee()) {
+			theUser.setAdmin(true);
+			systemMessage = "Zwiêkszono uprawnienia do poziomu: Administrator";
+		} else
+			systemMessage = "Nie mo¿na zwiêkszyæ uprawnieñ, osi¹gniêto maksymalny poziom";
+
+		userDAO.updateUser(theUser);
+		return systemMessage;
 	}
 
 	@Override
 	@Transactional
-	public void decreaseUserAccessLevel(User theUser) {
-		userDAO.decreaseUserAccessLevel(theUser);
+	public String decreaseUserAccessLevel(Integer decreaseAccessLevelUserId) {
+
+		User theUser = userDAO.getUser(decreaseAccessLevelUserId);
+		String systemMessage;
+
+		if (theUser.isAdmin() && theUser.isEmployee()) {
+			theUser.setAdmin(false);
+			systemMessage = "Zmniejszono uprawnienia do poziomu: Pracownik";
+		} else if (!theUser.isAdmin() && theUser.isEmployee()) {
+			theUser.setEmployee(false);
+			systemMessage = "Zmniejszono uprawnienia do poziomu: Klient";
+		} else
+			systemMessage = "Nie mo¿na zmniejszyæ uprawnieñ, osi¹gniêto minimalny poziom";
+
+		userDAO.updateUser(theUser);
+		return systemMessage;
 	}
 
+	@Override
+	public String getUserAccessLevel(User theUser) {
+		return loginAndAccessLevelCheck.getUserAccessLevel(theUser);
+	}
+
+	@Override
+	public String[] prepareTableToSearch(HttpSession session, String searchType, String userId, String userFirstName,
+			String userLastName, String userEmail, String userPesel) {
+
+		if (!(userId == null))
+			session.setAttribute(searchType + "SelectedUserId", userId);
+		if (!(userFirstName == null))
+			session.setAttribute(searchType + "FirstName", userFirstName);
+		if (!(userLastName == null))
+			session.setAttribute(searchType + "LastName", userLastName);
+		if (!(userEmail == null))
+			session.setAttribute(searchType + "Email", userEmail);
+		if (!(userPesel == null))
+			session.setAttribute(searchType + "Pesel", userPesel);
+
+		if ((userId == null) && !(session.getAttribute(searchType + "SelectedUserId") == null))
+			userId = String.valueOf(session.getAttribute(searchType + "SelectedUserId"));
+		if ((userFirstName == null) && !(session.getAttribute(searchType + "FirstName") == null))
+			userFirstName = String.valueOf(session.getAttribute(searchType + "FirstName"));
+		if ((userLastName == null) && !(session.getAttribute(searchType + "LastName") == null))
+			userLastName = String.valueOf(session.getAttribute(searchType + "LastName"));
+		if ((userEmail == null) && !(session.getAttribute(searchType + "Email") == null))
+			userEmail = String.valueOf(session.getAttribute(searchType + "Email"));
+		if ((userPesel == null) && !(session.getAttribute(searchType + "Pesel") == null))
+			userPesel = String.valueOf(session.getAttribute(searchType + "Pesel"));
+
+		String[] userSearchParameters = { "", "", "", "", "", "", "", "" };
+		userSearchParameters[0] = (userId == null) ? "" : userId.trim();
+		userSearchParameters[1] = (userFirstName == null) ? "" : userFirstName.trim();
+		userSearchParameters[2] = (userLastName == null) ? "" : userLastName.trim();
+		userSearchParameters[3] = (userEmail == null) ? "" : userEmail.trim();
+		userSearchParameters[4] = (userPesel == null) ? "" : userPesel.trim();
+
+		for (int i = 0; i < userSearchParameters.length; i++) {
+			if (forbiddenWords.findForbiddenWords(userSearchParameters[i])) {
+				userSearchParameters[i] = "";
+			}
+		}
+		return userSearchParameters;
+	}
+
+	@Override
+	public boolean hasTableAnyParameters(String[] userSearchParameters) {
+
+		boolean hasAnyParameters = false;
+		for (int i = 0; i < userSearchParameters.length; i++) {
+			if (userSearchParameters[i] != "")
+				hasAnyParameters = true;
+		}
+		return hasAnyParameters;
+	}
+
+	@Override
+	public long generateShowLessLinkValue(Integer startResult) {
+		if ((startResult - 10) < 0) {
+			return 0;
+		} else {
+			return startResult - 10;
+		}
+	}
+
+	@Override
+	public long generateShowMoreLinkValue(Integer startResult, long amountOfResults) {
+		if ((startResult + 10) > amountOfResults) {
+			return startResult;
+		} else {
+			return startResult + 10;
+		}
+	}
+
+	@Override
+	public String generateResultRange(Integer startResult, long amountOfResults, long showMoreLinkValue) {
+		if ((startResult + 10) > amountOfResults) {
+			return "Wyniki od " + (startResult + 1) + " do " + amountOfResults;
+		} else {
+			return "Wyniki od " + (startResult + 1) + " do " + showMoreLinkValue;
+		}
+	}
+
+	@Override
+	public void clearSearchParameters(HttpSession session, String searchType) {
+		session.setAttribute(searchType + "StartResult", null);
+		session.setAttribute(searchType + "SelectedUserId", null);
+		session.setAttribute(searchType + "FirstName", null);
+		session.setAttribute(searchType + "LastName", null);
+		session.setAttribute(searchType + "Email", null);
+		session.setAttribute(searchType + "Pesel", null);
+	}
 }

@@ -145,23 +145,13 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public long getAmountOfAllBooks() {
+	public long getAmountOfAllUsers() {
 
 		String hql = "select count(*) from User WHERE isActive = true ORDER BY id ASC";
 		Query<Long> theQuery = currentSession().createQuery(hql);
 		Long count = (Long) theQuery.uniqueResult();
 
 		return count;
-	}
-
-	@Override
-	public void increaseUserAccessLevel(User theUser) {
-		currentSession().update(theUser);
-	}
-
-	@Override
-	public void decreaseUserAccessLevel(User theUser) {
-		currentSession().update(theUser);
 	}
 
 }

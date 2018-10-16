@@ -22,9 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.itextpdf.text.log.SysoCounter;
-
 import pl.mazur.simpleabclibrary.entity.BorrowedBook;
+import pl.mazur.simpleabclibrary.entity.LoggedInUser;
 import pl.mazur.simpleabclibrary.entity.Reservation;
 import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.service.BookService;
@@ -32,8 +31,8 @@ import pl.mazur.simpleabclibrary.service.MessageService;
 import pl.mazur.simpleabclibrary.service.PdfService;
 import pl.mazur.simpleabclibrary.service.ReservationService;
 import pl.mazur.simpleabclibrary.service.UserService;
+import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
 import pl.mazur.simpleabclibrary.utils.ForbiddenWords;
-import pl.mazur.simpleabclibrary.utils.LoginAndAccessLevelCheck;
 import pl.mazur.simpleabclibrary.utils.PasswordValidator;
 
 @Controller
@@ -48,7 +47,7 @@ public class UserController {
 	PdfService pdfService;
 
 	@Autowired
-	LoginAndAccessLevelCheck loginAndAccessLevelCheck;
+	AccessLevelControl accessLevelControl;
 
 	@Autowired
 	ReservationService reservationService;
@@ -61,9 +60,6 @@ public class UserController {
 
 	@Autowired
 	PasswordValidator passwordValidator;
-
-	@Autowired
-	ForbiddenWords forbiddenWords;
 
 	@RequestMapping("/login-page")
 	public String loginPage(
@@ -88,7 +84,6 @@ public class UserController {
 		HttpSession session = request.getSession();
 
 		boolean isLoginOK = false;
-
 		try {
 			isLoginOK = userService.verificationAndAuthentication(email, thePasswordFromForm);
 		} catch (Exception e) {
@@ -98,22 +93,16 @@ public class UserController {
 
 		if (isLoginOK) {
 			User tempUser = userService.getUser(email);
+			LoggedInUser loggedInUser = new LoggedInUser(tempUser.getId(), userService.getUserAccessLevel(tempUser));
 			session.setAttribute("userFirstName", tempUser.getFirstName());
 			session.setAttribute("userLastName", tempUser.getLastName());
 			session.setAttribute("userId", tempUser.getId());
 			session.setAttribute("userEmail", tempUser.getEmail());
-
-			if (tempUser.isAdmin())
-				session.setAttribute("userAccessLevel", "Administrator");
-			else if (tempUser.isAdmin() == false && tempUser.isEmployee() == true)
-				session.setAttribute("userAccessLevel", "Employee");
-			else
-				session.setAttribute("userAccessLevel", "Customer");
-
+			session.setAttribute("userAccessLevel", loggedInUser.getUserAccessLevel());
+			session.setAttribute("loggedInUser", loggedInUser);
 			return "redirect:/user/main";
-
 		} else {
-			redirectAttributes.addAttribute("incorrectPasswordMessage", "Nieprawid³owe dane logowania");
+			redirectAttributes.addAttribute("incorrectPasswordMessage", "Nieprawid³owe dane logowania!!");
 			return "redirect:/user/login-page";
 		}
 	}
@@ -123,8 +112,7 @@ public class UserController {
 			HttpServletRequest request, Model theModel, RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		int userId = (int) session.getAttribute("userId");
@@ -153,14 +141,14 @@ public class UserController {
 	@RequestMapping("/saveUser")
 	public String saveUser(@ModelAttribute("user") User theUser, Model theModel, HttpServletRequest request,
 			RedirectAttributes redirectAttributes) {
-		
+
 		boolean isExist = userService.checkEmailIsExist(theUser.getEmail());
 
 		if (!passwordValidator.validate(theUser.getPassword())) {
 			redirectAttributes.addAttribute("systemMessage", "Has³o nie spe³nia wymagañ");
 			return "redirect:/user/create-user-form";
 		}
-		
+
 		if (isExist) {
 			theModel.addAttribute("isExist", isExist);
 			return "confirm-page";
@@ -187,8 +175,7 @@ public class UserController {
 			Model theModel, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		int userId = (Integer) session.getAttribute("userId");
@@ -200,17 +187,16 @@ public class UserController {
 
 		return "user-update";
 	}
-	
+
 	@RequestMapping("/user-management-update-form")
-	public String userManagementUpdateForm(@RequestParam(name="userUpdateUserId") Integer userUpdateUserId,
-			@RequestParam(required = false, name = "systemMessage") String systemMessage,
-			Model theModel, HttpServletRequest request) {
+	public String userManagementUpdateForm(@RequestParam(name = "userUpdateUserId") Integer userUpdateUserId,
+			@RequestParam(required = false, name = "systemMessage") String systemMessage, Model theModel,
+			HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
-		
+
 		User theUser = userService.getUser(userUpdateUserId);
 
 		session.setAttribute("oldUserEmail", theUser.getEmail());
@@ -225,8 +211,7 @@ public class UserController {
 			RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		boolean isExist = false;
@@ -249,8 +234,7 @@ public class UserController {
 		userService.updateUser(theUser);
 
 		session.setAttribute("oldUserEmail", null);
-		redirectAttributes.addAttribute("systemMessage", "Konto zosta³o zaktualizowane");
-
+		redirectAttributes.addAttribute("systemMessage", "Konto zosta³o zaktualizowane, zaloguj siê ponownie");
 		return "redirect:/user/user-details";
 
 	}
@@ -260,8 +244,7 @@ public class UserController {
 			Model theModel, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		theModel.addAttribute("systemMessage", systemMessage);
@@ -276,8 +259,7 @@ public class UserController {
 			RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		if (oldPassword.trim().equals(newPassword.trim())) {
@@ -291,7 +273,7 @@ public class UserController {
 
 		if (isOldPasswordCorrect) {
 			userService.changePassword(userId, newPassword.trim());
-			redirectAttributes.addAttribute("systemMessage", "Has³o zosta³o zmienione!");
+			redirectAttributes.addAttribute("systemMessage", "Has³o zosta³o zmienione! - Zaloguj siê ponowanie");
 			return "redirect:/user/user-details";
 		} else {
 			redirectAttributes.addAttribute("systemMessage", "Nieprawid³owe stare has³o");
@@ -299,24 +281,11 @@ public class UserController {
 		}
 	}
 
-	@RequestMapping("/employee-panel")
-	public String employeePanel(HttpServletRequest request) {
-
-		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
-			return "redirect:/user/logout";
-
-		return "emp-panel";
-
-	}
-
 	@RequestMapping("/admin-panel")
 	public String administratorPanel(HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isAdmin((String) session.getAttribute("userAccessLevel")))
+		if (!accessLevelControl.isAdmin((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		return "admin-panel";
@@ -350,78 +319,30 @@ public class UserController {
 			@RequestParam(required = false, name = "userManagementStartResult") Integer userManagementStartResult) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		if (userManagementUserId != null)
-			session.setAttribute("userManagementUserId", userManagementUserId);
-		if (userManagementFirstName != null)
-			session.setAttribute("userManagementFirstName", userManagementFirstName);
-		if (userManagementLastName != null)
-			session.setAttribute("userManagementLastName", userManagementLastName);
-		if (userManagementEmail != null)
-			session.setAttribute("userManagementEmail", userManagementEmail);
-		if (userManagementPesel != null)
-			session.setAttribute("userManagementPesel", userManagementPesel);
+		String[] userSearchParameters = userService.prepareTableToSearch(session, "userManagement", userManagementUserId,
+				userManagementFirstName, userManagementLastName, userManagementEmail, userManagementPesel);
 
-		if ((userManagementUserId == null) && (session.getAttribute("userManagementUserId") != null))
-			userManagementUserId = String.valueOf(session.getAttribute("userManagementUserId"));
-		if ((userManagementFirstName == null) && (session.getAttribute("userManagementFirstName") != null))
-			userManagementFirstName = String.valueOf(session.getAttribute("userManagementFirstName"));
-		if ((userManagementLastName == null) && (session.getAttribute("userManagementLastName") != null))
-			userManagementLastName = String.valueOf(session.getAttribute("userManagementLastName"));
-		if ((userManagementEmail == null) && (session.getAttribute("userManagementEmail") != null))
-			userManagementEmail = String.valueOf(session.getAttribute("userManagementEmail"));
-		if ((userManagementPesel == null) && (session.getAttribute("userManagementPesel") != null))
-			userManagementPesel = String.valueOf(session.getAttribute("userManagementPesel"));
+		userManagementStartResult = (userManagementStartResult == null)
+				? ((session.getAttribute("userManagementStartResult") != null)
+						? (Integer) session.getAttribute("userManagementStartResult")
+						: 0)
+				: 0;
+		session.setAttribute("userManagementStartResult", userManagementStartResult);
 
-		String[] userSearchParameters = { "", "", "", "", "", "", "", "" };
-		userSearchParameters[0] = (userManagementUserId == null) ? "" : userManagementUserId.trim();
-		userSearchParameters[1] = (userManagementFirstName == null) ? "" : userManagementFirstName.trim();
-		userSearchParameters[2] = (userManagementLastName == null) ? "" : userManagementLastName.trim();
-		userSearchParameters[3] = (userManagementEmail == null) ? "" : userManagementEmail.trim();
-		userSearchParameters[4] = (userManagementPesel == null) ? "" : userManagementPesel.trim();
-
-		for (String word : userSearchParameters) {
-			if (forbiddenWords.findForbiddenWords(word))
-				return "redirect:/error";
-		}
-
-		if (userManagementStartResult == null)
-			userManagementStartResult = (Integer) session.getAttribute("userManagementStartResult");
-		if (userManagementStartResult == null)
-			userManagementStartResult = 0;
-
-		List<User> usersList;
-		long amountOfResults;
-
-		if (!userSearchParameters[0].equals("") || !userSearchParameters[1].equals("")
-				|| !userSearchParameters[2].equals("") || !userSearchParameters[3].equals("")
-				|| !userSearchParameters[4].equals("")) {
-			usersList = userService.getUserSearchResult(userSearchParameters, userManagementStartResult);
-			amountOfResults = userService.getAmountOfSearchResult(userSearchParameters);
-		} else {
-			usersList = userService.getAllUsers(userManagementStartResult);
-			amountOfResults = userService.getAmountOfAllBooks();
-		}
-
-		String resultRange;
-		long showMoreLinkValue = 0;
-		if ((userManagementStartResult + 10) > amountOfResults) {
-			showMoreLinkValue = userManagementStartResult;
-			resultRange = "Wyniki od " + (userManagementStartResult + 1) + " do " + amountOfResults;
-		} else {
-			showMoreLinkValue = userManagementStartResult + 10;
-			resultRange = "Wyniki od " + (userManagementStartResult + 1) + " do " + showMoreLinkValue;
-		}
-
-		long showLessLinkValue = 0;
-		if ((userManagementStartResult - 10) < 0) {
-			showLessLinkValue = 0;
-		} else {
-			showLessLinkValue = userManagementStartResult - 10;
-		}
+		boolean hasAnyParameters = userService.hasTableAnyParameters(userSearchParameters);
+		List<User> usersList = hasAnyParameters
+				? userService.getUserSearchResult(userSearchParameters, userManagementStartResult)
+				: userService.getAllUsers(userManagementStartResult);
+		long amountOfResults = hasAnyParameters 
+				? userService.getAmountOfSearchResult(userSearchParameters)
+				: userService.getAmountOfAllUsers();
+		
+		long showMoreLinkValue=userService.generateShowMoreLinkValue(userManagementStartResult,amountOfResults);
+		String resultRange = userService.generateResultRange(userManagementStartResult,amountOfResults,showMoreLinkValue);
+		long showLessLinkValue = userService.generateShowLessLinkValue(userManagementStartResult);
 
 		theModel.addAttribute("userManagementStartResult", userManagementStartResult);
 		theModel.addAttribute("amountOfResults", amountOfResults);
@@ -438,8 +359,7 @@ public class UserController {
 			Model theModel, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		int userId = (Integer) session.getAttribute("userId");
@@ -459,12 +379,11 @@ public class UserController {
 			HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
-		
+
 		if (!session.getAttribute("userId").equals(userDetailsUserId)) {
-			if (!loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel"))) 
+			if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 				return "redirect:/user/logout";
 		}
 
@@ -479,20 +398,18 @@ public class UserController {
 	}
 
 	@RequestMapping("/users-books")
-	public String usersBooks(@RequestParam(required=false, name="systemSuccessMessage") String systemSuccessMessage,
+	public String usersBooks(@RequestParam(required = false, name = "systemSuccessMessage") String systemSuccessMessage,
 			HttpServletRequest request, Model theModel) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isCustomer((String) session.getAttribute("userAccessLevel")))
+		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		int theUserId = (Integer) session.getAttribute("userId");
-
 		List<Reservation> reservationList = reservationService.getUserReservations(theUserId);
 		List<BorrowedBook> borrowedBookList = bookService.getUserBorrowedBookList(theUserId);
-		
-		theModel.addAttribute("systemSuccessMessage",systemSuccessMessage);
+
+		theModel.addAttribute("systemSuccessMessage", systemSuccessMessage);
 		theModel.addAttribute("reservationList", reservationList);
 		theModel.addAttribute("borrowedBookList", borrowedBookList);
 
@@ -503,16 +420,10 @@ public class UserController {
 	public String clearReservationSearchParameters(HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isEmployee((String) session.getAttribute("userAccessLevel")))
+		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		session.setAttribute("returnBookStartResult", null);
-		session.setAttribute("userManagementUserId", null);
-		session.setAttribute("userManagementFirstName", null);
-		session.setAttribute("userManagementLastName", null);
-		session.setAttribute("userManagementEmail", null);
-		session.setAttribute("userManagementPesel", null);
+		userService.clearSearchParameters(session, "userManagement");
 
 		return "redirect:/user/user-management";
 	}
@@ -522,24 +433,11 @@ public class UserController {
 			RedirectAttributes redirectAttributes, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isAdmin((String) session.getAttribute("userAccessLevel")))
+		if (!accessLevelControl.isAdmin((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		User theUser = userService.getUser(increaseAccessLevelUserId);
-
-		if (!theUser.isAdmin() && !theUser.isEmployee()) {
-			theUser.setEmployee(true);
-			redirectAttributes.addAttribute("systemMessage", "Zwiêkszono uprawnienia do poziomu: Pracownik");
-		} else if (!theUser.isAdmin() && theUser.isEmployee()) {
-			theUser.setAdmin(true);
-			redirectAttributes.addAttribute("systemMessage", "Zwiêkszono uprawnienia do poziomu: Administrator");
-		} else {
-			redirectAttributes.addAttribute("systemMessage",
-					"Nie mo¿na zwiêkszyæ uprawnieñ, osi¹gniêto maksymalny poziom");
-		}
-
-		userService.increaseUserAccessLevel(theUser);
+		String systemMessage = userService.increaseUserAccessLevel(increaseAccessLevelUserId);
+		redirectAttributes.addAttribute("systemMessage", systemMessage);
 
 		return "redirect:/user/user-details";
 
@@ -550,28 +448,12 @@ public class UserController {
 			RedirectAttributes redirectAttributes, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-
-		if (!loginAndAccessLevelCheck.loginCheck((Integer) session.getAttribute("userId"))
-				|| !loginAndAccessLevelCheck.isAdmin((String) session.getAttribute("userAccessLevel")))
+		if (!accessLevelControl.isAdmin((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		User theUser = userService.getUser(decreaseAccessLevelUserId);
-
-		if (theUser.isAdmin() && theUser.isEmployee()) {
-			theUser.setAdmin(false);
-			redirectAttributes.addAttribute("systemMessage", "Zmniejszono uprawnienia do poziomu: Pracownik");
-		} else if (!theUser.isAdmin() && theUser.isEmployee()) {
-			theUser.setEmployee(false);
-			redirectAttributes.addAttribute("systemMessage", "Zmniejszono uprawnienia do poziomu: Klient");
-		} else {
-			redirectAttributes.addAttribute("systemMessage",
-					"Nie mo¿na zmniejszyæ uprawnieñ, osi¹gniêto minimalny poziom");
-		}
-
-		userService.decreaseUserAccessLevel(theUser);
+		String systemMessage = userService.decreaseUserAccessLevel(decreaseAccessLevelUserId);
+		redirectAttributes.addAttribute("systemMessage", systemMessage);
 
 		return "redirect:/user/user-details";
-
 	}
-
 }

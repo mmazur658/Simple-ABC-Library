@@ -5,11 +5,11 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import pl.mazur.simpleabclibrary.utils.LoginAndAccessLevelCheckImpl;
+import pl.mazur.simpleabclibrary.utils.AccessLevelControlImpl;
 
 class LoginAndAccessLevelCheckImplTest {
 
-	LoginAndAccessLevelCheckImpl loginAndAccessLevelCheckImpl = new LoginAndAccessLevelCheckImpl();
+	AccessLevelControlImpl loginAndAccessLevelCheckImpl = new AccessLevelControlImpl();
 
 	Integer userId;
 	String userAccessLevel;

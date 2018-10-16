@@ -1,5 +1,6 @@
 package pl.mazur.simpleabclibrary.service;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,13 +8,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import pl.mazur.simpleabclibrary.dao.MessageDAO;
+import pl.mazur.simpleabclibrary.dao.UserDAO;
 import pl.mazur.simpleabclibrary.entity.Message;
+import pl.mazur.simpleabclibrary.entity.User;
 
 @Service
 public class MessageServiceImpl implements MessageService {
 
 	@Autowired
 	private MessageDAO messageDAO;
+	
+	@Autowired
+	private UserDAO userDAO;
 
 	@Override
 	@Transactional
@@ -106,6 +112,53 @@ public class MessageServiceImpl implements MessageService {
 	@Transactional
 	public long getAmountOfAllSentMessages(int userId) {
 		return messageDAO.getAmountOfAllSentMessages(userId);
+	}
+
+	@Override
+	public void sendMessage(int senderID, String recipientEmail, String subject, String text) {
+		
+		User sender = userDAO.getUser(senderID);
+		User recipient = userDAO.getUser(recipientEmail);
+		
+		Message message = new Message();
+		message.setRecipientIsActive(true);
+		message.setRecipientIsRead(false);
+		message.setSenderIsActive(true);
+		message.setSenderIsRead(true);
+		message.setRecipient(recipient);
+		message.setSender(sender);
+		message.setStartDate(new Date());
+		message.setSubject(subject);
+		message.setText(text);
+		
+		messageDAO.sendMessage(message);
+	}
+
+	@Override
+	public long generateShowMoreLinkValue(Integer startResult, long amountOfResults) {
+		if ((startResult + 20) > amountOfResults) {
+			return startResult;
+		} else {
+			return startResult + 20;
+		}
+	}
+
+	@Override
+	public String generateResultRange(Integer startResult, long amountOfResults, long showMoreLinkValue) {
+		if ((startResult + 20) > amountOfResults) {
+			return "Wyniki od " + (startResult + 1) + " do " + amountOfResults;
+		} else {
+			return "Wyniki od " + (startResult + 1) + " do " + showMoreLinkValue;
+		}
+	}
+
+	@Override
+	public long generateShowLessLinkValue(Integer startResult) {
+		if ((startResult - 20) < 0) {
+			return 0;
+		} else {
+			return startResult - 20;
+		}
 	}
 
 }

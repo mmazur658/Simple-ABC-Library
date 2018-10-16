@@ -28,4 +28,12 @@ public interface MessageService {
 
 	long getAmountOfAllSentMessages(int userId);
 
+	void sendMessage(int senderID, String recipientEmail, String subject, String text);
+
+	long generateShowMoreLinkValue(Integer startResult, long amountOfResults);
+
+	String generateResultRange(Integer startResult, long amountOfResults, long showMoreLinkValue);
+
+	long generateShowLessLinkValue(Integer startResult);
+
 }

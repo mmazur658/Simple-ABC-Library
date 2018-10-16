@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,7 @@ import pl.mazur.simpleabclibrary.dao.UserDAO;
 import pl.mazur.simpleabclibrary.entity.Book;
 import pl.mazur.simpleabclibrary.entity.Message;
 import pl.mazur.simpleabclibrary.entity.Reservation;
+import pl.mazur.simpleabclibrary.utils.ForbiddenWords;
 
 @Service
 public class ReservationServiceImpl implements ReservationService {
@@ -31,6 +34,9 @@ public class ReservationServiceImpl implements ReservationService {
 
 	@Autowired
 	MessageDAO messageDAO;
+	
+	@Autowired
+	ForbiddenWords forbiddenWords;
 
 	@Override
 	@Transactional
@@ -222,4 +228,105 @@ public class ReservationServiceImpl implements ReservationService {
 		reservationDAO.deleteReservationByUser(reservation);
 		bookDAO.setBookActive(reservation.getBook());
 	}
+
+	@Override
+	public void clearReservationSearchParameters(HttpSession session) {
+		session.setAttribute("customerId", null);
+		session.setAttribute("customerFirstName", null);
+		session.setAttribute("customerLastName", null);
+		session.setAttribute("customerPesel", null);
+		session.setAttribute("bookId", null);
+		session.setAttribute("bookTitle", null);
+		session.setAttribute("reservationStartResult", null);
+		
+	}
+
+	@Override
+	public String[] prepareTableToSearch(HttpSession session, String customerId, String customerFirstName,
+			String customerLastName, String customerPesel, String bookId, String bookTitle,
+			Integer reservationStartResult) {
+
+
+		if (!(customerId == null))
+			session.setAttribute("customerId", customerId);
+		if (!(customerFirstName == null))
+			session.setAttribute("customerFirstName", customerFirstName);
+		if (!(customerLastName == null))
+			session.setAttribute("customerLastName", customerLastName);
+		if (!(customerPesel == null))
+			session.setAttribute("customerPesel", customerPesel);
+		if (!(bookId == null))
+			session.setAttribute("bookId", bookId);
+		if (!(bookTitle == null))
+			session.setAttribute("bookTitle", bookTitle);
+
+		if ((customerId == null) && !(session.getAttribute("customerId") == null))
+			customerId = (String) session.getAttribute("customerId");
+		if ((customerFirstName == null) && !(session.getAttribute("customerFirstName") == null))
+			customerFirstName = (String) session.getAttribute("customerFirstName");
+		if ((customerLastName == null) && !(session.getAttribute("customerLastName") == null))
+			customerLastName = (String) session.getAttribute("customerLastName");
+		if ((customerPesel == null) && !(session.getAttribute("customerPesel") == null))
+			customerPesel = (String) session.getAttribute("customerPesel");
+		if ((bookId == null) && !(session.getAttribute("bookId") == null))
+			bookId = (String) session.getAttribute("bookId");
+		if ((bookTitle == null) && !(session.getAttribute("bookTitle") == null))
+			bookTitle = (String) session.getAttribute("bookTitle");
+
+		String[] reservationSearchParameters = { "", "", "", "", "", "" };
+		reservationSearchParameters[0] = (customerId == null) ? "" : customerId;
+		reservationSearchParameters[1] = (customerFirstName == null) ? "" : customerFirstName;
+		reservationSearchParameters[2] = (customerLastName == null) ? "" : customerLastName;
+		reservationSearchParameters[3] = (customerPesel == null) ? "" : customerPesel;
+		reservationSearchParameters[4] = (bookId == null) ? "" : bookId;
+		reservationSearchParameters[5] = (bookTitle == null) ? "" : bookTitle;
+		
+		for (int i = 0; i < reservationSearchParameters.length; i++) {
+			if (forbiddenWords.findForbiddenWords(reservationSearchParameters[i])) {
+				reservationSearchParameters[i] = "";
+			}
+		}
+		
+		return reservationSearchParameters;
+
+	}
+
+	@Override
+	public boolean hasTableAnyParameters(String[] reservationSearchParameters) {
+
+		boolean hasAnyParameters = false;
+		for (int i = 0; i < reservationSearchParameters.length; i++) {
+			if (reservationSearchParameters[i] != "")
+				hasAnyParameters = true;
+		}
+		return hasAnyParameters;
+	}
+
+	@Override
+	public long generateShowLessLinkValue(Integer startResult) {
+		if ((startResult - 10) < 0) {
+			return 0;
+		} else {
+			return startResult - 10;
+		}
+	}
+
+	@Override
+	public long generateShowMoreLinkValue(Integer startResult, long amountOfResults) {
+		if ((startResult + 10) > amountOfResults) {
+			return startResult;
+		} else {
+			return startResult + 10;
+		}
+	}
+
+	@Override
+	public String generateResultRange(Integer startResult, long amountOfResults, long showMoreLinkValue) {
+		if ((startResult + 10) > amountOfResults) {
+			return "Wyniki od " + (startResult + 1) + " do " + amountOfResults;
+		} else {
+			return "Wyniki od " + (startResult + 1) + " do " + showMoreLinkValue;
+		}
+	}
+	
 }

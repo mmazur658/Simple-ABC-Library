@@ -28,10 +28,6 @@ public interface UserDAO {
 
 	public long getAmountOfSearchResult(String hql);
 
-	public long getAmountOfAllBooks();
-
-	public void increaseUserAccessLevel(User theUser);
-
-	public void decreaseUserAccessLevel(User theUser);
+	public long getAmountOfAllUsers();
 
 }
