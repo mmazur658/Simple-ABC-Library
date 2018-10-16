@@ -8,22 +8,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Scope("session")
 @RequestMapping("/adminstrator")
 public class AdminController {
-	
+
 	@RequestMapping("/errors-and-problems")
 	public String errorsAndProblems() {
-		
+
 		return "errors-and-problems";
 	}
-	
+
 	@RequestMapping("/configuration")
 	public String configuration() {
-		
+
 		return "configuration";
 	}
-	
+
 	@RequestMapping("test-page")
 	public String testPage() {
-		
+
 		return "test-page";
 	}
 

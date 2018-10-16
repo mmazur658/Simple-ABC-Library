@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
 	private AccessLevelControl loginAndAccessLevelCheck;
 
 	@Autowired
-	ForbiddenWords forbiddenWords;
+	private ForbiddenWords forbiddenWords;
 
 	@Override
 	@Transactional

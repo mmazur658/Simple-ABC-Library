@@ -21,6 +21,7 @@ public class MessageDAOImpl implements MessageDAO {
 		return sessionFactory.getCurrentSession();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Message> getAllUserMessages(int userId, int messageInboxStartResult) {
 
@@ -63,6 +64,7 @@ public class MessageDAOImpl implements MessageDAO {
 		currentSession().save(message);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Message> getAllUserSentMessages(int userId, int messageSentStartResult) {
 
@@ -77,6 +79,7 @@ public class MessageDAOImpl implements MessageDAO {
 		return userSentMessagesList;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public long countUnreadMessages(int userId) {
 
@@ -88,6 +91,7 @@ public class MessageDAOImpl implements MessageDAO {
 		return count;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public long getAmountOfAllInboxMessages(int userId) {
 
@@ -103,7 +107,8 @@ public class MessageDAOImpl implements MessageDAO {
 	public long getAmountOfAllSentMessages(int userId) {
 
 		String hql = "SELECT COUNT(*) FROM Message WHERE sender.id=:id AND senderIsActive=true";
-		Query theQuery = currentSession().createQuery(hql);
+		@SuppressWarnings("unchecked")
+		Query<Long> theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("id", userId);
 		Long count = (Long) theQuery.uniqueResult();
 

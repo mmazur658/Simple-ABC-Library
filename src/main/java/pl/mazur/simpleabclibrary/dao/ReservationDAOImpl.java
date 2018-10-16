@@ -33,6 +33,7 @@ public class ReservationDAOImpl implements ReservationDAO {
 		currentSession().save(reservation);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Reservation> getUserReservations(int userId) {
 
@@ -55,6 +56,7 @@ public class ReservationDAOImpl implements ReservationDAO {
 		currentSession().update(reservation);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Reservation> getAllReservation(boolean isActive) {
 
@@ -82,15 +84,16 @@ public class ReservationDAOImpl implements ReservationDAO {
 		currentSession().update(reservation);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public long getAmountOfSearchResult(String hql) {
-
 		Query<Long> theQuery = currentSession().createQuery(hql);
 		Long count = (Long) theQuery.uniqueResult();
 
 		return count;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public long getAmountOfAllReservation() {
 
@@ -101,6 +104,7 @@ public class ReservationDAOImpl implements ReservationDAO {
 		return count;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Reservation> getAllReservation(Integer startResult) {
 
@@ -114,19 +118,17 @@ public class ReservationDAOImpl implements ReservationDAO {
 		return reservationList;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Reservation> reservationSearchResult(String hql, Integer startResult) {
 
 		List<Reservation> reservationList = new ArrayList<>();
 		try {
-
 			Query<Reservation> theQuery = currentSession().createQuery(hql);
 			theQuery.setFirstResult(startResult);
 			theQuery.setMaxResults(10);
 			reservationList = theQuery.getResultList();
-
 			return reservationList;
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

@@ -20,7 +20,7 @@ public interface MessageDAO {
 	long getAmountOfAllInboxMessages(int userId);
 
 	long getAmountOfAllSentMessages(int userId);
-	
+
 	public void updateMessage(Message message);
 
 }

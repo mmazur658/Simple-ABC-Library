@@ -1,6 +1,5 @@
 package pl.mazur.simpleabclibrary.controller;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +16,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pl.mazur.simpleabclibrary.entity.LoggedInUser;
 import pl.mazur.simpleabclibrary.entity.Message;
-import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.service.MessageService;
 import pl.mazur.simpleabclibrary.service.UserService;
 import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
@@ -51,7 +49,7 @@ public class MessageController {
 						: 0)
 				: 0;
 		session.setAttribute("messageInboxStartResult", messageInboxStartResult);
-						
+
 		int userId = (int) session.getAttribute("userId");
 		List<Message> userMessagesList = messageService.getAllUserMessages(userId, messageInboxStartResult);
 		long amountOfResults = messageService.getAmountOfAllInboxMessages(userId);
@@ -80,14 +78,14 @@ public class MessageController {
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
-		
+
 		messageSentStartResult = (messageSentStartResult == null)
 				? ((session.getAttribute("messageSentStartResult") != null)
 						? (Integer) session.getAttribute("messageSentStartResult")
 						: 0)
 				: 0;
 		session.setAttribute("messageSentStartResult", messageSentStartResult);
-		
+
 		int userId = (int) session.getAttribute("userId");
 		List<Message> userSentMessagesList = messageService.getAllUserSentMessages(userId, messageSentStartResult);
 		long amountOfResults = messageService.getAmountOfAllSentMessages(userId);

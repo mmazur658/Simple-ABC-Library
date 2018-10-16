@@ -18,8 +18,8 @@ public class ErrorController {
 		HttpSession session = request.getSession();
 
 		int errorCode = getErrorCode(request);
-		
-		System.out.println("Error code: "+errorCode);
+
+		System.out.println("Error code: " + errorCode);
 
 		String errorMessage = "";
 
@@ -32,8 +32,8 @@ public class ErrorController {
 			errorMessage = "Http Error Code: 401. Unauthorized";
 			break;
 		}
-		case 404:{
-			errorMessage ="Http Error Code: 404. Resource not found";
+		case 404: {
+			errorMessage = "Http Error Code: 404. Resource not found";
 		}
 		case 500: {
 			errorMessage = "Http Error Code: 500. Internal Server Error";

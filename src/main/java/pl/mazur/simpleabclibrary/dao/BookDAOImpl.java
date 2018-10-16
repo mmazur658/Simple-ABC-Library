@@ -1,7 +1,6 @@
 package pl.mazur.simpleabclibrary.dao;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -29,6 +28,7 @@ public class BookDAOImpl implements BookDAO {
 		return sessionFactory.getCurrentSession();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Book> getAllBooks(int startResult) {
 
@@ -42,6 +42,7 @@ public class BookDAOImpl implements BookDAO {
 		return listOfAllBooks;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Book> bookSearchResult(String hql, int startResult) {
 
@@ -91,6 +92,7 @@ public class BookDAOImpl implements BookDAO {
 		currentSession().save(borrowedBook);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<BorrowedBook> getUserBorrowedBookList(int userId) {
 
@@ -103,6 +105,7 @@ public class BookDAOImpl implements BookDAO {
 		return userBorrowedBookList;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void closeBorrowedBook(Book book) {
 
@@ -120,6 +123,7 @@ public class BookDAOImpl implements BookDAO {
 		return currentSession().get(BorrowedBook.class, borrowedBookId);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Date getExpectedEndDate(User tempUser, Book book) {
 
@@ -132,6 +136,7 @@ public class BookDAOImpl implements BookDAO {
 		return borrowedBook.getExpectedEndDate();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public long getAmountOfSearchResult(String hql) {
 
@@ -141,6 +146,7 @@ public class BookDAOImpl implements BookDAO {
 		return count;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public long getAmountOfAllBooks() {
 
@@ -151,6 +157,7 @@ public class BookDAOImpl implements BookDAO {
 		return count;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<BorrowedBook> getAllBorrowedBookList() {
 

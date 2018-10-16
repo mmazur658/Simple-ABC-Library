@@ -1,7 +1,6 @@
 package pl.mazur.simpleabclibrary.utils.pdf;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,7 +18,6 @@ import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
 import com.opensymphony.xwork2.util.ClassLoaderUtil;
 
 import pl.mazur.simpleabclibrary.entity.Book;
@@ -35,7 +33,6 @@ public class BookLabelGeneratorImpl implements BookLabelGenerator {
 	public File generateBookLabel(Book theBook, String userName) {
 
 		File tempFile = null;
-		PdfWriter writer;
 		Document document = new Document();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
@@ -44,8 +41,6 @@ public class BookLabelGeneratorImpl implements BookLabelGenerator {
 		String stringBookId = String.valueOf(theBook.getId());
 		try {
 			tempFile = File.createTempFile("tempFile", ".pdf");
-			writer = PdfWriter.getInstance(document, new FileOutputStream(tempFile));
-
 			Image logoImage = Image.getInstance(url);
 			Image barcodeImage = Image.getInstance(BarcodeGenerator.generateBarcode(stringBookId));
 

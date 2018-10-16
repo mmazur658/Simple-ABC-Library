@@ -134,7 +134,6 @@ public class PeselValidatorImpl implements PeselValidator {
 
 	private boolean checkMonth() {
 		int month = getBirthMonth();
-		int day = getBirthDay();
 		if (month > 0 && month < 13) {
 			return true;
 		} else {

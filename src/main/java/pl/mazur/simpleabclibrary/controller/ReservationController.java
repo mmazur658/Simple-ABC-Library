@@ -57,7 +57,7 @@ public class ReservationController {
 						: 0)
 				: 0;
 		session.setAttribute("reservationStartResult", reservationStartResult);
-						
+
 		boolean hasAnyParameters = reservationService.hasTableAnyParameters(reservationSearchParameters);
 		List<Reservation> reservationList = hasAnyParameters
 				? reservationService.reservationSearchResult(reservationSearchParameters, reservationStartResult)

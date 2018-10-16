@@ -28,11 +28,11 @@
 			      <div class="modal-body">
 			        <form action="main-bookstore">
 			          <div class="form-group">
-			          <input class="form-control" placeholder="ID" type="text" name ="id" value = "<%=(session.getAttribute("id")==null) ? "" : session.getAttribute("id")%>"/>
-						<input class="form-control" placeholder="Tytuł" type="text" name="title" value = "<%=(session.getAttribute("title")==null) ? "" : session.getAttribute("title")%>"/>
-						<input class="form-control" placeholder="Autor" type="text" name="author" value = "<%=(session.getAttribute("author")==null) ? "" : session.getAttribute("author") %>"/>
-						<input class="form-control" placeholder="Wydawca" type="text" name="publisher" value = "<%=(session.getAttribute("publisher")== null) ? "" : session.getAttribute("publisher")%>"/>
-						<input class="form-control" placeholder="ISBN" type="text" name="isbn" value = "<%=(session.getAttribute("isbn")==null) ? "" : session.getAttribute("isbn")%>"/>	
+			          <input class="form-control" placeholder="ID" type="text" name ="id" value = "<%=(session.getAttribute("bookSeachParamId")==null) ? "" : session.getAttribute("bookSeachParamId")%>"/>
+						<input class="form-control" placeholder="Tytuł" type="text" name="title" value = "<%=(session.getAttribute("bookSeachParamTitle")==null) ? "" : session.getAttribute("bookSeachParamTitle")%>"/>
+						<input class="form-control" placeholder="Autor" type="text" name="author" value = "<%=(session.getAttribute("bookSeachParamAuthor")==null) ? "" : session.getAttribute("bookSeachParamAuthor") %>"/>
+						<input class="form-control" placeholder="Wydawca" type="text" name="publisher" value = "<%=(session.getAttribute("bookSeachParamPublisher")== null) ? "" : session.getAttribute("bookSeachParamPublisher")%>"/>
+						<input class="form-control" placeholder="ISBN" type="text" name="isbn" value = "<%=(session.getAttribute("bookSeachParamIsbn")==null) ? "" : session.getAttribute("bookSeachParamIsbn")%>"/>	
 					  </div>
 			         <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Zamknij</button>
 			         <input class="btn btn-secondary float-right mr-2" type="submit" value="Szukaj">

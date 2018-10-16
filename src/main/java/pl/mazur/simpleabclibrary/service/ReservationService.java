@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import pl.mazur.simpleabclibrary.entity.Book;
 import pl.mazur.simpleabclibrary.entity.Reservation;
 
 public interface ReservationService {
@@ -47,4 +48,6 @@ public interface ReservationService {
 	public long generateShowMoreLinkValue(Integer startResult, long amountOfResults);
 
 	public String generateResultRange(Integer startResult, long amountOfResults, long showMoreLinkValue);
+
+	public void createReservation(Book tempBook, int userId);
 }

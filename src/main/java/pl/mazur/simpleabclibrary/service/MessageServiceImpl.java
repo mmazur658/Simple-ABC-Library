@@ -17,7 +17,7 @@ public class MessageServiceImpl implements MessageService {
 
 	@Autowired
 	private MessageDAO messageDAO;
-	
+
 	@Autowired
 	private UserDAO userDAO;
 
@@ -36,7 +36,7 @@ public class MessageServiceImpl implements MessageService {
 	@Override
 	@Transactional
 	public void changeReadStatus(int messageId, String boxType) {
-		
+
 		Message message = messageDAO.getMessage(messageId);
 		if (boxType.equals("sent")) {
 			if (message.getSenderIsRead())
@@ -55,7 +55,7 @@ public class MessageServiceImpl implements MessageService {
 	@Override
 	@Transactional
 	public void setReadStatusTrue(int messageId, String boxType) {
-		
+
 		Message message = messageDAO.getMessage(messageId);
 		if (boxType.equals("sent")) {
 			message.setSenderIsRead(true);
@@ -68,7 +68,7 @@ public class MessageServiceImpl implements MessageService {
 	@Override
 	@Transactional
 	public void setReadStatusFalse(int messageId, String boxType) {
-		
+
 		Message message = messageDAO.getMessage(messageId);
 		if (boxType.equals("sent")) {
 			message.setSenderIsRead(false);
@@ -115,11 +115,12 @@ public class MessageServiceImpl implements MessageService {
 	}
 
 	@Override
+	@Transactional
 	public void sendMessage(int senderID, String recipientEmail, String subject, String text) {
-		
+
 		User sender = userDAO.getUser(senderID);
 		User recipient = userDAO.getUser(recipientEmail);
-		
+
 		Message message = new Message();
 		message.setRecipientIsActive(true);
 		message.setRecipientIsRead(false);
@@ -130,7 +131,7 @@ public class MessageServiceImpl implements MessageService {
 		message.setStartDate(new Date());
 		message.setSubject(subject);
 		message.setText(text);
-		
+
 		messageDAO.sendMessage(message);
 	}
 

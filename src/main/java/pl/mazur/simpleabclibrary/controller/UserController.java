@@ -32,7 +32,6 @@ import pl.mazur.simpleabclibrary.service.PdfService;
 import pl.mazur.simpleabclibrary.service.ReservationService;
 import pl.mazur.simpleabclibrary.service.UserService;
 import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
-import pl.mazur.simpleabclibrary.utils.ForbiddenWords;
 import pl.mazur.simpleabclibrary.utils.PasswordValidator;
 
 @Controller
@@ -322,8 +321,9 @@ public class UserController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		String[] userSearchParameters = userService.prepareTableToSearch(session, "userManagement", userManagementUserId,
-				userManagementFirstName, userManagementLastName, userManagementEmail, userManagementPesel);
+		String[] userSearchParameters = userService.prepareTableToSearch(session, "userManagement",
+				userManagementUserId, userManagementFirstName, userManagementLastName, userManagementEmail,
+				userManagementPesel);
 
 		userManagementStartResult = (userManagementStartResult == null)
 				? ((session.getAttribute("userManagementStartResult") != null)
@@ -336,12 +336,12 @@ public class UserController {
 		List<User> usersList = hasAnyParameters
 				? userService.getUserSearchResult(userSearchParameters, userManagementStartResult)
 				: userService.getAllUsers(userManagementStartResult);
-		long amountOfResults = hasAnyParameters 
-				? userService.getAmountOfSearchResult(userSearchParameters)
+		long amountOfResults = hasAnyParameters ? userService.getAmountOfSearchResult(userSearchParameters)
 				: userService.getAmountOfAllUsers();
-		
-		long showMoreLinkValue=userService.generateShowMoreLinkValue(userManagementStartResult,amountOfResults);
-		String resultRange = userService.generateResultRange(userManagementStartResult,amountOfResults,showMoreLinkValue);
+
+		long showMoreLinkValue = userService.generateShowMoreLinkValue(userManagementStartResult, amountOfResults);
+		String resultRange = userService.generateResultRange(userManagementStartResult, amountOfResults,
+				showMoreLinkValue);
 		long showLessLinkValue = userService.generateShowLessLinkValue(userManagementStartResult);
 
 		theModel.addAttribute("userManagementStartResult", userManagementStartResult);

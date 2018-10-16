@@ -70,29 +70,28 @@ public class BorrowBookController {
 			Model theModel, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if(!accessLevelControl.isEmployee((LoggedInUser)session.getAttribute("loggedInUser")))
+		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
-		
-		String[] userSearchParameters = userService.prepareTableToSearch(session, "borrowBook", borrowBookSelectedUserId,
-				borrowBookFirstName, borrowBookLastName, borrowBookEmail, borrowBookPesel);
-		
+
+		String[] userSearchParameters = userService.prepareTableToSearch(session, "borrowBook",
+				borrowBookSelectedUserId, borrowBookFirstName, borrowBookLastName, borrowBookEmail, borrowBookPesel);
+
 		borrowBookStartResult = (borrowBookStartResult == null)
 				? ((session.getAttribute("borrowBookStartResult") != null)
 						? (Integer) session.getAttribute("borrowBookStartResult")
 						: 0)
 				: 0;
 		session.setAttribute("borrowBookStartResult", borrowBookStartResult);
-		
+
 		boolean hasAnyParameters = userService.hasTableAnyParameters(userSearchParameters);
 		List<User> usersList = hasAnyParameters
 				? userService.getUserSearchResult(userSearchParameters, borrowBookStartResult)
 				: userService.getAllUsers(borrowBookStartResult);
-		long amountOfResults = hasAnyParameters 
-				? userService.getAmountOfSearchResult(userSearchParameters)
+		long amountOfResults = hasAnyParameters ? userService.getAmountOfSearchResult(userSearchParameters)
 				: userService.getAmountOfAllUsers();
 
-		long showMoreLinkValue=userService.generateShowMoreLinkValue(borrowBookStartResult,amountOfResults);
-		String resultRange = userService.generateResultRange(borrowBookStartResult,amountOfResults,showMoreLinkValue);
+		long showMoreLinkValue = userService.generateShowMoreLinkValue(borrowBookStartResult, amountOfResults);
+		String resultRange = userService.generateResultRange(borrowBookStartResult, amountOfResults, showMoreLinkValue);
 		long showLessLinkValue = userService.generateShowLessLinkValue(borrowBookStartResult);
 		List<Book> tempBookList = new ArrayList<>();
 
@@ -112,7 +111,7 @@ public class BorrowBookController {
 	public String clearUserSearchParameters(HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if(!accessLevelControl.isEmployee((LoggedInUser)session.getAttribute("loggedInUser")))
+		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		userService.clearSearchParameters(session, "borrowBook");
@@ -135,9 +134,9 @@ public class BorrowBookController {
 			Model theModel, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if(!accessLevelControl.isEmployee((LoggedInUser)session.getAttribute("loggedInUser")))
+		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
-		
+
 		session.setAttribute("borrowBookStartResult", null);
 
 		borrowBookChooseBookStartResult = (borrowBookChooseBookStartResult == null)
@@ -151,29 +150,27 @@ public class BorrowBookController {
 		if (selectedUserId == null)
 			theUserId = Integer.valueOf((String) session.getAttribute("selectedUserId"));
 		else
-			session.setAttribute("selectedUserId", selectedUserId);	
-			theUserId = Integer.valueOf(selectedUserId);
+			session.setAttribute("selectedUserId", selectedUserId);
+		theUserId = Integer.valueOf(selectedUserId);
 
 		User user = userService.getUser(theUserId);
 		List<BorrowedBook> borrowedBookList = bookService.getUserBorrowedBookList(user.getId());
+		@SuppressWarnings("unchecked")
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
 		List<Reservation> tempReservationList = reservationService.getUserReservations(theUserId);
 
 		isAbleToBorrow = true;
-
 		if (borrowedBookList.size() + tempBookList.size() >= 5) {
 			isAbleToBorrow = false;
 			extraMessage = " Limit wypo¿yczenia zosta³ osi¹gniêty";
-		} else {
+		} else
 			extraMessage = " U¿ytkownik mo¿e wypo¿yczyæ jeszcze: "
 					+ (5 - borrowedBookList.size() - tempBookList.size());
-		}
 
 		if (isAbleToBorrow) {
 			for (BorrowedBook borrowedBook : borrowedBookList) {
 				Long currentTimeMillis = System.currentTimeMillis();
 				Long expTimeMillis = borrowedBook.getExpectedEndDate().getTime();
-
 				if (currentTimeMillis > expTimeMillis) {
 					isAbleToBorrow = false;
 					extraMessage = " U¿ytkownik posiada przeterminowan¹ ksi¹¿kê";
@@ -182,70 +179,21 @@ public class BorrowBookController {
 			}
 		}
 
-		if (!(title == null))
-			session.setAttribute("borrowBookSeachParamTitle", title);
-		if (!(bookId == null))
-			session.setAttribute("borrowBookSeachParamId", bookId);
-		if (!(author == null))
-			session.setAttribute("borrowBookSeachParamAuthor", author);
-		if (!(isbn == null))
-			session.setAttribute("borrowBookSeachParamIsbn", isbn);
-		if (!(publisher == null))
-			session.setAttribute("borrowBookSeachParamPublisher", publisher);
+		String[] searchBookParameters = bookService.prepareTableToSearch(session, "borrowBook", title, bookId, author,
+				isbn, publisher);
+		boolean hasAnyParameters = bookService.hasTableAnyParameters(searchBookParameters);
 
-		if ((title == null) && !(session.getAttribute("title") == null))
-			title = (String) session.getAttribute("title");
-		if ((bookId == null) && !(session.getAttribute("id") == null))
-			bookId = (String) session.getAttribute("id");
-		if ((author == null) && !(session.getAttribute("author") == null))
-			author = (String) session.getAttribute("author");
-		if ((publisher == null) && !(session.getAttribute("publisher") == null))
-			publisher = (String) session.getAttribute("publisher");
-		if ((isbn == null) && !(session.getAttribute("isbn") == null))
-			isbn = (String) session.getAttribute("isbn");
+		List<Book> booksList = hasAnyParameters
+				? bookService.bookSearchResult(searchBookParameters, borrowBookChooseBookStartResult)
+				: bookService.getAllBooks(borrowBookChooseBookStartResult);
+		long amountOfResults = hasAnyParameters ? bookService.getAmountOfSearchResult(searchBookParameters)
+				: bookService.getAmountOfAllBooks();
 
-		String[] searchParameters = { "", "", "", "", "", "" };
-		searchParameters[0] = (title == null) ? "" : title.trim();
-		searchParameters[1] = (author == null) ? "" : author.trim();
-		searchParameters[2] = (publisher == null) ? "" : publisher.trim();
-		searchParameters[3] = (isbn == null) ? "" : isbn.trim();
-		searchParameters[4] = "";
-		searchParameters[5] = (bookId == null) ? "" : bookId.trim();
-
-		for (String word : searchParameters) {
-			if (forbiddenWords.findForbiddenWords(word))
-				return "redirect:/error";
-		}
-
-		List<Book> booksList;
-		long amountOfResults;
-
-		if (!searchParameters[0].equals("") || !searchParameters[1].equals("") || !searchParameters[2].equals("")
-				|| !searchParameters[3].equals("") || !searchParameters[4].equals("")
-				|| !searchParameters[5].equals("")) {
-			amountOfResults = bookService.getAmountOfSearchResult(searchParameters);
-			booksList = bookService.bookSearchResult(searchParameters, borrowBookChooseBookStartResult);
-		} else {
-			amountOfResults = bookService.getAmountOfAllBooks();
-			booksList = bookService.getAllBooks(borrowBookChooseBookStartResult);
-		}
-
-		String resultRange;
-		long showMoreLinkValue = 0;
-		if ((borrowBookChooseBookStartResult + 10) > amountOfResults) {
-			showMoreLinkValue = borrowBookChooseBookStartResult;
-			resultRange = "Wyniki od " + (borrowBookChooseBookStartResult + 1) + " do " + amountOfResults;
-		} else {
-			showMoreLinkValue = borrowBookChooseBookStartResult + 10;
-			resultRange = "Wyniki od " + (borrowBookChooseBookStartResult + 1) + " do " + showMoreLinkValue;
-		}
-
-		long showLessLinkValue = 0;
-		if ((borrowBookChooseBookStartResult - 10) < 0) {
-			showLessLinkValue = 0;
-		} else {
-			showLessLinkValue = borrowBookChooseBookStartResult - 10;
-		}
+		long showMoreLinkValue = bookService.generateShowMoreLinkValue(borrowBookChooseBookStartResult,
+				amountOfResults);
+		String resultRange = bookService.generateResultRange(borrowBookChooseBookStartResult, amountOfResults,
+				showMoreLinkValue);
+		long showLessLinkValue = bookService.generateShowLessLinkValue(borrowBookChooseBookStartResult);
 
 		theModel.addAttribute("borrowBookChooseBookStartResult", borrowBookChooseBookStartResult);
 		session.setAttribute("borrowBookChooseBookStartResult", borrowBookChooseBookStartResult);
@@ -269,10 +217,10 @@ public class BorrowBookController {
 	public String clearBookSearchParameters(HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if(!accessLevelControl.isEmployee((LoggedInUser)session.getAttribute("loggedInUser")))
+		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		bookService.clearBookSearchParameters(session);
+		bookService.clearBorrowedBookSearchParameters(session);
 
 		return "redirect:/borrow-book/borrow-book-choose-books";
 	}
@@ -283,32 +231,16 @@ public class BorrowBookController {
 			RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-		if(!accessLevelControl.isEmployee((LoggedInUser)session.getAttribute("loggedInUser")))
+		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		if (isAbleToBorrow) {
-			List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
-			Book theBook = bookService.getBook(bookId);
-			boolean isAllreadyOnTheList = false;
-
-			for (Book tempBook : tempBookList) {
-				if (tempBook.getId() == theBook.getId())
-					isAllreadyOnTheList = true;
-			}
-
-			if (!isAllreadyOnTheList) {
-				tempBookList.add(theBook);
-				session.setAttribute("tempBookList", tempBookList);
-				redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka zosta³a dodana do listy. ");
-				return "redirect:/borrow-book/borrow-book-choose-books";
-			} else {
-				redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka ju¿ znajduje siê na liœcie. ");
-				return "redirect:/borrow-book/borrow-book-choose-books";
-			}
-		} else {
+			String errorMessage = bookService.addBookToList(session, bookId);
+			redirectAttributes.addAttribute("errorMessage", errorMessage);
+		} else
 			redirectAttributes.addAttribute("errorMessage", "Nie mo¿na wypo¿yczyæ wiêcej ksi¹¿ek");
-			return "redirect:/borrow-book/borrow-book-choose-books";
-		}
+
+		return "redirect:/borrow-book/borrow-book-choose-books";
 
 	}
 
@@ -318,35 +250,16 @@ public class BorrowBookController {
 			RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-		if(!accessLevelControl.isEmployee((LoggedInUser)session.getAttribute("loggedInUser")))
+		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
-		
-		if(isAbleToBorrow) {
-			List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
-			Reservation reservation = reservationService.getReservation(reservationId);
-			Book theBook = reservation.getBook();
-			boolean isAllreadyOnTheList = false;
 
-			for (Book tempBook : tempBookList) {
-				if (tempBook.getId() == theBook.getId())
-					isAllreadyOnTheList = true;
-			}
-
-			if (!isAllreadyOnTheList) {
-				reservationService.deleteReservationInOrderToCreateBorrowedBook(reservation);
-				tempBookList.add(theBook);
-				session.setAttribute("tempBookList", tempBookList);
-				redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka zosta³a dodana do listy");
-				return "redirect:/borrow-book/borrow-book-choose-books";
-			} else {
-				redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka ju¿ znajduje siê na liœcie. ");
-				return "redirect:/borrow-book/borrow-book-choose-books";
-			}
-		} else {
+		if (isAbleToBorrow) {
+			String errorMessage = bookService.addReservedBookToList(session, reservationId);
+			redirectAttributes.addAttribute("errorMessage", errorMessage);
+		} else
 			redirectAttributes.addAttribute("errorMessage", "Nie mo¿na wypo¿yczyæ wiêcej ksi¹¿ek");
-			return "redirect:/borrow-book/borrow-book-choose-books";
-		}
-		
+
+		return "redirect:/borrow-book/borrow-book-choose-books";
 
 	}
 
@@ -355,7 +268,7 @@ public class BorrowBookController {
 			RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
-		if(!accessLevelControl.isEmployee((LoggedInUser)session.getAttribute("loggedInUser")))
+		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		bookService.deleteBookFromList(session, bookId);
@@ -368,34 +281,25 @@ public class BorrowBookController {
 	public String borrowBooks(HttpServletRequest request, RedirectAttributes redirectAttributes, Model theModel) {
 
 		HttpSession session = request.getSession();
-		if(!accessLevelControl.isEmployee((LoggedInUser)session.getAttribute("loggedInUser")))
+		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
+		@SuppressWarnings("unchecked")
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
 
 		if (tempBookList.size() < 1) {
 			redirectAttributes.addAttribute("systemMessage", "Lista ksi¹¿ek do wypo¿yczenia jest pusta!!");
 			return "redirect:/borrow-book/borrow-book-choose-books";
-		} else {
-			User tempUser = userService.getUser(Integer.valueOf((String) session.getAttribute("selectedUserId")));
-			StringBuilder sb = new StringBuilder();
-
-			sb.append(tempUser.getId());
-			sb.append(" ");
-
-			for (Book tempBook : tempBookList) {
-				bookService.borrowBook(tempBook, tempUser);
-				sb.append(tempBook.getId());
-				sb.append(" ");
-			}
-			String borrowedBookInfo = sb.toString();
-
-			theModel.addAttribute("borrowedBookInfo", borrowedBookInfo);
-			session.setAttribute("isUserAbleToBorrow", false);
-			session.setAttribute("tempBookList", null);
-
-			return "borrow-book-confirmation";
 		}
+
+		String borrowedBookInfo = bookService.borrowBooks(session);
+
+		theModel.addAttribute("borrowedBookInfo", borrowedBookInfo);
+		session.setAttribute("isUserAbleToBorrow", false);
+		session.setAttribute("tempBookList", null);
+
+		return "borrow-book-confirmation";
+
 	}
 
 	@RequestMapping("/generate-borrowed-book-confirmation")
@@ -426,14 +330,13 @@ public class BorrowBookController {
 
 		InputStreamResource isr = new InputStreamResource(new FileInputStream(tempFile));
 		return new ResponseEntity<InputStreamResource>(isr, responseHeaders, HttpStatus.OK);
-
 	}
 
 	@RequestMapping("/cancel-borrowed-book")
 	public String cancelBorrowedBook(HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		if(!accessLevelControl.isEmployee((LoggedInUser)session.getAttribute("loggedInUser")))
+		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		bookService.cancelBorrowedBook(session);

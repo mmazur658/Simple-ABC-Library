@@ -76,7 +76,7 @@ public class ReturnBookController {
 						: 0)
 				: 0;
 		session.setAttribute("returnBookStartResult", returnBookStartResult);
-						
+
 		boolean hasAnyParameters = userService.hasTableAnyParameters(userSearchParameters);
 		List<User> usersList = hasAnyParameters
 				? userService.getUserSearchResult(userSearchParameters, returnBookStartResult)
@@ -252,7 +252,7 @@ public class ReturnBookController {
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
-		
+
 		bookService.cancelBookReturning(session);
 
 		return "redirect:/user/main";

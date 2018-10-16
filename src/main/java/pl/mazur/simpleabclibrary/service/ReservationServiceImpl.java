@@ -34,7 +34,7 @@ public class ReservationServiceImpl implements ReservationService {
 
 	@Autowired
 	MessageDAO messageDAO;
-	
+
 	@Autowired
 	ForbiddenWords forbiddenWords;
 
@@ -194,7 +194,8 @@ public class ReservationServiceImpl implements ReservationService {
 	@Transactional
 	public long getAmountOfSearchResult(String[] reservationSearchParameters) {
 
-		String hql = prepareHqlUsingReservationSearchParameters(reservationSearchParameters, "select count(*) from Reservation where ");
+		String hql = prepareHqlUsingReservationSearchParameters(reservationSearchParameters,
+				"select count(*) from Reservation where ");
 		return reservationDAO.getAmountOfSearchResult(hql);
 	}
 
@@ -213,7 +214,7 @@ public class ReservationServiceImpl implements ReservationService {
 	@Override
 	@Transactional
 	public List<Reservation> reservationSearchResult(String[] reservationSearchParameters, Integer startResult) {
-		
+
 		String hql = prepareHqlUsingReservationSearchParameters(reservationSearchParameters, "from Reservation where ");
 		return reservationDAO.reservationSearchResult(hql, startResult);
 	}
@@ -238,14 +239,13 @@ public class ReservationServiceImpl implements ReservationService {
 		session.setAttribute("bookId", null);
 		session.setAttribute("bookTitle", null);
 		session.setAttribute("reservationStartResult", null);
-		
+
 	}
 
 	@Override
 	public String[] prepareTableToSearch(HttpSession session, String customerId, String customerFirstName,
 			String customerLastName, String customerPesel, String bookId, String bookTitle,
 			Integer reservationStartResult) {
-
 
 		if (!(customerId == null))
 			session.setAttribute("customerId", customerId);
@@ -280,13 +280,13 @@ public class ReservationServiceImpl implements ReservationService {
 		reservationSearchParameters[3] = (customerPesel == null) ? "" : customerPesel;
 		reservationSearchParameters[4] = (bookId == null) ? "" : bookId;
 		reservationSearchParameters[5] = (bookTitle == null) ? "" : bookTitle;
-		
+
 		for (int i = 0; i < reservationSearchParameters.length; i++) {
 			if (forbiddenWords.findForbiddenWords(reservationSearchParameters[i])) {
 				reservationSearchParameters[i] = "";
 			}
 		}
-		
+
 		return reservationSearchParameters;
 
 	}
@@ -328,5 +328,26 @@ public class ReservationServiceImpl implements ReservationService {
 			return "Wyniki od " + (startResult + 1) + " do " + showMoreLinkValue;
 		}
 	}
-	
+
+	@Override
+	@Transactional
+	public void createReservation(Book tempBook, int userId) {
+
+		Reservation reservation = new Reservation();
+		reservation.setBook(tempBook);
+		reservation.setUser(userDAO.getUser(userId));
+		reservation.setIsActive(true);
+		reservation.setStartDate(new Date());
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(reservation.getStartDate());
+		calendar.add(Calendar.DATE, 2);
+		reservation.setEndDate(calendar.getTime());
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		String date = sdf.format(calendar.getTime());
+		reservation.setStatus("Rezerwacja wa¿na do " + date);
+
+		reservationDAO.createReservation(reservation);
+
+	}
+
 }

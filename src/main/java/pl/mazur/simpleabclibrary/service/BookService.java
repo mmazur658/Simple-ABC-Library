@@ -51,10 +51,32 @@ public interface BookService {
 
 	public void cancelBookReturning(HttpSession session);
 
-	public void clearBookSearchParameters(HttpSession session);
+	public void clearBorrowedBookSearchParameters(HttpSession session);
 
 	public void cancelBorrowedBook(HttpSession session);
 
 	public void deleteBookFromList(HttpSession session, int bookId);
+
+	public String[] prepareTableToSearch(HttpSession session, String searchType, String title, String bookId, String author,
+			String isbn, String publisher);
+
+	public long generateShowLessLinkValue(Integer startResult);
+
+	public String generateResultRange(Integer startResult, long amountOfResults,
+			long showMoreLinkValue);
+
+	public long generateShowMoreLinkValue(Integer startResult, long amountOfResults);
+
+	public boolean hasTableAnyParameters(String[] searchBookParameters);
+
+	public String addBookToList(HttpSession session, int bookId);
+
+	public String addReservedBookToList(HttpSession session, int reservationId);
+
+	public String borrowBooks(HttpSession session);
+
+	public void clearBookSearchParameters(HttpSession session);
+	
+	public String prepareHqlUsingBookSearchParameters(String[] searchBookParameters,String searchType);
 
 }

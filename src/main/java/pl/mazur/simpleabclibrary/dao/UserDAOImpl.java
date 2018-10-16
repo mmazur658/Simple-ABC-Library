@@ -35,11 +35,12 @@ public class UserDAOImpl implements UserDAO {
 		return currentSession().get(User.class, theId);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public User getUser(String email) {
 
 		String hql = "select id from User where email=:email";
-		Query theQuery = currentSession().createQuery(hql);
+		Query<Integer> theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("email", email);
 		int theId = (int) theQuery.getSingleResult();
 		User tempUser = getUser(theId);
@@ -47,6 +48,7 @@ public class UserDAOImpl implements UserDAO {
 		return tempUser;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean checkEmailIsExist(String email) {
 
@@ -66,19 +68,20 @@ public class UserDAOImpl implements UserDAO {
 		return passwordUtils.checkPassword(thePasswordFromForm, theEncryptedPasswordFromDatabase);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean verificationAndAuthentication(String email, String thePasswordFromForm) {
 
 		String hql = "select isActive from User where email=:email";
-		Query theQuery = currentSession().createQuery(hql);
-		theQuery.setParameter("email", email.trim());
-		boolean isActive = (boolean) theQuery.getSingleResult();
+		Query<Boolean> theIsActiveQuery = currentSession().createQuery(hql);
+		theIsActiveQuery.setParameter("email", email.trim());
+		boolean isActive = (boolean) theIsActiveQuery.getSingleResult();
 		System.out.println("userDAO: " + isActive);
 
 		if (isActive) {
 
 			hql = "select password from User where email=:email";
-			theQuery = currentSession().createQuery(hql);
+			Query<String> theQuery = currentSession().createQuery(hql);
 			theQuery.setParameter("email", email.trim());
 			String theEncryptedPasswordFromDatabase = (String) theQuery.getSingleResult();
 			return authenticatePassword(thePasswordFromForm, theEncryptedPasswordFromDatabase);
@@ -103,12 +106,13 @@ public class UserDAOImpl implements UserDAO {
 		currentSession().update(tempUser);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<User> getAllUsers(int startResult) {
 
 		List<User> usersList = new ArrayList<>();
 		String hql = "from User where isActive = true ORDER BY id ASC";
-		Query theQuery = currentSession().createQuery(hql);
+		Query<User> theQuery = currentSession().createQuery(hql);
 		theQuery.setFirstResult(startResult);
 		theQuery.setMaxResults(10);
 		usersList = theQuery.getResultList();
@@ -116,6 +120,7 @@ public class UserDAOImpl implements UserDAO {
 		return usersList;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<User> getUserSearchResult(String hql, int startResult) {
 
@@ -135,6 +140,7 @@ public class UserDAOImpl implements UserDAO {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public long getAmountOfSearchResult(String hql) {
 
@@ -144,6 +150,7 @@ public class UserDAOImpl implements UserDAO {
 		return count;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public long getAmountOfAllUsers() {
 
