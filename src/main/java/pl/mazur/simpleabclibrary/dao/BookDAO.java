@@ -11,7 +11,7 @@ public interface BookDAO {
 
 	public List<Book> getAllBooks(int startResult);
 
-	public List<Book> bookSearchResult(String[] searchParameters, int startResult);
+	public List<Book> bookSearchResult(String hql, int startResult);
 
 	public void saveBook(Book tempBook);
 
@@ -23,11 +23,9 @@ public interface BookDAO {
 
 	public void deleteBook(Book tempBook);
 
-	public void borrowBook(Book tempBook, User tempUser);
+	public void borrowBook(BorrowedBook borrowedBook);
 
 	public List<BorrowedBook> getUserBorrowedBookList(int userId);
-
-	public void returnBook(Book book);
 
 	public void closeBorrowedBook(Book book);
 
@@ -35,7 +33,7 @@ public interface BookDAO {
 
 	public Date getExpectedEndDate(User tempUser, Book book);
 
-	public long getAmountOfSearchResult(String[] searchParameters);
+	public long getAmountOfSearchResult(String hql);
 
 	public long getAmountOfAllBooks();
 

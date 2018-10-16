@@ -1,7 +1,6 @@
 package pl.mazur.simpleabclibrary.dao;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -22,38 +21,26 @@ public class UserDAOImpl implements UserDAO {
 	@Autowired
 	private PasswordUtils passwordUtils;
 
+	protected Session currentSession() {
+		return sessionFactory.getCurrentSession();
+	}
+
 	@Override
 	public void saveUser(User theUser) {
-
-		Session session = sessionFactory.getCurrentSession();
-
-		theUser.setActive(true);
-		theUser.setAdmin(false);
-		theUser.setEmployee(false);
-		theUser.setStartDate(new Date());
-		theUser.setPassword(passwordUtils.encryptPassword(theUser.getPassword().trim()));
-
-		session.save(theUser);
+		currentSession().save(theUser);
 	}
 
 	@Override
 	public User getUser(int theId) {
-
-		Session session = sessionFactory.getCurrentSession();
-
-		User tempUser = session.get(User.class, theId);
-
-		return tempUser;
+		return currentSession().get(User.class, theId);
 	}
 
 	@Override
 	public User getUser(String email) {
 
-		Session session = sessionFactory.getCurrentSession();
-
 		String hql = "select id from User where email=:email";
-		Query theQuery = session.createQuery(hql);
-		theQuery.setParameter("email", email.trim());
+		Query theQuery = currentSession().createQuery(hql);
+		theQuery.setParameter("email", email);
 		int theId = (int) theQuery.getSingleResult();
 		User tempUser = getUser(theId);
 
@@ -63,10 +50,8 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public boolean checkEmailIsExist(String email) {
 
-		Session session = sessionFactory.getCurrentSession();
-
 		String hql = "select count(*) from User where email=:email";
-		Query theQuery = session.createQuery(hql);
+		Query<Long> theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("email", email);
 		Long count = (Long) theQuery.uniqueResult();
 
@@ -74,7 +59,6 @@ public class UserDAOImpl implements UserDAO {
 			return true;
 		else
 			return false;
-
 	}
 
 	@Override
@@ -85,10 +69,8 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public boolean verificationAndAuthentication(String email, String thePasswordFromForm) {
 
-		Session session = sessionFactory.getCurrentSession();
-
 		String hql = "select isActive from User where email=:email";
-		Query theQuery = session.createQuery(hql);
+		Query theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("email", email.trim());
 		boolean isActive = (boolean) theQuery.getSingleResult();
 		System.out.println("userDAO: " + isActive);
@@ -96,7 +78,7 @@ public class UserDAOImpl implements UserDAO {
 		if (isActive) {
 
 			hql = "select password from User where email=:email";
-			theQuery = session.createQuery(hql);
+			theQuery = currentSession().createQuery(hql);
 			theQuery.setParameter("email", email.trim());
 			String theEncryptedPasswordFromDatabase = (String) theQuery.getSingleResult();
 			return authenticatePassword(thePasswordFromForm, theEncryptedPasswordFromDatabase);
@@ -109,43 +91,24 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	public void updateUser(User theUser) {
-
-		Session session = sessionFactory.getCurrentSession();
-
-		User tempUser = session.get(User.class, theUser.getId());
-		tempUser.setFirstName(theUser.getFirstName());
-		tempUser.setLastName(theUser.getLastName());
-		tempUser.setEmail(theUser.getEmail());
-		tempUser.setPesel(theUser.getPesel());
-		tempUser.setStreet(theUser.getStreet());
-		tempUser.setHouseNumber(theUser.getHouseNumber());
-		tempUser.setCity(theUser.getCity());
-		tempUser.setPostalCode(theUser.getPostalCode());
-		tempUser.setSex(theUser.getSex());
-		tempUser.setBirthday(theUser.getBirthday());
-
-		session.update(tempUser);
+		currentSession().update(theUser);
 	}
 
 	@Override
 	public void changePassword(int userId, String newPassword) {
 
-		Session session = sessionFactory.getCurrentSession();
-
-		User tempUser = session.get(User.class, userId);
+		User tempUser = currentSession().get(User.class, userId);
 		tempUser.setPassword(passwordUtils.encryptPassword(newPassword));
 
-		session.update(tempUser);
-
+		currentSession().update(tempUser);
 	}
 
 	@Override
 	public List<User> getAllUsers(int startResult) {
 
-		Session session = sessionFactory.getCurrentSession();
-
 		List<User> usersList = new ArrayList<>();
-		Query theQuery = session.createQuery("from User where isActive = true ORDER BY id ASC");
+		String hql = "from User where isActive = true ORDER BY id ASC";
+		Query theQuery = currentSession().createQuery(hql);
 		theQuery.setFirstResult(startResult);
 		theQuery.setMaxResults(10);
 		usersList = theQuery.getResultList();
@@ -154,66 +117,12 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public List<User> getUserSearchResult(String[] userSearchParameters, int startResult) {
-		// 1 - userId, 2 - first name, 3 - last name, 4 - email, 5 - pesel,
-		boolean isContent = false;
-		StringBuilder sb = new StringBuilder();
+	public List<User> getUserSearchResult(String hql, int startResult) {
+
 		List<User> userList = new ArrayList<>();
 
-		sb.append("from User where ");
-
-		if (!userSearchParameters[0].equals("")) {
-			sb.append("id like '%" + userSearchParameters[0] + "%'");
-			isContent = true;
-		}
-		if (!userSearchParameters[1].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("firstName like '%" + userSearchParameters[1] + "%'");
-			} else {
-				sb.append("firstName like '%" + userSearchParameters[1] + "%'");
-				isContent = true;
-			}
-		}
-		if (!userSearchParameters[2].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("lastName like '%" + userSearchParameters[2] + "%'");
-			} else {
-				sb.append("lastName like '%" + userSearchParameters[2] + "%'");
-				isContent = true;
-			}
-		}
-		if (!userSearchParameters[3].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("email like '%" + userSearchParameters[3] + "%'");
-			} else {
-				sb.append("email like '%" + userSearchParameters[3] + "%'");
-				isContent = true;
-			}
-		}
-		if (!userSearchParameters[4].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("pesel like '%" + userSearchParameters[4] + "%'");
-			} else {
-				sb.append("pesel like '%" + userSearchParameters[4] + "%'");
-				isContent = true;
-			}
-		}
-		if (isContent) {
-			sb.append(" AND isActive = true ORDER BY id ASC");
-		} else {
-			sb.append("isAdmin=true");
-
-		}
-
-		String hql = sb.toString();
-
 		try {
-			Session session = sessionFactory.getCurrentSession();
-			Query theQuery = session.createQuery(hql);
+			Query<User> theQuery = currentSession().createQuery(hql);
 			theQuery.setFirstResult(startResult);
 			theQuery.setMaxResults(10);
 			userList = theQuery.getResultList();
@@ -227,66 +136,9 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public long getAmountOfSearchResult(String[] userSearchParameters) {
+	public long getAmountOfSearchResult(String hql) {
 
-		boolean isContent = false;
-		StringBuilder sb = new StringBuilder();
-		List<User> userList = new ArrayList<>();
-
-		sb.append("SELECT COUNT(*) FROM User where ");
-
-		if (!userSearchParameters[0].equals("")) {
-			sb.append("id like '%" + userSearchParameters[0] + "%'");
-			isContent = true;
-		}
-		if (!userSearchParameters[1].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("firstName like '%" + userSearchParameters[1] + "%'");
-			} else {
-				sb.append("firstName like '%" + userSearchParameters[1] + "%'");
-				isContent = true;
-			}
-		}
-		if (!userSearchParameters[2].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("lastName like '%" + userSearchParameters[2] + "%'");
-			} else {
-				sb.append("lastName like '%" + userSearchParameters[2] + "%'");
-				isContent = true;
-			}
-		}
-		if (!userSearchParameters[3].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("email like '%" + userSearchParameters[3] + "%'");
-			} else {
-				sb.append("email like '%" + userSearchParameters[3] + "%'");
-				isContent = true;
-			}
-		}
-		if (!userSearchParameters[4].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("pesel like '%" + userSearchParameters[4] + "%'");
-			} else {
-				sb.append("pesel like '%" + userSearchParameters[4] + "%'");
-				isContent = true;
-			}
-		}
-
-		if (isContent) {
-			sb.append(" AND isActive = true ORDER BY id ASC");
-		} else {
-			sb.append("isAdmin=true");
-
-		}
-
-		Session session = sessionFactory.getCurrentSession();
-
-		String hql = sb.toString();
-		Query theQuery = session.createQuery(hql);
+		Query<Long> theQuery = currentSession().createQuery(hql);
 		Long count = (Long) theQuery.uniqueResult();
 
 		return count;
@@ -295,9 +147,8 @@ public class UserDAOImpl implements UserDAO {
 	@Override
 	public long getAmountOfAllBooks() {
 
-		Session session = sessionFactory.getCurrentSession();
-
-		Query theQuery = session.createQuery("select count(*) from User WHERE isActive = true ORDER BY id ASC");
+		String hql = "select count(*) from User WHERE isActive = true ORDER BY id ASC";
+		Query<Long> theQuery = currentSession().createQuery(hql);
 		Long count = (Long) theQuery.uniqueResult();
 
 		return count;
@@ -305,18 +156,12 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	public void increaseUserAccessLevel(User theUser) {
-
-		Session session = sessionFactory.getCurrentSession();
-		session.update(theUser);
-
+		currentSession().update(theUser);
 	}
 
 	@Override
 	public void decreaseUserAccessLevel(User theUser) {
-
-		Session session = sessionFactory.getCurrentSession();
-		session.update(theUser);
-
+		currentSession().update(theUser);
 	}
 
 }

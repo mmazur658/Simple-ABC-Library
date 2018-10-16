@@ -30,19 +30,46 @@ public class MessageServiceImpl implements MessageService {
 	@Override
 	@Transactional
 	public void changeReadStatus(int messageId, String boxType) {
-		messageDAO.changeReadStatus(messageId, boxType);
+		
+		Message message = messageDAO.getMessage(messageId);
+		if (boxType.equals("sent")) {
+			if (message.getSenderIsRead())
+				message.setSenderIsRead(false);
+			else
+				message.setSenderIsRead(true);
+		} else {
+			if (message.getRecipientIsRead())
+				message.setRecipientIsRead(false);
+			else
+				message.setRecipientIsRead(true);
+		}
+		messageDAO.updateMessage(message);
 	}
 
 	@Override
 	@Transactional
 	public void setReadStatusTrue(int messageId, String boxType) {
-		messageDAO.setReadStatusTrue(messageId, boxType);
+		
+		Message message = messageDAO.getMessage(messageId);
+		if (boxType.equals("sent")) {
+			message.setSenderIsRead(true);
+		} else {
+			message.setRecipientIsRead(true);
+		}
+		messageDAO.updateMessage(message);
 	}
 
 	@Override
 	@Transactional
 	public void setReadStatusFalse(int messageId, String boxType) {
-		messageDAO.setReadStatusFalse(messageId, boxType);
+		
+		Message message = messageDAO.getMessage(messageId);
+		if (boxType.equals("sent")) {
+			message.setSenderIsRead(false);
+		} else {
+			message.setRecipientIsRead(false);
+		}
+		messageDAO.updateMessage(message);
 	}
 
 	@Override

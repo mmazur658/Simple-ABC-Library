@@ -24,9 +24,9 @@ public interface UserDAO {
 
 	public List<User> getAllUsers(int startResult);
 
-	public List<User> getUserSearchResult(String[] userSearchParameters, int startResult);
+	public List<User> getUserSearchResult(String hql, int startResult);
 
-	public long getAmountOfSearchResult(String[] userSearchParameters);
+	public long getAmountOfSearchResult(String hql);
 
 	public long getAmountOfAllBooks();
 

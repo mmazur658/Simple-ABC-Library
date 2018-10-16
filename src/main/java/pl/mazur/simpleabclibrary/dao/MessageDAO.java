@@ -9,12 +9,6 @@ public interface MessageDAO {
 
 	Message getMessage(int messageId);
 
-	void changeReadStatus(int messageId, String boxType);
-
-	void setReadStatusTrue(int messageId, String boxType);
-
-	void setReadStatusFalse(int messageId, String boxType);
-
 	void deleteMessage(int messageId, String boxType);
 
 	void sendMessage(Message message);
@@ -26,5 +20,7 @@ public interface MessageDAO {
 	long getAmountOfAllInboxMessages(int userId);
 
 	long getAmountOfAllSentMessages(int userId);
+	
+	public void updateMessage(Message message);
 
 }

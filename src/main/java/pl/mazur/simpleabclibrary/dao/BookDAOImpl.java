@@ -25,12 +25,16 @@ public class BookDAOImpl implements BookDAO {
 	@Autowired
 	private ReservationDAO reservationDAO;
 
+	protected Session currentSession() {
+		return sessionFactory.getCurrentSession();
+	}
+
 	@Override
 	public List<Book> getAllBooks(int startResult) {
 
-		Session session = sessionFactory.getCurrentSession();
 		List<Book> listOfAllBooks = new ArrayList<>();
-		Query theQuery = session.createQuery("from Book where isActive = true ORDER BY id ASC");
+		String hql = "from Book where isActive = true ORDER BY id ASC";
+		Query<Book> theQuery = currentSession().createQuery(hql);
 		theQuery.setFirstResult(startResult);
 		theQuery.setMaxResults(10);
 		listOfAllBooks = theQuery.getResultList();
@@ -39,207 +43,88 @@ public class BookDAOImpl implements BookDAO {
 	}
 
 	@Override
-	public List<Book> bookSearchResult(String[] searchParameters, int startResult) {
+	public List<Book> bookSearchResult(String hql, int startResult) {
 
-		// 0 - title, 1 - author, 2 - publisher, 3 - isbn, 5-id
-
-		boolean isContent = false;
-		StringBuilder sb = new StringBuilder();
 		List<Book> booksList = new ArrayList<>();
 
-		sb.append("from Book where ");
-
-		if (!searchParameters[0].equals("")) {
-			sb.append("title like '%" + searchParameters[0] + "%'");
-			isContent = true;
-		}
-
-		if (!searchParameters[1].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("author like '%" + searchParameters[1] + "%'");
-			} else {
-				sb.append("author like '%" + searchParameters[1] + "%'");
-				isContent = true;
-			}
-		}
-
-		if (!searchParameters[2].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("publisher like '%" + searchParameters[2] + "%'");
-			} else {
-				sb.append("publisher like '%" + searchParameters[2] + "%'");
-				isContent = true;
-			}
-		}
-
-		if (!searchParameters[3].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("isbn like '%" + searchParameters[3] + "%'");
-			} else {
-				sb.append("isbn like '%" + searchParameters[3] + "%'");
-				isContent = true;
-			}
-		}
-
-		if (!searchParameters[5].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("id like '%" + searchParameters[5] + "%'");
-			} else {
-				sb.append("id like '%" + searchParameters[5] + "%'");
-				isContent = true;
-			}
-		}
-		sb.append(" AND isActive = true ORDER BY id ASC");
-
-		String hql = sb.toString();
-
 		try {
-			Session session = sessionFactory.getCurrentSession();
-			Query theQuery = session.createQuery(hql);
+			Query<Book> theQuery = currentSession().createQuery(hql);
 			theQuery.setFirstResult(startResult);
 			theQuery.setMaxResults(10);
 			booksList = theQuery.getResultList();
 
 			return booksList;
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
-
 		}
 	}
 
 	@Override
 	public void saveBook(Book tempBook) {
-
-		Session session = sessionFactory.getCurrentSession();
-		session.save(tempBook);
-
+		currentSession().save(tempBook);
 	}
 
 	@Override
 	public Book getBook(int bookId) {
-
-		Session session = sessionFactory.getCurrentSession();
-		Book tempBook = session.get(Book.class, bookId);
-
-		return tempBook;
+		return currentSession().get(Book.class, bookId);
 	}
 
 	@Override
 	public void setBookActive(Book book) {
-
-		Session session = sessionFactory.getCurrentSession();
 		book.setIsAvailable(true);
-		session.update(book);
-
+		currentSession().update(book);
 	}
 
 	@Override
 	public void updateBook(Book book) {
-
-		Session session = sessionFactory.getCurrentSession();
-
-		Book tempBook = session.get(Book.class, book.getId());
-		tempBook.setAuthor(book.getAuthor());
-		tempBook.setTitle(book.getTitle());
-		tempBook.setIsbn(book.getIsbn());
-		tempBook.setLanguage(book.getLanguage());
-		tempBook.setPages(book.getPages());
-		tempBook.setPublisher(book.getPublisher());
-
-		session.update(tempBook);
-
+		currentSession().update(book);
 	}
 
 	@Override
 	public void deleteBook(Book tempBook) {
-
-		Session session = sessionFactory.getCurrentSession();
-		tempBook.setIsActive(false);
-		session.update(tempBook);
-
+		currentSession().update(tempBook);
 	}
 
 	@Override
-	public void borrowBook(Book tempBook, User tempUser) {
-
-		Session session = sessionFactory.getCurrentSession();
-
-		BorrowedBook borrowedBook = new BorrowedBook();
-		borrowedBook.setBook(tempBook);
-		borrowedBook.setUser(tempUser);
-		borrowedBook.setStartDate(new Date());
-
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(borrowedBook.getStartDate());
-		calendar.add(Calendar.DATE, 14);
-
-		borrowedBook.setExpectedEndDate(calendar.getTime());
-		session.save(borrowedBook);
-
-		tempBook.setIsAvailable(false);
-		session.update(tempBook);
-
+	public void borrowBook(BorrowedBook borrowedBook) {
+		currentSession().save(borrowedBook);
 	}
 
 	@Override
 	public List<BorrowedBook> getUserBorrowedBookList(int userId) {
 
-		Session session = sessionFactory.getCurrentSession();
-
 		List<BorrowedBook> userBorrowedBookList = new ArrayList<>();
-		Query theQuery = session
-				.createQuery("from BorrowedBook where user.id=:id AND stopDate = null ORDER BY id ASC");
+		String hql = "from BorrowedBook where user.id=:id AND stopDate = null ORDER BY id ASC";
+		Query<BorrowedBook> theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("id", userId);
 		userBorrowedBookList = theQuery.getResultList();
 
 		return userBorrowedBookList;
-
-	}
-
-	@Override
-	public void returnBook(Book book) {
-
-		Session session = sessionFactory.getCurrentSession();
-
-		book.setIsAvailable(true);
-		session.update(book);
-
 	}
 
 	@Override
 	public void closeBorrowedBook(Book book) {
 
-		Session session = sessionFactory.getCurrentSession();
-
-		Query theQuery = session
-				.createQuery("from BorrowedBook where book.id=:id and stopDate = null ORDER BY id ASC");
+		String hql = "from BorrowedBook where book.id=:id and stopDate = null ORDER BY id ASC";
+		Query<BorrowedBook> theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("id", book.getId());
 		BorrowedBook borrowedBook = (BorrowedBook) theQuery.getSingleResult();
 		borrowedBook.setStopDate(new Date());
-		session.update(borrowedBook);
 
+		currentSession().update(borrowedBook);
 	}
 
 	@Override
 	public BorrowedBook getBorrowedBook(int borrowedBookId) {
-		Session session = sessionFactory.getCurrentSession();
-		BorrowedBook borrowedBook = session.get(BorrowedBook.class, borrowedBookId);
-		return borrowedBook;
+		return currentSession().get(BorrowedBook.class, borrowedBookId);
 	}
 
 	@Override
 	public Date getExpectedEndDate(User tempUser, Book book) {
 
-		Session session = sessionFactory.getCurrentSession();
-
-		Query theQuery = session.createQuery(
-				"from BorrowedBook where book.id=:id and user.id=:userid and stopDate = null ORDER BY id ASC");
+		String hql = "from BorrowedBook where book.id=:id and user.id=:userid and stopDate = null ORDER BY id ASC";
+		Query<BorrowedBook> theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("id", book.getId());
 		theQuery.setParameter("userid", tempUser.getId());
 		BorrowedBook borrowedBook = (BorrowedBook) theQuery.getSingleResult();
@@ -248,74 +133,9 @@ public class BookDAOImpl implements BookDAO {
 	}
 
 	@Override
-	public long getAmountOfSearchResult(String[] searchParameters) {
-		// 0 - title, 1 - author, 2 - publisher, 3 - isbn, 4- isAvailable
+	public long getAmountOfSearchResult(String hql) {
 
-		boolean isContent = false;
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("select count(*) from Book where ");
-
-		if (!searchParameters[0].equals("")) {
-			sb.append("title like '%" + searchParameters[0] + "%'");
-			isContent = true;
-		}
-
-		if (!searchParameters[1].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("author like '%" + searchParameters[1] + "%'");
-			} else {
-				sb.append("author like '%" + searchParameters[1] + "%'");
-				isContent = true;
-			}
-		}
-
-		if (!searchParameters[2].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("publisher like '%" + searchParameters[2] + "%'");
-			} else {
-				sb.append("publisher like '%" + searchParameters[2] + "%'");
-				isContent = true;
-			}
-		}
-
-		if (!searchParameters[3].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("isbn like '%" + searchParameters[3] + "%'");
-			} else {
-				sb.append("isbn like '%" + searchParameters[3] + "%'");
-				isContent = true;
-			}
-		}
-
-		if (searchParameters[4].equals("true")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("isAvailable=true");
-			} else {
-				sb.append("isAvailable=true");
-				isContent = true;
-			}
-		}
-
-		if (!searchParameters[5].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("id like '%" + searchParameters[5] + "%'");
-			} else {
-				sb.append("id like '%" + searchParameters[5] + "%'");
-				isContent = true;
-			}
-		}
-		sb.append(" AND isActive = true ORDER BY id ASC");
-
-		String hql = sb.toString();
-
-		Session session = sessionFactory.getCurrentSession();
-		Query theQuery = session.createQuery(hql);
+		Query<Long> theQuery = currentSession().createQuery(hql);
 		Long count = (Long) theQuery.uniqueResult();
 
 		return count;
@@ -324,8 +144,8 @@ public class BookDAOImpl implements BookDAO {
 	@Override
 	public long getAmountOfAllBooks() {
 
-		Session session = sessionFactory.getCurrentSession();
-		Query theQuery = session.createQuery("select count(*) from Book where isActive = true ORDER BY id ASC");
+		String hql = "select count(*) from Book where isActive = true ORDER BY id ASC";
+		Query<Long> theQuery = currentSession().createQuery(hql);
 		Long count = (Long) theQuery.uniqueResult();
 
 		return count;
@@ -334,9 +154,9 @@ public class BookDAOImpl implements BookDAO {
 	@Override
 	public List<BorrowedBook> getAllBorrowedBookList() {
 
-		Session session = sessionFactory.getCurrentSession();
 		List<BorrowedBook> borrowedBookList = new ArrayList<>();
-		Query theQuery = session.createQuery("FROM BorrowedBook WHERE stopDate = null ORDER BY id ASC");
+		String hql = "FROM BorrowedBook WHERE stopDate = null ORDER BY id ASC";
+		Query<BorrowedBook> theQuery = currentSession().createQuery(hql);
 		borrowedBookList = theQuery.getResultList();
 
 		return borrowedBookList;
@@ -345,14 +165,10 @@ public class BookDAOImpl implements BookDAO {
 	@Override
 	public void setBookActive(int reservationId) {
 
-		Session session = sessionFactory.getCurrentSession();
-
 		Reservation reservation = reservationDAO.getReservation(reservationId);
 		Book book = reservation.getBook();
 		book.setIsAvailable(true);
 
-		session.update(book);
-
+		currentSession().update(book);
 	}
-
 }

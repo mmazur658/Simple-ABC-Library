@@ -17,14 +17,16 @@ public class MessageDAOImpl implements MessageDAO {
 	@Autowired
 	private SessionFactory sessionFactory;
 
+	protected Session currentSession() {
+		return sessionFactory.getCurrentSession();
+	}
+
 	@Override
 	public List<Message> getAllUserMessages(int userId, int messageInboxStartResult) {
 
-		Session session = sessionFactory.getCurrentSession();
-
 		List<Message> userMessagesList = new ArrayList<>();
-		Query theQuery = session
-				.createQuery("FROM Message WHERE recipient.id=:id AND recipientIsActive=true ORDER BY startDate DESC");
+		String hql = "FROM Message WHERE recipient.id=:id AND recipientIsActive=true ORDER BY startDate DESC";
+		Query<Message> theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("id", userId);
 		theQuery.setMaxResults(20);
 		theQuery.setFirstResult(messageInboxStartResult);
@@ -35,114 +37,51 @@ public class MessageDAOImpl implements MessageDAO {
 
 	@Override
 	public Message getMessage(int messageId) {
-
-		Session session = sessionFactory.getCurrentSession();
-
-		Message tempMessage = session.get(Message.class, messageId);
-
-		return tempMessage;
+		return currentSession().get(Message.class, messageId);
 	}
 
 	@Override
-	public void changeReadStatus(int messageId, String boxType) {
-
-		Session session = sessionFactory.getCurrentSession();
-
-		Message message = session.get(Message.class, messageId);
-		if (boxType.equals("sent")) {
-			if (message.getSenderIsRead())
-				message.setSenderIsRead(false);
-			else
-				message.setSenderIsRead(true);
-		} else {
-			if (message.getRecipientIsRead())
-				message.setRecipientIsRead(false);
-			else
-				message.setRecipientIsRead(true);
-		}
-	}
-
-	@Override
-	public void setReadStatusTrue(int messageId, String boxType) {
-
-		Session session = sessionFactory.getCurrentSession();
-
-		Message message = session.get(Message.class, messageId);
-		if (boxType.equals("sent")) {
-			message.setSenderIsRead(true);
-		} else {
-			message.setRecipientIsRead(true);
-		}
-
-		session.update(message);
-
-	}
-
-	@Override
-	public void setReadStatusFalse(int messageId, String boxType) {
-
-		Session session = sessionFactory.getCurrentSession();
-
-		Message message = session.get(Message.class, messageId);
-		if (boxType.equals("sent")) {
-			message.setSenderIsRead(false);
-		} else {
-			message.setRecipientIsRead(false);
-		}
-
-		session.update(message);
-
+	public void updateMessage(Message message) {
+		currentSession().update(message);
 	}
 
 	@Override
 	public void deleteMessage(int messageId, String boxType) {
 
-		Session session = sessionFactory.getCurrentSession();
-
-		Message message = session.get(Message.class, messageId);
+		Message message = currentSession().get(Message.class, messageId);
 		if (boxType.equals("sent")) {
 			message.setSenderIsActive(false);
 		} else {
 			message.setRecipientIsActive(false);
 		}
 
-		session.update(message);
-
+		currentSession().update(message);
 	}
 
 	@Override
 	public void sendMessage(Message message) {
-
-		Session session = sessionFactory.getCurrentSession();
-
-		session.save(message);
-
+		currentSession().save(message);
 	}
 
 	@Override
 	public List<Message> getAllUserSentMessages(int userId, int messageSentStartResult) {
 
-		Session session = sessionFactory.getCurrentSession();
-
 		List<Message> userSentMessagesList = new ArrayList<>();
-		Query theQuery = session
-				.createQuery("FROM Message WHERE sender.id=:id AND senderIsActive=true ORDER BY startDate DESC");
+		String hql = "FROM Message WHERE sender.id=:id AND senderIsActive=true ORDER BY startDate DESC";
+		Query<Message> theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("id", userId);
 		theQuery.setMaxResults(20);
 		theQuery.setFirstResult(messageSentStartResult);
 		userSentMessagesList = theQuery.getResultList();
 
 		return userSentMessagesList;
-
 	}
 
 	@Override
 	public long countUnreadMessages(int userId) {
 
-		Session session = sessionFactory.getCurrentSession();
-
-		Query theQuery = session.createQuery(
-				"SELECT COUNT(*) FROM Message WHERE recipient.id=:id AND recipientIsActive=true AND recipientIsRead=false");
+		String hql = "SELECT COUNT(*) FROM Message WHERE recipient.id=:id AND recipientIsActive=true AND recipientIsRead=false";
+		Query<Long> theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("id", userId);
 		Long count = (Long) theQuery.uniqueResult();
 
@@ -152,10 +91,8 @@ public class MessageDAOImpl implements MessageDAO {
 	@Override
 	public long getAmountOfAllInboxMessages(int userId) {
 
-		Session session = sessionFactory.getCurrentSession();
-
-		Query theQuery = session
-				.createQuery("SELECT COUNT(*) FROM Message WHERE recipient.id=:id AND recipientIsActive=true");
+		String hql = "SELECT COUNT(*) FROM Message WHERE recipient.id=:id AND recipientIsActive=true";
+		Query<Long> theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("id", userId);
 		Long count = (Long) theQuery.uniqueResult();
 
@@ -165,14 +102,11 @@ public class MessageDAOImpl implements MessageDAO {
 	@Override
 	public long getAmountOfAllSentMessages(int userId) {
 
-		Session session = sessionFactory.getCurrentSession();
-
-		Query theQuery = session
-				.createQuery("SELECT COUNT(*) FROM Message WHERE sender.id=:id AND senderIsActive=true");
+		String hql = "SELECT COUNT(*) FROM Message WHERE sender.id=:id AND senderIsActive=true";
+		Query theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("id", userId);
 		Long count = (Long) theQuery.uniqueResult();
 
 		return count;
 	}
-
 }

@@ -17,17 +17,17 @@ public interface ReservationDAO {
 
 	void deleteReservationDueToOutdated(Reservation reservation);
 
-	void increaseExpirationDate(int reservationId);
+	void increaseExpirationDate(Reservation reservation);
 
-	void deleteReservationByEmployee(int reservationId);
+	void deleteReservationByEmployee(Reservation reservation);
 
-	long getAmountOfSearchResult(String[] reservationSearchParameters);
+	long getAmountOfSearchResult(String hql);
 
 	long getAmountOfAllReservation();
 
 	List<Reservation> getAllReservation(Integer startResult);
 
-	List<Reservation> reservationSearchResult(String[] reservationSearchParameters, Integer startResult);
+	List<Reservation> reservationSearchResult(String hql, Integer startResult);
 
 	void deleteReservationByUser(Reservation reservation);
 
