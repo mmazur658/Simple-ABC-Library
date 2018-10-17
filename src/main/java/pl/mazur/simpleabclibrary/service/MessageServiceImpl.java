@@ -135,31 +135,4 @@ public class MessageServiceImpl implements MessageService {
 		messageDAO.sendMessage(message);
 	}
 
-	@Override
-	public long generateShowMoreLinkValue(Integer startResult, long amountOfResults) {
-		if ((startResult + 20) > amountOfResults) {
-			return startResult;
-		} else {
-			return startResult + 20;
-		}
-	}
-
-	@Override
-	public String generateResultRange(Integer startResult, long amountOfResults, long showMoreLinkValue) {
-		if ((startResult + 20) > amountOfResults) {
-			return "Wyniki od " + (startResult + 1) + " do " + amountOfResults;
-		} else {
-			return "Wyniki od " + (startResult + 1) + " do " + showMoreLinkValue;
-		}
-	}
-
-	@Override
-	public long generateShowLessLinkValue(Integer startResult) {
-		if ((startResult - 20) < 0) {
-			return 0;
-		} else {
-			return startResult - 20;
-		}
-	}
-
 }

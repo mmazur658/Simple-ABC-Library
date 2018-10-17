@@ -2,8 +2,6 @@ package pl.mazur.simpleabclibrary.service;
 
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
 import pl.mazur.simpleabclibrary.entity.Book;
 import pl.mazur.simpleabclibrary.entity.Reservation;
 
@@ -35,19 +33,6 @@ public interface ReservationService {
 
 	public void deleteReservationByUser(Reservation reservation);
 
-	public void clearReservationSearchParameters(HttpSession session);
-
-	public String[] prepareTableToSearch(HttpSession session, String customerId, String customerFirstName,
-			String customerLastName, String customerPesel, String bookId, String bookTitle,
-			Integer reservationStartResult);
-
-	public boolean hasTableAnyParameters(String[] reservationSearchParameters);
-
-	public long generateShowLessLinkValue(Integer startResult);
-
-	public long generateShowMoreLinkValue(Integer startResult, long amountOfResults);
-
-	public String generateResultRange(Integer startResult, long amountOfResults, long showMoreLinkValue);
-
 	public void createReservation(Book tempBook, int userId);
+
 }

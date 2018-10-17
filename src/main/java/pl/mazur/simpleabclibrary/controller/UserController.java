@@ -33,6 +33,7 @@ import pl.mazur.simpleabclibrary.service.ReservationService;
 import pl.mazur.simpleabclibrary.service.UserService;
 import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
 import pl.mazur.simpleabclibrary.utils.PasswordValidator;
+import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 
 @Controller
 @Scope("session")
@@ -59,6 +60,9 @@ public class UserController {
 
 	@Autowired
 	PasswordValidator passwordValidator;
+
+	@Autowired
+	SearchEngineUtils searchEngineUtils;
 
 	@RequestMapping("/login-page")
 	public String loginPage(
@@ -147,7 +151,6 @@ public class UserController {
 			redirectAttributes.addAttribute("systemMessage", "Has³o nie spe³nia wymagañ");
 			return "redirect:/user/create-user-form";
 		}
-
 		if (isExist) {
 			theModel.addAttribute("isExist", isExist);
 			return "confirm-page";
@@ -321,28 +324,32 @@ public class UserController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		String[] userSearchParameters = userService.prepareTableToSearch(session, "userManagement",
-				userManagementUserId, userManagementFirstName, userManagementLastName, userManagementEmail,
-				userManagementPesel);
+		String[] searchParametersName = { "userManagementSelectedUserId", "userManagementFirstName",
+				"userManagementLastName", "userManagementEmail", "userManagementPesel" };
+		String[] searchParametersValue = { userManagementUserId, userManagementFirstName, userManagementLastName,
+				userManagementEmail, userManagementPesel };
 
-		userManagementStartResult = (userManagementStartResult == null)
-				? ((session.getAttribute("userManagementStartResult") != null)
-						? (Integer) session.getAttribute("userManagementStartResult")
-						: 0)
-				: 0;
+		String[] userSearchParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
+				searchParametersValue);
+
+		if (userManagementStartResult == null)
+			userManagementStartResult = (Integer) session.getAttribute("userManagementStartResult");
+		if (userManagementStartResult == null)
+			userManagementStartResult = 0;
 		session.setAttribute("userManagementStartResult", userManagementStartResult);
 
-		boolean hasAnyParameters = userService.hasTableAnyParameters(userSearchParameters);
+		boolean hasAnyParameters = searchEngineUtils.hasTableAnyParameters(userSearchParameters);
 		List<User> usersList = hasAnyParameters
 				? userService.getUserSearchResult(userSearchParameters, userManagementStartResult)
 				: userService.getAllUsers(userManagementStartResult);
 		long amountOfResults = hasAnyParameters ? userService.getAmountOfSearchResult(userSearchParameters)
 				: userService.getAmountOfAllUsers();
 
-		long showMoreLinkValue = userService.generateShowMoreLinkValue(userManagementStartResult, amountOfResults);
-		String resultRange = userService.generateResultRange(userManagementStartResult, amountOfResults,
-				showMoreLinkValue);
-		long showLessLinkValue = userService.generateShowLessLinkValue(userManagementStartResult);
+		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(userManagementStartResult, amountOfResults,
+				10);
+		String resultRange = searchEngineUtils.generateResultRange(userManagementStartResult, amountOfResults,
+				showMoreLinkValue, 10);
+		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(userManagementStartResult, 10);
 
 		theModel.addAttribute("userManagementStartResult", userManagementStartResult);
 		theModel.addAttribute("amountOfResults", amountOfResults);
@@ -423,7 +430,9 @@ public class UserController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		userService.clearSearchParameters(session, "userManagement");
+		String[] searchParametersName = { "userManagementStartResult", "userManagementSelectedUserId",
+				"userManagementFirstName", "userManagementLastName", "userManagementEmail", "userManagementPesel" };
+		searchEngineUtils.clearSearchParameters(session, searchParametersName);
 
 		return "redirect:/user/user-management";
 	}

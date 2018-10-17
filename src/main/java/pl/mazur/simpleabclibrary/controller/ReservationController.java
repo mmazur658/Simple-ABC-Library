@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.mazur.simpleabclibrary.entity.LoggedInUser;
 import pl.mazur.simpleabclibrary.entity.Reservation;
 import pl.mazur.simpleabclibrary.service.ReservationService;
-import pl.mazur.simpleabclibrary.utils.ForbiddenWords;
+import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
 
 @Controller
@@ -31,7 +31,7 @@ public class ReservationController {
 	ReservationService reservationService;
 
 	@Autowired
-	ForbiddenWords forbiddenWords;
+	SearchEngineUtils searchEngineUtils;
 
 	@RequestMapping("/reservation-management")
 	public String reservationPage(@RequestParam(required = false, name = "systemMessage") String systemMessage,
@@ -48,17 +48,20 @@ public class ReservationController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		String[] reservationSearchParameters = reservationService.prepareTableToSearch(session, customerId,
-				customerFirstName, customerLastName, customerPesel, bookId, bookTitle, reservationStartResult);
+		String[] searchParametersName = { "customerId", "customerFirstName", "customerLastName", "customerPesel",
+				"bookId", "bookTitle" };
+		String[] searchParametersValue = { customerId, customerFirstName, customerLastName, customerPesel, bookId,
+				bookTitle };
+		String[] reservationSearchParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
+				searchParametersValue);
 
-		reservationStartResult = (reservationStartResult == null)
-				? ((session.getAttribute("reservationStartResult") != null)
-						? (Integer) session.getAttribute("reservationStartResult")
-						: 0)
-				: 0;
+		if (reservationStartResult == null)
+			reservationStartResult = (Integer) session.getAttribute("reservationStartResult");
+		if (reservationStartResult == null)
+			reservationStartResult = 0;
 		session.setAttribute("reservationStartResult", reservationStartResult);
 
-		boolean hasAnyParameters = reservationService.hasTableAnyParameters(reservationSearchParameters);
+		boolean hasAnyParameters = searchEngineUtils.hasTableAnyParameters(reservationSearchParameters);
 		List<Reservation> reservationList = hasAnyParameters
 				? reservationService.reservationSearchResult(reservationSearchParameters, reservationStartResult)
 				: reservationService.getAllReservation(reservationStartResult);
@@ -66,10 +69,11 @@ public class ReservationController {
 				? reservationService.getAmountOfSearchResult(reservationSearchParameters)
 				: reservationService.getAmountOfAllReservation();
 
-		long showMoreLinkValue = reservationService.generateShowMoreLinkValue(reservationStartResult, amountOfResults);
-		String resultRange = reservationService.generateResultRange(reservationStartResult, amountOfResults,
-				showMoreLinkValue);
-		long showLessLinkValue = reservationService.generateShowLessLinkValue(reservationStartResult);
+		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(reservationStartResult, amountOfResults,
+				10);
+		String resultRange = searchEngineUtils.generateResultRange(reservationStartResult, amountOfResults,
+				showMoreLinkValue, 10);
+		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(reservationStartResult, 10);
 
 		session.setAttribute("reservationStartResult", reservationStartResult);
 		theModel.addAttribute("showLessLinkValue", showLessLinkValue);
@@ -90,7 +94,9 @@ public class ReservationController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		reservationService.clearReservationSearchParameters(session);
+		String[] searchParametersName = { "customerId", "customerFirstName", "customerLastName", "customerPesel",
+				"bookId", "bookTitle", "reservationStartResult" };
+		searchEngineUtils.clearSearchParameters(session, searchParametersName);
 
 		return "redirect:/reservation/reservation-management";
 	}

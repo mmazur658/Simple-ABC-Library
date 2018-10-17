@@ -30,8 +30,8 @@ import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.PdfService;
 import pl.mazur.simpleabclibrary.service.ReservationService;
 import pl.mazur.simpleabclibrary.service.UserService;
-import pl.mazur.simpleabclibrary.utils.ForbiddenWords;
 import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
+import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 
 @Controller
 @Scope("session")
@@ -54,7 +54,7 @@ public class BookController {
 	ReservationService reservationService;
 
 	@Autowired
-	ForbiddenWords forbiddenWords;
+	SearchEngineUtils searchEngineUtils;
 
 	@RequestMapping("/main-bookstore")
 	public String mainBookstore(HttpServletRequest request, Model theModel,
@@ -70,13 +70,18 @@ public class BookController {
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		String[] searchBookParameters = bookService.prepareTableToSearch(session, "book", title, bookId, author, isbn,
-				publisher);
-		boolean hasAnyParameters = bookService.hasTableAnyParameters(searchBookParameters);
+		String[] searchParametersName = { "bookSeachParamTitle", "bookSeachParamAuthor", "bookSeachParamPublisher",
+				"bookSeachParamIsbn", "bookSeachParamId" };
+		String[] searchParametersValue = { title, author, publisher, isbn, bookId };
 
-		startResult = (startResult == null)
-				? ((session.getAttribute("startResult") != null) ? (Integer) session.getAttribute("startResult") : 0)
-				: 0;
+		String[] searchBookParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
+				searchParametersValue);
+		boolean hasAnyParameters = searchEngineUtils.hasTableAnyParameters(searchBookParameters);
+
+		if (startResult == null)
+			startResult = (Integer) session.getAttribute("startResult");
+		if (startResult == null)
+			startResult = 0;
 		session.setAttribute("startResult", startResult);
 
 		List<Book> booksList = hasAnyParameters ? bookService.bookSearchResult(searchBookParameters, startResult)
@@ -84,10 +89,14 @@ public class BookController {
 		long amountOfResults = hasAnyParameters ? bookService.getAmountOfSearchResult(searchBookParameters)
 				: bookService.getAmountOfAllBooks();
 
-		long showMoreLinkValue = bookService.generateShowMoreLinkValue(startResult, amountOfResults);
-		String resultRange = bookService.generateResultRange(startResult, amountOfResults, showMoreLinkValue);
-		long showLessLinkValue = bookService.generateShowLessLinkValue(startResult);
+		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(startResult, amountOfResults, 10);
+		String resultRange = searchEngineUtils.generateResultRange(startResult, amountOfResults, showMoreLinkValue, 10);
+		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(startResult, 10);
 
+		List<Reservation> userReservationList = reservationService
+				.getUserReservations((int) session.getAttribute("userId"));
+
+		session.setAttribute("userReservationsCount", userReservationList.size());
 		theModel.addAttribute("startResult", startResult);
 		theModel.addAttribute("amountOfResults", amountOfResults);
 		theModel.addAttribute("showMoreLinkValue", showMoreLinkValue);
@@ -109,7 +118,9 @@ public class BookController {
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		bookService.clearBookSearchParameters(session);
+		String[] searchParameters = { "bookSeachParamTitle", "bookSeachParamId", "bookSeachParamAuthor",
+				"bookSeachParamPublisher", "bookSeachParamIsbn", "bookSeachParamIsAvailable" };
+		searchEngineUtils.clearSearchParameters(session, searchParameters);
 
 		return "redirect:/book/main-bookstore";
 	}
@@ -148,6 +159,7 @@ public class BookController {
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
+
 		Book tempBook = bookService.getBook(bookId);
 
 		theModel.addAttribute("tempBook", tempBook);
@@ -172,14 +184,11 @@ public class BookController {
 			Book tempBook = bookService.getBook(bookId);
 
 			if (tempBook.getIsAvailable()) {
-
 				reservationService.createReservation(tempBook, userId);
-
 				redirectAttributes.addAttribute("systemSuccessMessage", "Rezerwacja zosta³a dodana.");
 				redirectAttributes.addAttribute("bookId", bookId);
 			} else {
-				redirectAttributes.addAttribute("systemErrorMessage",
-						"Nie mo¿na zarezerwowaæ niedostêpnej ksi¹¿ki . . . ");
+				redirectAttributes.addAttribute("systemErrorMessage", "Nie mo¿na zarezerwowaæ niedostêpnej ksi¹¿ki.");
 				redirectAttributes.addAttribute("bookId", bookId);
 			}
 		}
@@ -197,7 +206,6 @@ public class BookController {
 
 		Reservation reservation = reservationService.getReservation(reservationId);
 		reservationService.deleteReservationByUser(reservation);
-
 		redirectAttributes.addAttribute("systemSuccessMessage", "Rezerwacja zosta³a usuniêta");
 
 		if (deleteReservationWayBack.equals("main-bookstore"))
@@ -259,13 +267,19 @@ public class BookController {
 	}
 
 	@RequestMapping("/book-details")
-	public String bookDetails(@RequestParam("bookId") int bookId, Model theModel, HttpServletRequest request,
+	public String bookDetails(@RequestParam(required = false, name = "bookId") Integer bookId, Model theModel,
+			HttpServletRequest request,
 			@RequestParam(required = false, name = "systemErrorMessage") String systemErrorMessage,
 			@RequestParam(required = false, name = "systemSuccessMessage") String systemSuccessMessage) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
+
+		if (bookId != null)
+			session.setAttribute("bookId", bookId);
+		if (bookId == null)
+			bookId = (Integer) session.getAttribute("bookId");
 
 		Book tempBook = bookService.getBook(bookId);
 

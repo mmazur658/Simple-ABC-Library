@@ -3,8 +3,6 @@ package pl.mazur.simpleabclibrary.service;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,27 +10,27 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.mazur.simpleabclibrary.dao.UserDAO;
 import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
-import pl.mazur.simpleabclibrary.utils.ForbiddenWords;
 import pl.mazur.simpleabclibrary.utils.PasswordUtils;
 import pl.mazur.simpleabclibrary.utils.PeselValidator;
+import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 
 @Service
 public class UserServiceImpl implements UserService {
 
 	@Autowired
-	private UserDAO userDAO;
+	UserDAO userDAO;
 
 	@Autowired
-	private PeselValidator peselValidator;
+	PeselValidator peselValidator;
 
 	@Autowired
-	private PasswordUtils passwordUtils;
+	PasswordUtils passwordUtils;
 
 	@Autowired
-	private AccessLevelControl loginAndAccessLevelCheck;
+	AccessLevelControl loginAndAccessLevelCheck;
 
 	@Autowired
-	private ForbiddenWords forbiddenWords;
+	SearchEngineUtils searchEngineUtils;
 
 	@Override
 	@Transactional
@@ -74,7 +72,6 @@ public class UserServiceImpl implements UserService {
 	public void updateUser(User theUser) {
 
 		User tempUser = userDAO.getUser(theUser.getId());
-
 		tempUser.setFirstName(theUser.getFirstName());
 		tempUser.setLastName(theUser.getLastName());
 		tempUser.setEmail(theUser.getEmail());
@@ -90,7 +87,7 @@ public class UserServiceImpl implements UserService {
 			tempUser.setBirthday(peselValidator.getBirthDate(theUser.getPesel()));
 		}
 
-		userDAO.updateUser(theUser);
+		userDAO.updateUser(tempUser);
 	}
 
 	@Override
@@ -115,7 +112,9 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public List<User> getUserSearchResult(String[] userSearchParameters, int startResult) {
 
-		String hql = prepareHqlUsingUserSearchParameters(userSearchParameters, "from User where ");
+		String searchType = "from User where ";
+		String[] fieldsName = { "id", "firstName", "lastName", "email", "pesel" };
+		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(userSearchParameters, searchType, fieldsName);
 		return userDAO.getUserSearchResult(hql, startResult);
 	}
 
@@ -123,65 +122,10 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public long getAmountOfSearchResult(String[] userSearchParameters) {
 
-		String hql = prepareHqlUsingUserSearchParameters(userSearchParameters, "SELECT COUNT(*) FROM User where ");
+		String searchType = "SELECT COUNT(*) FROM User where ";
+		String[] fieldsName = { "id", "firstName", "lastName", "email", "pesel" };
+		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(userSearchParameters, searchType, fieldsName);
 		return userDAO.getAmountOfSearchResult(hql);
-	}
-
-	public String prepareHqlUsingUserSearchParameters(String[] userSearchParameters, String searchType) {
-		// 1 - userId, 2 - first name, 3 - last name, 4 - email, 5 - pesel,
-		boolean isContent = false;
-		StringBuilder sb = new StringBuilder();
-
-		sb.append(searchType);
-
-		if (!userSearchParameters[0].equals("")) {
-			sb.append("id like '%" + userSearchParameters[0] + "%'");
-			isContent = true;
-		}
-		if (!userSearchParameters[1].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("firstName like '%" + userSearchParameters[1] + "%'");
-			} else {
-				sb.append("firstName like '%" + userSearchParameters[1] + "%'");
-				isContent = true;
-			}
-		}
-		if (!userSearchParameters[2].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("lastName like '%" + userSearchParameters[2] + "%'");
-			} else {
-				sb.append("lastName like '%" + userSearchParameters[2] + "%'");
-				isContent = true;
-			}
-		}
-		if (!userSearchParameters[3].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("email like '%" + userSearchParameters[3] + "%'");
-			} else {
-				sb.append("email like '%" + userSearchParameters[3] + "%'");
-				isContent = true;
-			}
-		}
-		if (!userSearchParameters[4].equals("")) {
-			if (isContent) {
-				sb.append(" AND ");
-				sb.append("pesel like '%" + userSearchParameters[4] + "%'");
-			} else {
-				sb.append("pesel like '%" + userSearchParameters[4] + "%'");
-				isContent = true;
-			}
-		}
-		if (isContent) {
-			sb.append(" AND isActive = true ORDER BY id ASC");
-		} else {
-			sb.append("isAdmin=true");
-
-		}
-
-		return sb.toString();
 	}
 
 	@Override
@@ -235,92 +179,4 @@ public class UserServiceImpl implements UserService {
 		return loginAndAccessLevelCheck.getUserAccessLevel(theUser);
 	}
 
-	@Override
-	public String[] prepareTableToSearch(HttpSession session, String searchType, String userId, String userFirstName,
-			String userLastName, String userEmail, String userPesel) {
-
-		if (!(userId == null))
-			session.setAttribute(searchType + "SelectedUserId", userId);
-		if (!(userFirstName == null))
-			session.setAttribute(searchType + "FirstName", userFirstName);
-		if (!(userLastName == null))
-			session.setAttribute(searchType + "LastName", userLastName);
-		if (!(userEmail == null))
-			session.setAttribute(searchType + "Email", userEmail);
-		if (!(userPesel == null))
-			session.setAttribute(searchType + "Pesel", userPesel);
-
-		if ((userId == null) && !(session.getAttribute(searchType + "SelectedUserId") == null))
-			userId = String.valueOf(session.getAttribute(searchType + "SelectedUserId"));
-		if ((userFirstName == null) && !(session.getAttribute(searchType + "FirstName") == null))
-			userFirstName = String.valueOf(session.getAttribute(searchType + "FirstName"));
-		if ((userLastName == null) && !(session.getAttribute(searchType + "LastName") == null))
-			userLastName = String.valueOf(session.getAttribute(searchType + "LastName"));
-		if ((userEmail == null) && !(session.getAttribute(searchType + "Email") == null))
-			userEmail = String.valueOf(session.getAttribute(searchType + "Email"));
-		if ((userPesel == null) && !(session.getAttribute(searchType + "Pesel") == null))
-			userPesel = String.valueOf(session.getAttribute(searchType + "Pesel"));
-
-		String[] userSearchParameters = { "", "", "", "", "", "", "", "" };
-		userSearchParameters[0] = (userId == null) ? "" : userId.trim();
-		userSearchParameters[1] = (userFirstName == null) ? "" : userFirstName.trim();
-		userSearchParameters[2] = (userLastName == null) ? "" : userLastName.trim();
-		userSearchParameters[3] = (userEmail == null) ? "" : userEmail.trim();
-		userSearchParameters[4] = (userPesel == null) ? "" : userPesel.trim();
-
-		for (int i = 0; i < userSearchParameters.length; i++) {
-			if (forbiddenWords.findForbiddenWords(userSearchParameters[i])) {
-				userSearchParameters[i] = "";
-			}
-		}
-		return userSearchParameters;
-	}
-
-	@Override
-	public boolean hasTableAnyParameters(String[] userSearchParameters) {
-
-		boolean hasAnyParameters = false;
-		for (int i = 0; i < userSearchParameters.length; i++) {
-			if (userSearchParameters[i] != "")
-				hasAnyParameters = true;
-		}
-		return hasAnyParameters;
-	}
-
-	@Override
-	public long generateShowLessLinkValue(Integer startResult) {
-		if ((startResult - 10) < 0) {
-			return 0;
-		} else {
-			return startResult - 10;
-		}
-	}
-
-	@Override
-	public long generateShowMoreLinkValue(Integer startResult, long amountOfResults) {
-		if ((startResult + 10) > amountOfResults) {
-			return startResult;
-		} else {
-			return startResult + 10;
-		}
-	}
-
-	@Override
-	public String generateResultRange(Integer startResult, long amountOfResults, long showMoreLinkValue) {
-		if ((startResult + 10) > amountOfResults) {
-			return "Wyniki od " + (startResult + 1) + " do " + amountOfResults;
-		} else {
-			return "Wyniki od " + (startResult + 1) + " do " + showMoreLinkValue;
-		}
-	}
-
-	@Override
-	public void clearSearchParameters(HttpSession session, String searchType) {
-		session.setAttribute(searchType + "StartResult", null);
-		session.setAttribute(searchType + "SelectedUserId", null);
-		session.setAttribute(searchType + "FirstName", null);
-		session.setAttribute(searchType + "LastName", null);
-		session.setAttribute(searchType + "Email", null);
-		session.setAttribute(searchType + "Pesel", null);
-	}
 }

@@ -2,8 +2,6 @@ package pl.mazur.simpleabclibrary.service;
 
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
 import pl.mazur.simpleabclibrary.entity.User;
 
 public interface UserService {
@@ -37,18 +35,5 @@ public interface UserService {
 	public String decreaseUserAccessLevel(Integer decreaseAccessLevelUserId);
 
 	public String getUserAccessLevel(User theUser);
-
-	public String[] prepareTableToSearch(HttpSession session, String searchType, String userId, String userFirstName,
-			String userLastName, String userEmail, String userPesel);
-
-	public boolean hasTableAnyParameters(String[] userSearchParameters);
-
-	public long generateShowLessLinkValue(Integer userManagementStartResult);
-
-	public long generateShowMoreLinkValue(Integer startResult, long amountOfResults);
-
-	public String generateResultRange(Integer startResult, long amountOfResults, long showMoreLinkValue);
-
-	public void clearSearchParameters(HttpSession session, String searchType);
 
 }

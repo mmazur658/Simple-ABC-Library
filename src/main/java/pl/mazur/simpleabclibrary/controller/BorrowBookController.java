@@ -33,7 +33,7 @@ import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.PdfService;
 import pl.mazur.simpleabclibrary.service.ReservationService;
 import pl.mazur.simpleabclibrary.service.UserService;
-import pl.mazur.simpleabclibrary.utils.ForbiddenWords;
+import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
 
 @Controller
@@ -57,7 +57,7 @@ public class BorrowBookController {
 	ReservationService reservationService;
 
 	@Autowired
-	ForbiddenWords forbiddenWords;
+	SearchEngineUtils searchEngineUtils;
 
 	@RequestMapping("/borrow-book-choose-user")
 	public String borrowBook(
@@ -73,8 +73,14 @@ public class BorrowBookController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		String[] userSearchParameters = userService.prepareTableToSearch(session, "borrowBook",
-				borrowBookSelectedUserId, borrowBookFirstName, borrowBookLastName, borrowBookEmail, borrowBookPesel);
+		String[] searchParametersName = { "borrowBookSelectedUserId", "borrowBookFirstName", "borrowBookLastName",
+				"borrowBookEmail", "borrowBookPesel" };
+		String[] searchParametersValue = { borrowBookSelectedUserId, borrowBookFirstName, borrowBookLastName,
+				borrowBookEmail, borrowBookPesel };
+
+		String[] userSearchParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
+				searchParametersValue);
+		boolean hasAnyParameters = searchEngineUtils.hasTableAnyParameters(userSearchParameters);
 
 		borrowBookStartResult = (borrowBookStartResult == null)
 				? ((session.getAttribute("borrowBookStartResult") != null)
@@ -83,16 +89,17 @@ public class BorrowBookController {
 				: 0;
 		session.setAttribute("borrowBookStartResult", borrowBookStartResult);
 
-		boolean hasAnyParameters = userService.hasTableAnyParameters(userSearchParameters);
 		List<User> usersList = hasAnyParameters
 				? userService.getUserSearchResult(userSearchParameters, borrowBookStartResult)
 				: userService.getAllUsers(borrowBookStartResult);
 		long amountOfResults = hasAnyParameters ? userService.getAmountOfSearchResult(userSearchParameters)
 				: userService.getAmountOfAllUsers();
 
-		long showMoreLinkValue = userService.generateShowMoreLinkValue(borrowBookStartResult, amountOfResults);
-		String resultRange = userService.generateResultRange(borrowBookStartResult, amountOfResults, showMoreLinkValue);
-		long showLessLinkValue = userService.generateShowLessLinkValue(borrowBookStartResult);
+		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(borrowBookStartResult, amountOfResults,
+				10);
+		String resultRange = searchEngineUtils.generateResultRange(borrowBookStartResult, amountOfResults,
+				showMoreLinkValue, 10);
+		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(borrowBookStartResult, 10);
 		List<Book> tempBookList = new ArrayList<>();
 
 		session.setAttribute("borrowBookStartResult", borrowBookStartResult);
@@ -114,7 +121,9 @@ public class BorrowBookController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		userService.clearSearchParameters(session, "borrowBook");
+		String[] searchParametersName = { "borrowBookStartResult", "borrowBookSelectedUserId", "borrowBookFirstName",
+				"borrowBookLastName", "borrowBookEmail", "borrowBookPesel" };
+		searchEngineUtils.clearSearchParameters(session, searchParametersName);
 
 		return "redirect:/borrow-book/borrow-book-choose-user";
 	}
@@ -139,19 +148,19 @@ public class BorrowBookController {
 
 		session.setAttribute("borrowBookStartResult", null);
 
-		borrowBookChooseBookStartResult = (borrowBookChooseBookStartResult == null)
-				? ((session.getAttribute("borrowBookChooseBookStartResult") != null)
-						? (Integer) session.getAttribute("borrowBookChooseBookStartResult")
-						: 0)
-				: 0;
+		if (borrowBookChooseBookStartResult == null)
+			borrowBookChooseBookStartResult = (Integer) session.getAttribute("borrowBookChooseBookStartResult");
+		if (borrowBookChooseBookStartResult == null)
+			borrowBookChooseBookStartResult = 0;
 		session.setAttribute("borrowBookStartResult", borrowBookChooseBookStartResult);
 
 		int theUserId;
 		if (selectedUserId == null)
 			theUserId = Integer.valueOf((String) session.getAttribute("selectedUserId"));
-		else
+		else {
 			session.setAttribute("selectedUserId", selectedUserId);
-		theUserId = Integer.valueOf(selectedUserId);
+			theUserId = Integer.valueOf(selectedUserId);
+		}
 
 		User user = userService.getUser(theUserId);
 		List<BorrowedBook> borrowedBookList = bookService.getUserBorrowedBookList(user.getId());
@@ -179,9 +188,12 @@ public class BorrowBookController {
 			}
 		}
 
-		String[] searchBookParameters = bookService.prepareTableToSearch(session, "borrowBook", title, bookId, author,
-				isbn, publisher);
-		boolean hasAnyParameters = bookService.hasTableAnyParameters(searchBookParameters);
+		String[] searchParametersName = { "borrowBookSeachParamTitle", "borrowBookSeachParamId",
+				"borrowBookSeachParamAuthor", "borrowBookSeachParamIsbn", "borrowBookSeachParamPublisher" };
+		String[] searchParametersValue = { title, bookId, author, isbn, publisher };
+		String[] searchBookParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
+				searchParametersValue);
+		boolean hasAnyParameters = searchEngineUtils.hasTableAnyParameters(searchBookParameters);
 
 		List<Book> booksList = hasAnyParameters
 				? bookService.bookSearchResult(searchBookParameters, borrowBookChooseBookStartResult)
@@ -189,11 +201,11 @@ public class BorrowBookController {
 		long amountOfResults = hasAnyParameters ? bookService.getAmountOfSearchResult(searchBookParameters)
 				: bookService.getAmountOfAllBooks();
 
-		long showMoreLinkValue = bookService.generateShowMoreLinkValue(borrowBookChooseBookStartResult,
-				amountOfResults);
-		String resultRange = bookService.generateResultRange(borrowBookChooseBookStartResult, amountOfResults,
-				showMoreLinkValue);
-		long showLessLinkValue = bookService.generateShowLessLinkValue(borrowBookChooseBookStartResult);
+		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(borrowBookChooseBookStartResult,
+				amountOfResults, 10);
+		String resultRange = searchEngineUtils.generateResultRange(borrowBookChooseBookStartResult, amountOfResults,
+				showMoreLinkValue, 10);
+		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(borrowBookChooseBookStartResult, 10);
 
 		theModel.addAttribute("borrowBookChooseBookStartResult", borrowBookChooseBookStartResult);
 		session.setAttribute("borrowBookChooseBookStartResult", borrowBookChooseBookStartResult);
@@ -210,6 +222,7 @@ public class BorrowBookController {
 		theModel.addAttribute("systemMessage", systemMessage);
 		theModel.addAttribute("extraMessage", extraMessage);
 		theModel.addAttribute("errorMessage", errorMessage);
+
 		return "borrow-book-choose-books";
 	}
 
@@ -220,7 +233,8 @@ public class BorrowBookController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		bookService.clearBorrowedBookSearchParameters(session);
+		String[] searchParametersName = { "borrowBookChooseBookStartResult", "title", "id", "author" };
+		searchEngineUtils.clearSearchParameters(session, searchParametersName);
 
 		return "redirect:/borrow-book/borrow-book-choose-books";
 	}
@@ -274,7 +288,7 @@ public class BorrowBookController {
 		bookService.deleteBookFromList(session, bookId);
 		redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka zosta³a usuniêta z listy");
 
-		return "redirect:/borrow-book/borlrow-book-choose-books";
+		return "redirect:/borrow-book/borrow-book-choose-books";
 	}
 
 	@RequestMapping("/borrow-books")
@@ -339,7 +353,12 @@ public class BorrowBookController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		bookService.cancelBorrowedBook(session);
+		session.setAttribute("isUserAbleToBorrow", false);
+
+		String[] searchParametersName = { "borrowBookSelectedUserId", "borrowBookFirstName", "borrowBookLastName",
+				"borrowBookEmail", "borrowBookPesel", "borrowBookStartResult", "borrowBookStartResult", "tempBookList",
+				"borrowBookChooseBookStartResult", "title", "id", "author" };
+		searchEngineUtils.clearSearchParameters(session, searchParametersName);
 
 		return "redirect:/user/main";
 	}

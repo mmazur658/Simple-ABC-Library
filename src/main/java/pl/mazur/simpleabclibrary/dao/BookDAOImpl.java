@@ -113,9 +113,11 @@ public class BookDAOImpl implements BookDAO {
 		Query<BorrowedBook> theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("id", book.getId());
 		BorrowedBook borrowedBook = (BorrowedBook) theQuery.getSingleResult();
+		System.out.println(borrowedBook);
 		borrowedBook.setStopDate(new Date());
-
+		System.out.println(borrowedBook);
 		currentSession().update(borrowedBook);
+
 	}
 
 	@Override

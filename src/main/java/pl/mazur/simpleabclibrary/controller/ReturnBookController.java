@@ -30,7 +30,7 @@ import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.PdfService;
 import pl.mazur.simpleabclibrary.service.UserService;
-import pl.mazur.simpleabclibrary.utils.ForbiddenWords;
+import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
 
 @Controller
@@ -51,7 +51,7 @@ public class ReturnBookController {
 	AccessLevelControl accessLevelControl;
 
 	@Autowired
-	ForbiddenWords forbiddenWords;
+	SearchEngineUtils searchEngineUtils;
 
 	@RequestMapping("/return-book-choose-user")
 	public String borrowBook(
@@ -67,26 +67,31 @@ public class ReturnBookController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		String[] userSearchParameters = userService.prepareTableToSearch(session, "returnBook",
-				returnBookSelectedUserId, returnBookFirstName, returnBookLastName, returnBookEmail, returnBookPesel);
+		String[] searchParametersName = { "returnBookSelectedUserId", "returnBookFirstName", "returnBookLastName",
+				"returnBookEmail", "returnBookPesel" };
+		String[] searchParametersValue = { returnBookSelectedUserId, returnBookFirstName, returnBookLastName,
+				returnBookEmail, returnBookPesel };
+		String[] userSearchParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
+				searchParametersValue);
 
-		returnBookStartResult = (returnBookStartResult == null)
-				? ((session.getAttribute("returnBookStartResult") != null)
-						? (Integer) session.getAttribute("returnBookStartResult")
-						: 0)
-				: 0;
+		if (returnBookStartResult == null)
+			returnBookStartResult = (Integer) session.getAttribute("returnBookStartResult");
+		if (returnBookStartResult == null)
+			returnBookStartResult = 0;
 		session.setAttribute("returnBookStartResult", returnBookStartResult);
 
-		boolean hasAnyParameters = userService.hasTableAnyParameters(userSearchParameters);
+		boolean hasAnyParameters = searchEngineUtils.hasTableAnyParameters(userSearchParameters);
 		List<User> usersList = hasAnyParameters
 				? userService.getUserSearchResult(userSearchParameters, returnBookStartResult)
 				: userService.getAllUsers(returnBookStartResult);
 		long amountOfResults = hasAnyParameters ? userService.getAmountOfSearchResult(userSearchParameters)
 				: userService.getAmountOfAllUsers();
 
-		long showMoreLinkValue = userService.generateShowMoreLinkValue(returnBookStartResult, amountOfResults);
-		String resultRange = userService.generateResultRange(returnBookStartResult, amountOfResults, showMoreLinkValue);
-		long showLessLinkValue = userService.generateShowLessLinkValue(returnBookStartResult);
+		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(returnBookStartResult, amountOfResults,
+				10);
+		String resultRange = searchEngineUtils.generateResultRange(returnBookStartResult, amountOfResults,
+				showMoreLinkValue, 10);
+		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(returnBookStartResult, 10);
 
 		session.setAttribute("returnBookStartResult", returnBookStartResult);
 		theModel.addAttribute("returnBookStartResult", returnBookStartResult);
@@ -106,7 +111,9 @@ public class ReturnBookController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		userService.clearSearchParameters(session, "returnBook");
+		String[] searchParametersName = { "returnBookStartResult", "returnBookSelectedUserId", "returnBookFirstName",
+				"returnBookLastName", "returnBookEmail", "returnBookPesel" };
+		searchEngineUtils.clearSearchParameters(session, searchParametersName);
 
 		return "redirect:/return-book/return-book-choose-user";
 	}
@@ -206,6 +213,7 @@ public class ReturnBookController {
 			redirectAttributes.addAttribute("systemMessage", "Lista ksi¹¿ek do zwrotu jest pusta!!");
 			return "redirect:/return-book/return-book-choose-books";
 		}
+
 		String returnedBookInfo = bookService.returnBooks(session);
 
 		theModel.addAttribute("returnedBookInfo", returnedBookInfo);
@@ -214,7 +222,6 @@ public class ReturnBookController {
 		session.setAttribute("userBorrowedBooksList", null);
 
 		return "return-book-confirmation";
-
 	}
 
 	@RequestMapping("/generate-return-book-confirmation")
@@ -253,7 +260,10 @@ public class ReturnBookController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		bookService.cancelBookReturning(session);
+		String[] searchParametersName = { "returnBookSelectedUserId", "returnBookFirstName", "returnBookLastName",
+				"returnBookEmail", "returnBookPesel", "returnBookStartResult", "tempBookList", "selectedUserId",
+				"userBorrowedBooksList", "tempReturnedBookList" };
+		searchEngineUtils.clearSearchParameters(session, searchParametersName);
 
 		return "redirect:/user/main";
 	}
