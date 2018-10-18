@@ -1,6 +1,5 @@
 package pl.mazur.simpleabclibrary.service;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,7 @@ import pl.mazur.simpleabclibrary.dao.MessageDAO;
 import pl.mazur.simpleabclibrary.dao.UserDAO;
 import pl.mazur.simpleabclibrary.entity.Message;
 import pl.mazur.simpleabclibrary.entity.User;
+import pl.mazur.simpleabclibrary.service.utils.MessageServiceUtils;
 
 @Service
 public class MessageServiceImpl implements MessageService {
@@ -20,6 +20,9 @@ public class MessageServiceImpl implements MessageService {
 
 	@Autowired
 	private UserDAO userDAO;
+
+	@Autowired
+	private MessageServiceUtils messageServiceUtils;
 
 	@Override
 	@Transactional
@@ -38,17 +41,8 @@ public class MessageServiceImpl implements MessageService {
 	public void changeReadStatus(int messageId, String boxType) {
 
 		Message message = messageDAO.getMessage(messageId);
-		if (boxType.equals("sent")) {
-			if (message.getSenderIsRead())
-				message.setSenderIsRead(false);
-			else
-				message.setSenderIsRead(true);
-		} else {
-			if (message.getRecipientIsRead())
-				message.setRecipientIsRead(false);
-			else
-				message.setRecipientIsRead(true);
-		}
+		messageServiceUtils.changeReadStatus(message, boxType);
+
 		messageDAO.updateMessage(message);
 	}
 
@@ -57,11 +51,8 @@ public class MessageServiceImpl implements MessageService {
 	public void setReadStatusTrue(int messageId, String boxType) {
 
 		Message message = messageDAO.getMessage(messageId);
-		if (boxType.equals("sent")) {
-			message.setSenderIsRead(true);
-		} else {
-			message.setRecipientIsRead(true);
-		}
+		messageServiceUtils.setReadStatusTrue(message, boxType);
+
 		messageDAO.updateMessage(message);
 	}
 
@@ -70,11 +61,8 @@ public class MessageServiceImpl implements MessageService {
 	public void setReadStatusFalse(int messageId, String boxType) {
 
 		Message message = messageDAO.getMessage(messageId);
-		if (boxType.equals("sent")) {
-			message.setSenderIsRead(false);
-		} else {
-			message.setRecipientIsRead(false);
-		}
+		messageServiceUtils.setReadStatusFalse(message, boxType);
+
 		messageDAO.updateMessage(message);
 	}
 
@@ -120,17 +108,7 @@ public class MessageServiceImpl implements MessageService {
 
 		User sender = userDAO.getUser(senderID);
 		User recipient = userDAO.getUser(recipientEmail);
-
-		Message message = new Message();
-		message.setRecipientIsActive(true);
-		message.setRecipientIsRead(false);
-		message.setSenderIsActive(true);
-		message.setSenderIsRead(true);
-		message.setRecipient(recipient);
-		message.setSender(sender);
-		message.setStartDate(new Date());
-		message.setSubject(subject);
-		message.setText(text);
+		Message message = messageServiceUtils.sendMessage(sender, recipient, subject, text);
 
 		messageDAO.sendMessage(message);
 	}

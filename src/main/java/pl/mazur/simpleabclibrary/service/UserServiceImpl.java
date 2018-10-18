@@ -1,6 +1,5 @@
 package pl.mazur.simpleabclibrary.service;
 
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import pl.mazur.simpleabclibrary.dao.UserDAO;
 import pl.mazur.simpleabclibrary.entity.User;
+import pl.mazur.simpleabclibrary.service.utils.UserServiceUtils;
 import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
-import pl.mazur.simpleabclibrary.utils.PasswordUtils;
 import pl.mazur.simpleabclibrary.utils.PeselValidator;
 import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 
@@ -18,28 +17,24 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 public class UserServiceImpl implements UserService {
 
 	@Autowired
-	UserDAO userDAO;
+	private UserDAO userDAO;
 
 	@Autowired
-	PeselValidator peselValidator;
+	private PeselValidator peselValidator;
 
 	@Autowired
-	PasswordUtils passwordUtils;
+	private AccessLevelControl loginAndAccessLevelCheck;
 
 	@Autowired
-	AccessLevelControl loginAndAccessLevelCheck;
-
+	private SearchEngineUtils searchEngineUtils;
+	
 	@Autowired
-	SearchEngineUtils searchEngineUtils;
+	private UserServiceUtils userServiceUtils;
 
 	@Override
 	@Transactional
 	public void saveUser(User theUser) {
-		theUser.setActive(true);
-		theUser.setAdmin(false);
-		theUser.setEmployee(false);
-		theUser.setStartDate(new Date());
-		theUser.setPassword(passwordUtils.encryptPassword(theUser.getPassword().trim()));
+		userServiceUtils.setAdditionalData(theUser);
 		userDAO.saveUser(theUser);
 	}
 
@@ -70,23 +65,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void updateUser(User theUser) {
-
 		User tempUser = userDAO.getUser(theUser.getId());
-		tempUser.setFirstName(theUser.getFirstName());
-		tempUser.setLastName(theUser.getLastName());
-		tempUser.setEmail(theUser.getEmail());
-		tempUser.setPesel(theUser.getPesel());
-		tempUser.setStreet(theUser.getStreet());
-		tempUser.setHouseNumber(theUser.getHouseNumber());
-		tempUser.setCity(theUser.getCity());
-		tempUser.setPostalCode(theUser.getPostalCode());
-		tempUser.setSex(theUser.getSex());
-		tempUser.setBirthday(theUser.getBirthday());
-		if (!theUser.getPesel().equals("")) {
-			tempUser.setSex(peselValidator.getSex(theUser.getPesel()));
-			tempUser.setBirthday(peselValidator.getBirthDate(theUser.getPesel()));
-		}
-
+		userServiceUtils.updateUserData(tempUser,theUser);
 		userDAO.updateUser(tempUser);
 	}
 
@@ -115,6 +95,7 @@ public class UserServiceImpl implements UserService {
 		String searchType = "from User where ";
 		String[] fieldsName = { "id", "firstName", "lastName", "email", "pesel" };
 		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(userSearchParameters, searchType, fieldsName);
+		
 		return userDAO.getUserSearchResult(hql, startResult);
 	}
 
@@ -125,6 +106,7 @@ public class UserServiceImpl implements UserService {
 		String searchType = "SELECT COUNT(*) FROM User where ";
 		String[] fieldsName = { "id", "firstName", "lastName", "email", "pesel" };
 		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(userSearchParameters, searchType, fieldsName);
+		
 		return userDAO.getAmountOfSearchResult(hql);
 	}
 
@@ -139,18 +121,9 @@ public class UserServiceImpl implements UserService {
 	public String increaseUserAccessLevel(Integer increaseAccessLevelUserId) {
 
 		User theUser = userDAO.getUser(increaseAccessLevelUserId);
-		String systemMessage;
-
-		if (!theUser.isAdmin() && !theUser.isEmployee()) {
-			theUser.setEmployee(true);
-			systemMessage = "Zwiêkszono uprawnienia do poziomu: Pracownik";
-		} else if (!theUser.isAdmin() && theUser.isEmployee()) {
-			theUser.setAdmin(true);
-			systemMessage = "Zwiêkszono uprawnienia do poziomu: Administrator";
-		} else
-			systemMessage = "Nie mo¿na zwiêkszyæ uprawnieñ, osi¹gniêto maksymalny poziom";
-
+		String systemMessage = userServiceUtils.increaseUserAccessLevel(theUser);
 		userDAO.updateUser(theUser);
+		
 		return systemMessage;
 	}
 
@@ -159,18 +132,9 @@ public class UserServiceImpl implements UserService {
 	public String decreaseUserAccessLevel(Integer decreaseAccessLevelUserId) {
 
 		User theUser = userDAO.getUser(decreaseAccessLevelUserId);
-		String systemMessage;
-
-		if (theUser.isAdmin() && theUser.isEmployee()) {
-			theUser.setAdmin(false);
-			systemMessage = "Zmniejszono uprawnienia do poziomu: Pracownik";
-		} else if (!theUser.isAdmin() && theUser.isEmployee()) {
-			theUser.setEmployee(false);
-			systemMessage = "Zmniejszono uprawnienia do poziomu: Klient";
-		} else
-			systemMessage = "Nie mo¿na zmniejszyæ uprawnieñ, osi¹gniêto minimalny poziom";
-
+		String systemMessage = userServiceUtils.decreaseUserAccessLevel(theUser);
 		userDAO.updateUser(theUser);
+		
 		return systemMessage;
 	}
 
@@ -178,5 +142,4 @@ public class UserServiceImpl implements UserService {
 	public String getUserAccessLevel(User theUser) {
 		return loginAndAccessLevelCheck.getUserAccessLevel(theUser);
 	}
-
 }

@@ -1,8 +1,5 @@
 package pl.mazur.simpleabclibrary.service;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,31 +7,31 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import pl.mazur.simpleabclibrary.dao.BookDAO;
-import pl.mazur.simpleabclibrary.dao.MessageDAO;
 import pl.mazur.simpleabclibrary.dao.ReservationDAO;
 import pl.mazur.simpleabclibrary.dao.UserDAO;
 import pl.mazur.simpleabclibrary.entity.Book;
-import pl.mazur.simpleabclibrary.entity.Message;
 import pl.mazur.simpleabclibrary.entity.Reservation;
+import pl.mazur.simpleabclibrary.entity.User;
+import pl.mazur.simpleabclibrary.service.utils.ReservationServiceUtils;
 import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 
 @Service
 public class ReservationServiceImpl implements ReservationService {
 
 	@Autowired
-	ReservationDAO reservationDAO;
+	private ReservationDAO reservationDAO;
 
 	@Autowired
-	BookDAO bookDAO;
+	private BookDAO bookDAO;
 
 	@Autowired
-	UserDAO userDAO;
+	private UserDAO userDAO;
 
 	@Autowired
-	MessageDAO messageDAO;
+	private SearchEngineUtils searchEngineUtils;
 
 	@Autowired
-	SearchEngineUtils searchEngineUtils;
+	private ReservationServiceUtils reservationServiceUtils;
 
 	@Override
 	@Transactional
@@ -90,14 +87,8 @@ public class ReservationServiceImpl implements ReservationService {
 	@Transactional
 	public void increaseExpirationDate(int reservationId) {
 
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		Reservation reservation = reservationDAO.getReservation(reservationId);
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(reservation.getEndDate());
-		calendar.add(Calendar.DATE, 1); // 24h
-		reservation.setEndDate(calendar.getTime());
-		reservation.setStatus("Rezerwacja wa¿na do " + sdf.format(reservation.getEndDate()));
-
+		reservationServiceUtils.increaseExpirationDate(reservation);
 		reservationDAO.increaseExpirationDate(reservation);
 	}
 
@@ -106,26 +97,12 @@ public class ReservationServiceImpl implements ReservationService {
 	public void deleteReservationByEmployee(int reservationId) {
 
 		Reservation reservation = reservationDAO.getReservation(reservationId);
-		reservation.setStatus("Rezerwacja usuniêta przez pracownika biblioteki.");
-		reservation.setIsActive(false);
+		User adminUser = userDAO.getUser(1);
+		reservationServiceUtils.deleteReservationByEmployee(reservation, adminUser);
 
 		reservationDAO.deleteReservationByEmployee(reservation);
 		bookDAO.setBookActive(reservationId);
 
-		Message message = new Message();
-		message.setRecipient(reservation.getUser());
-		message.setRecipientIsActive(true);
-		message.setRecipientIsRead(false);
-		message.setSender(userDAO.getUser(1));
-		message.setSenderIsActive(false);
-		message.setSenderIsRead(true);
-		message.setStartDate(new Date());
-		message.setSubject(
-				"Rzerwacja ksi¹¿ki " + reservation.getBook().getTitle() + " zosta³a usuniêta przez pracownika");
-		message.setText("Z przykroœci¹ informujemy, ¿e twoja rezerwacja ksi¹¿ki " + reservation.getBook().getTitle()
-				+ " zosta³a usuniêta przez pracownika biblioteki.");
-
-		messageDAO.sendMessage(message);
 	}
 
 	@Override
@@ -136,6 +113,7 @@ public class ReservationServiceImpl implements ReservationService {
 		String[] fieldsName = { "user.id", "user.firstName", "user.lastName", "user.pesel", "book.id", "book.title" };
 		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(reservationSearchParameters, searchType,
 				fieldsName);
+
 		return reservationDAO.getAmountOfSearchResult(hql);
 	}
 
@@ -159,6 +137,7 @@ public class ReservationServiceImpl implements ReservationService {
 		String[] fieldsName = { "user.id", "user.firstName", "user.lastName", "user.pesel", "book.id,", "book.title" };
 		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(reservationSearchParameters, searchType,
 				fieldsName);
+
 		return reservationDAO.reservationSearchResult(hql, startResult);
 	}
 
@@ -177,19 +156,9 @@ public class ReservationServiceImpl implements ReservationService {
 	@Transactional
 	public void createReservation(Book tempBook, int userId) {
 
-		Reservation reservation = new Reservation();
-		reservation.setBook(tempBook);
-		reservation.setUser(userDAO.getUser(userId));
-		reservation.setIsActive(true);
-		reservation.setStartDate(new Date());
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(reservation.getStartDate());
-		calendar.add(Calendar.DATE, 2);
-		reservation.setEndDate(calendar.getTime());
-		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-		String date = sdf.format(calendar.getTime());
-		reservation.setStatus("Rezerwacja wa¿na do " + date);
-		tempBook.setIsAvailable(false);
+		User theUser = userDAO.getUser(userId);
+		Reservation reservation = reservationServiceUtils.createReservation(tempBook, theUser);
+
 		bookDAO.updateBook(tempBook);
 		reservationDAO.createReservation(reservation);
 	}

@@ -1,6 +1,5 @@
 package pl.mazur.simpleabclibrary.service;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -12,25 +11,29 @@ import org.springframework.transaction.annotation.Transactional;
 
 import pl.mazur.simpleabclibrary.dao.BookDAO;
 import pl.mazur.simpleabclibrary.entity.Book;
-import pl.mazur.simpleabclibrary.entity.User;
-import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 import pl.mazur.simpleabclibrary.entity.BorrowedBook;
 import pl.mazur.simpleabclibrary.entity.Reservation;
+import pl.mazur.simpleabclibrary.entity.User;
+import pl.mazur.simpleabclibrary.service.utils.BookServiceUtils;
+import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 
 @Service
 public class BookServiceImpl implements BookService {
 
 	@Autowired
-	BookDAO bookDAO;
+	private BookDAO bookDAO;
 
 	@Autowired
-	ReservationService reservationService;
+	private ReservationService reservationService;
 
 	@Autowired
-	UserService userService;
+	private UserService userService;
 
 	@Autowired
-	SearchEngineUtils searchEngineUtils;
+	private SearchEngineUtils searchEngineUtils;
+
+	@Autowired
+	private BookServiceUtils bookServiceUtils;
 
 	@Override
 	@Transactional
@@ -45,15 +48,15 @@ public class BookServiceImpl implements BookService {
 		String searchType = "from Book where ";
 		String[] fieldsName = { "title", "author", "publisher", "isbn", "id" };
 		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(searchParameters, searchType, fieldsName);
+
 		return bookDAO.bookSearchResult(hql, startResult);
 	}
 
 	@Override
 	@Transactional
 	public void saveBook(Book tempBook) {
-		tempBook.setDateOfAdded(new Date());
-		tempBook.setIsActive(true);
-		tempBook.setIsAvailable(true);
+
+		bookServiceUtils.saveBook(tempBook);
 		bookDAO.saveBook(tempBook);
 	}
 
@@ -66,15 +69,8 @@ public class BookServiceImpl implements BookService {
 	@Override
 	@Transactional
 	public void updateBook(Book book) {
-
 		Book tempBook = bookDAO.getBook(book.getId());
-		tempBook.setAuthor(book.getAuthor());
-		tempBook.setTitle(book.getTitle());
-		tempBook.setIsbn(book.getIsbn());
-		tempBook.setLanguage(book.getLanguage());
-		tempBook.setPages(book.getPages());
-		tempBook.setPublisher(book.getPublisher());
-
+		bookServiceUtils.updateBook(tempBook, book);
 		bookDAO.updateBook(book);
 	}
 
@@ -89,18 +85,7 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	public void borrowBook(Book tempBook, User tempUser) {
 
-		BorrowedBook borrowedBook = new BorrowedBook();
-		borrowedBook.setBook(tempBook);
-		borrowedBook.setUser(tempUser);
-		borrowedBook.setStartDate(new Date());
-
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(borrowedBook.getStartDate());
-		calendar.add(Calendar.DATE, 14);
-
-		borrowedBook.setExpectedEndDate(calendar.getTime());
-
-		tempBook.setIsAvailable(false);
+		BorrowedBook borrowedBook = bookServiceUtils.createBorrowedBook(tempBook, tempUser);
 		bookDAO.updateBook(tempBook);
 		bookDAO.borrowBook(borrowedBook);
 	}
@@ -143,6 +128,7 @@ public class BookServiceImpl implements BookService {
 		String searchType = "select count(*) from Book where ";
 		String[] fieldsName = { "title", "author", "publisher", "isbn", "id" };
 		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(searchParameters, searchType, fieldsName);
+
 		return bookDAO.getAmountOfSearchResult(hql);
 	}
 
