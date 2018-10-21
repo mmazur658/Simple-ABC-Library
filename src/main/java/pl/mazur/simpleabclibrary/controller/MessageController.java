@@ -6,7 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,19 +26,24 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 @Controller
 @Scope("session")
 @RequestMapping("/message-module")
+@PropertySource("classpath:messages.properties")
+@PropertySource("classpath:library-configuration.properties")
 public class MessageController {
 
 	@Autowired
-	MessageService messageService;
+	private MessageService messageService;
 
 	@Autowired
-	UserService userService;
+	private UserService userService;
 
 	@Autowired
-	AccessLevelControl accessLevelControl;
+	private Environment env;
 
 	@Autowired
-	SearchEngineUtils searchEngineUtils;
+	private AccessLevelControl accessLevelControl;
+
+	@Autowired
+	private SearchEngineUtils searchEngineUtils;
 
 	@RequestMapping("/message-box-inbox")
 	public String messageBoxInbox(HttpServletRequest request, Model theModel,
@@ -56,11 +63,14 @@ public class MessageController {
 		int userId = (int) session.getAttribute("userId");
 		List<Message> userMessagesList = messageService.getAllUserMessages(userId, messageInboxStartResult);
 		long amountOfResults = messageService.getAmountOfAllInboxMessages(userId);
+
+		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit.messages"));
 		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(messageInboxStartResult, amountOfResults,
-				20);
+				searchResultLimit);
 		String resultRange = searchEngineUtils.generateResultRange(messageInboxStartResult, amountOfResults,
-				showMoreLinkValue, 20);
-		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(messageInboxStartResult, 20);
+				showMoreLinkValue, searchResultLimit);
+		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(messageInboxStartResult,
+				searchResultLimit);
 
 		session.setAttribute("messageInboxStartResult", messageInboxStartResult);
 		theModel.addAttribute("messageInboxStartResult", messageInboxStartResult);
@@ -92,11 +102,13 @@ public class MessageController {
 		int userId = (int) session.getAttribute("userId");
 		List<Message> userSentMessagesList = messageService.getAllUserSentMessages(userId, messageSentStartResult);
 		long amountOfResults = messageService.getAmountOfAllSentMessages(userId);
+
+		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit.messages"));
 		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(messageSentStartResult, amountOfResults,
-				20);
+				searchResultLimit);
 		String resultRange = searchEngineUtils.generateResultRange(messageSentStartResult, amountOfResults,
-				showMoreLinkValue, 20);
-		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(messageSentStartResult, 20);
+				showMoreLinkValue, searchResultLimit);
+		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(messageSentStartResult, searchResultLimit);
 
 		theModel.addAttribute("messageSentStartResult", messageSentStartResult);
 		theModel.addAttribute("amountOfResults", amountOfResults);
@@ -118,7 +130,8 @@ public class MessageController {
 			return "redirect:/user/logout";
 
 		messageService.deleteMessage(messageId, boxType);
-		redirectAttributes.addAttribute("systemMessage", "Wiadomoœæ zosta³a usuniêta.");
+		redirectAttributes.addAttribute("systemMessage",
+				env.getProperty("controller.MessageController.deleteMessage.success.1"));
 
 		if (boxType.equals("sent"))
 			return "redirect:/message-module/message-box-sent";
@@ -135,7 +148,8 @@ public class MessageController {
 			return "redirect:/user/logout";
 
 		messageService.changeReadStatus(messageId, boxType);
-		redirectAttributes.addAttribute("systemMessage", "Status wiadomoœci zosta³ zmieniony");
+		redirectAttributes.addAttribute("systemMessage",
+				env.getProperty("controller.MessageController.readUnreadMessage.success.1"));
 
 		if (boxType.equals("sent"))
 			return "redirect:/message-module/message-box-sent";
@@ -209,12 +223,14 @@ public class MessageController {
 			return "redirect:/user/logout";
 
 		if (!userService.checkEmailIsExist(email)) {
-			redirectAttributesa.addAttribute("systemMessage", "Nieprawid³owy adres email odbiorcy");
+			redirectAttributesa.addAttribute("systemMessage",
+					env.getProperty("controller.MessageController.sendMessage.error.1"));
 			return "redirect:/message-module/message";
 		}
 
 		messageService.sendMessage((int) session.getAttribute("userId"), email, subject, text);
-		redirectAttributesa.addAttribute("systemMessage", "Wiadomoœæ zosta³a wys³ana.");
+		redirectAttributesa.addAttribute("systemMessage",
+				env.getProperty("controller.MessageController.sendMessage.success.1"));
 
 		return "redirect:/message-module/message-box-inbox";
 

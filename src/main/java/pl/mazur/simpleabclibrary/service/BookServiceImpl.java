@@ -6,6 +6,8 @@ import java.util.List;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,10 +20,14 @@ import pl.mazur.simpleabclibrary.service.utils.BookServiceUtils;
 import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 
 @Service
+@PropertySource("classpath:messages.properties")
 public class BookServiceImpl implements BookService {
 
 	@Autowired
 	private BookDAO bookDAO;
+
+	@Autowired
+	private Environment env;
 
 	@Autowired
 	private ReservationService reservationService;
@@ -56,7 +62,7 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	public void saveBook(Book tempBook) {
 
-		bookServiceUtils.saveBook(tempBook);
+		bookServiceUtils.prepareBookToSave(tempBook);
 		bookDAO.saveBook(tempBook);
 	}
 
@@ -70,7 +76,7 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	public void updateBook(Book book) {
 		Book tempBook = bookDAO.getBook(book.getId());
-		bookServiceUtils.updateBook(tempBook, book);
+		bookServiceUtils.prepareBookToUpdate(tempBook, book);
 		bookDAO.updateBook(book);
 	}
 
@@ -248,11 +254,11 @@ public class BookServiceImpl implements BookService {
 		}
 
 		if (isAllreadyOnTheList)
-			return "Ksi¹¿ka ju¿ znajduje siê na liœcie. ";
+			return env.getProperty("service.BookServiceImpl.addBookToList.error.1");
 		else {
 			tempBookList.add(theBook);
 			session.setAttribute("tempBookList", tempBookList);
-			return "Ksi¹¿ka zosta³a dodana do listy. ";
+			return env.getProperty("service.BookServiceImpl.addBookToList.success.1");
 		}
 	}
 
@@ -271,12 +277,12 @@ public class BookServiceImpl implements BookService {
 		}
 
 		if (isAllreadyOnTheList) {
-			return "Ksi¹¿ka ju¿ znajduje siê na liœcie";
+			return env.getProperty("service.BookServiceImpl.addReservedBookToList.error.1");
 		} else {
 			reservationService.deleteReservationInOrderToCreateBorrowedBook(reservation);
 			tempBookList.add(theBook);
 			session.setAttribute("tempBookList", tempBookList);
-			return "Ksi¹¿ka zosta³a dodana do listy";
+			return env.getProperty("service.BookServiceImpl.addReservedBookToList.success.1");
 		}
 	}
 

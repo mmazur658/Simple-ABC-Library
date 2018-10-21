@@ -6,7 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,22 +18,27 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import pl.mazur.simpleabclibrary.entity.LoggedInUser;
 import pl.mazur.simpleabclibrary.entity.Reservation;
 import pl.mazur.simpleabclibrary.service.ReservationService;
-import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
+import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 
 @Controller
 @Scope("session")
 @RequestMapping("/reservation")
+@PropertySource("classpath:messages.properties")
+@PropertySource("classpath:library-configuration.properties")
 public class ReservationController {
 
 	@Autowired
-	AccessLevelControl accessLevelControl;
+	private AccessLevelControl accessLevelControl;
 
 	@Autowired
-	ReservationService reservationService;
+	private ReservationService reservationService;
 
 	@Autowired
-	SearchEngineUtils searchEngineUtils;
+	private Environment env;
+
+	@Autowired
+	private SearchEngineUtils searchEngineUtils;
 
 	@RequestMapping("/reservation-management")
 	public String reservationPage(@RequestParam(required = false, name = "systemMessage") String systemMessage,
@@ -69,11 +76,12 @@ public class ReservationController {
 				? reservationService.getAmountOfSearchResult(reservationSearchParameters)
 				: reservationService.getAmountOfAllReservation();
 
+		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
 		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(reservationStartResult, amountOfResults,
-				10);
+				searchResultLimit);
 		String resultRange = searchEngineUtils.generateResultRange(reservationStartResult, amountOfResults,
-				showMoreLinkValue, 10);
-		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(reservationStartResult, 10);
+				showMoreLinkValue, searchResultLimit);
+		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(reservationStartResult, searchResultLimit);
 
 		session.setAttribute("reservationStartResult", reservationStartResult);
 		theModel.addAttribute("showLessLinkValue", showLessLinkValue);
@@ -110,7 +118,8 @@ public class ReservationController {
 			return "redirect:/user/logout";
 
 		reservationService.deleteReservationByEmployee(reservationId);
-		redirectAttributes.addAttribute("systemMessage", "Rezerwacja zosta³a usuniêta");
+		redirectAttributes.addAttribute("systemMessage",
+				env.getProperty("controller.ReservationController.deleteReservation.success.1"));
 
 		return "redirect:/reservation/reservation-management";
 	}
@@ -124,7 +133,8 @@ public class ReservationController {
 			return "redirect:/user/logout";
 
 		reservationService.increaseExpirationDate(reservationId);
-		redirectAttributes.addAttribute("systemMessage", "Czas rezerwacji wyd³u¿ony o 24h");
+		redirectAttributes.addAttribute("systemMessage",
+				env.getProperty("controller.ReservationController.increaseExpDate.success.1"));
 
 		return "redirect:/reservation/reservation-management";
 	}

@@ -44,7 +44,7 @@ public class MessageServiceUtilsImpl implements MessageServiceUtils {
 	}
 
 	@Override
-	public Message sendMessage(User sender, User recipient, String subject, String text) {
+	public Message createNewMessage(User sender, User recipient, String subject, String text) {
 
 		Message message = new Message();
 		message.setRecipientIsActive(true);

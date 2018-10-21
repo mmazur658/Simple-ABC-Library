@@ -4,10 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import pl.mazur.simpleabclibrary.dao.MessageDAO;
 import pl.mazur.simpleabclibrary.entity.Book;
 import pl.mazur.simpleabclibrary.entity.Message;
 import pl.mazur.simpleabclibrary.entity.Reservation;
@@ -15,14 +13,6 @@ import pl.mazur.simpleabclibrary.entity.User;
 
 @Component
 public class ReservationServiceUtilsImpl implements ReservationServiceUtils {
-
-	private MessageDAO messageDAO;
-
-	@Autowired
-	public ReservationServiceUtilsImpl(MessageDAO messageDAO) {
-		this.messageDAO = messageDAO;
-
-	}
 
 	@Override
 	public Reservation createReservation(Book tempBook, User theUser) {
@@ -45,10 +35,11 @@ public class ReservationServiceUtilsImpl implements ReservationServiceUtils {
 	}
 
 	@Override
-	public void deleteReservationByEmployee(Reservation reservation, User adminUser) {
+	public Message prepareReservationToDeleteAndCreateNewMessage(Reservation reservation, User adminUser) {
 
 		reservation.setStatus("Rezerwacja usuniêta przez pracownika biblioteki.");
 		reservation.setIsActive(false);
+
 		Message message = new Message();
 		message.setRecipient(reservation.getUser());
 		message.setRecipientIsActive(true);
@@ -61,7 +52,9 @@ public class ReservationServiceUtilsImpl implements ReservationServiceUtils {
 				"Rzerwacja ksi¹¿ki " + reservation.getBook().getTitle() + " zosta³a usuniêta przez pracownika");
 		message.setText("Z przykroœci¹ informujemy, ¿e twoja rezerwacja ksi¹¿ki " + reservation.getBook().getTitle()
 				+ " zosta³a usuniêta przez pracownika biblioteki.");
-		messageDAO.sendMessage(message);
+
+		return message;
+
 	}
 
 	@Override

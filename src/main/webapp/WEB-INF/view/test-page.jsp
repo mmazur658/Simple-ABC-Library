@@ -8,7 +8,7 @@
 	<title>Simple ABC Library - XYZ</title>
 </head>
 <body>
-	<%@ include file="/resources/parts/nav.jsp" %>  
+	<%@ include file="/resources/parts/nav.jsp" %>
 	
 	<div class="container">	
 	

@@ -4,8 +4,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<%@ include file="/resources/parts/header.jsp" %>  
+
+	<%@ include file="/resources/parts/header.jsp" %> 
+
 	<title>Simple ABC Library - Strona Główna</title>
+
 </head>
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  		

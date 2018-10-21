@@ -108,7 +108,7 @@ public class MessageServiceImpl implements MessageService {
 
 		User sender = userDAO.getUser(senderID);
 		User recipient = userDAO.getUser(recipientEmail);
-		Message message = messageServiceUtils.sendMessage(sender, recipient, subject, text);
+		Message message = messageServiceUtils.createNewMessage(sender, recipient, subject, text);
 
 		messageDAO.sendMessage(message);
 	}

@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional
 	public void saveUser(User theUser) {
-		userServiceUtils.setAdditionalData(theUser);
+		userServiceUtils.setAdditionalUserData(theUser);
 		userDAO.saveUser(theUser);
 	}
 

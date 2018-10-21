@@ -12,7 +12,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -25,39 +27,44 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import pl.mazur.simpleabclibrary.entity.Book;
-import pl.mazur.simpleabclibrary.entity.Reservation;
-import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.entity.BorrowedBook;
 import pl.mazur.simpleabclibrary.entity.LoggedInUser;
+import pl.mazur.simpleabclibrary.entity.Reservation;
+import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.PdfService;
 import pl.mazur.simpleabclibrary.service.ReservationService;
 import pl.mazur.simpleabclibrary.service.UserService;
-import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
+import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 
 @Controller
 @Scope("session")
 @RequestMapping("/borrow-book")
+@PropertySource("classpath:messages.properties")
+@PropertySource("classpath:library-configuration.properties")
 public class BorrowBookController {
 
 	@Autowired
-	BookService bookService;
+	private BookService bookService;
 
 	@Autowired
-	UserService userService;
+	private UserService userService;
 
 	@Autowired
-	PdfService pdfService;
+	private Environment env;
 
 	@Autowired
-	AccessLevelControl accessLevelControl;
+	private PdfService pdfService;
 
 	@Autowired
-	ReservationService reservationService;
+	private AccessLevelControl accessLevelControl;
 
 	@Autowired
-	SearchEngineUtils searchEngineUtils;
+	private ReservationService reservationService;
+
+	@Autowired
+	private SearchEngineUtils searchEngineUtils;
 
 	@RequestMapping("/borrow-book-choose-user")
 	public String borrowBook(
@@ -82,11 +89,10 @@ public class BorrowBookController {
 				searchParametersValue);
 		boolean hasAnyParameters = searchEngineUtils.hasTableAnyParameters(userSearchParameters);
 
-		borrowBookStartResult = (borrowBookStartResult == null)
-				? ((session.getAttribute("borrowBookStartResult") != null)
-						? (Integer) session.getAttribute("borrowBookStartResult")
-						: 0)
-				: 0;
+		if (borrowBookStartResult == null)
+			borrowBookStartResult = (Integer) session.getAttribute("borrowBookStartResult");
+		if (borrowBookStartResult == null)
+			borrowBookStartResult = 0;
 		session.setAttribute("borrowBookStartResult", borrowBookStartResult);
 
 		List<User> usersList = hasAnyParameters
@@ -95,11 +101,12 @@ public class BorrowBookController {
 		long amountOfResults = hasAnyParameters ? userService.getAmountOfSearchResult(userSearchParameters)
 				: userService.getAmountOfAllUsers();
 
+		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
 		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(borrowBookStartResult, amountOfResults,
-				10);
+				searchResultLimit);
 		String resultRange = searchEngineUtils.generateResultRange(borrowBookStartResult, amountOfResults,
-				showMoreLinkValue, 10);
-		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(borrowBookStartResult, 10);
+				showMoreLinkValue, searchResultLimit);
+		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(borrowBookStartResult, searchResultLimit);
 		List<Book> tempBookList = new ArrayList<>();
 
 		session.setAttribute("borrowBookStartResult", borrowBookStartResult);
@@ -168,13 +175,15 @@ public class BorrowBookController {
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
 		List<Reservation> tempReservationList = reservationService.getUserReservations(theUserId);
 
+		int borrowedBookLimit = Integer.valueOf(env.getProperty("borrowed.book.limit"));
 		isAbleToBorrow = true;
-		if (borrowedBookList.size() + tempBookList.size() >= 5) {
+
+		if (borrowedBookList.size() + tempBookList.size() >= borrowedBookLimit) {
 			isAbleToBorrow = false;
-			extraMessage = " Limit wypo¿yczenia zosta³ osi¹gniêty";
+			extraMessage = env.getProperty("controller.BorrowBookController.borrowBookChooseBooks.error.1");
 		} else
-			extraMessage = " U¿ytkownik mo¿e wypo¿yczyæ jeszcze: "
-					+ (5 - borrowedBookList.size() - tempBookList.size());
+			extraMessage = env.getProperty("controller.BorrowBookController.borrowBookChooseBooks.success.1"
+					+ (borrowedBookLimit - borrowedBookList.size() - tempBookList.size()));
 
 		if (isAbleToBorrow) {
 			for (BorrowedBook borrowedBook : borrowedBookList) {
@@ -182,7 +191,7 @@ public class BorrowBookController {
 				Long expTimeMillis = borrowedBook.getExpectedEndDate().getTime();
 				if (currentTimeMillis > expTimeMillis) {
 					isAbleToBorrow = false;
-					extraMessage = " U¿ytkownik posiada przeterminowan¹ ksi¹¿kê";
+					extraMessage = env.getProperty("controller.BorrowBookController.borrowBookChooseBooks.error.2");
 					break;
 				}
 			}
@@ -201,11 +210,13 @@ public class BorrowBookController {
 		long amountOfResults = hasAnyParameters ? bookService.getAmountOfSearchResult(searchBookParameters)
 				: bookService.getAmountOfAllBooks();
 
+		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
 		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(borrowBookChooseBookStartResult,
-				amountOfResults, 10);
+				amountOfResults, searchResultLimit);
 		String resultRange = searchEngineUtils.generateResultRange(borrowBookChooseBookStartResult, amountOfResults,
-				showMoreLinkValue, 10);
-		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(borrowBookChooseBookStartResult, 10);
+				showMoreLinkValue, searchResultLimit);
+		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(borrowBookChooseBookStartResult,
+				searchResultLimit);
 
 		theModel.addAttribute("borrowBookChooseBookStartResult", borrowBookChooseBookStartResult);
 		session.setAttribute("borrowBookChooseBookStartResult", borrowBookChooseBookStartResult);
@@ -252,7 +263,8 @@ public class BorrowBookController {
 			String errorMessage = bookService.addBookToList(session, bookId);
 			redirectAttributes.addAttribute("errorMessage", errorMessage);
 		} else
-			redirectAttributes.addAttribute("errorMessage", "Nie mo¿na wypo¿yczyæ wiêcej ksi¹¿ek");
+			redirectAttributes.addAttribute("errorMessage",
+					env.getProperty("controller.BorrowBookController.addBookToList.error.1"));
 
 		return "redirect:/borrow-book/borrow-book-choose-books";
 
@@ -271,7 +283,8 @@ public class BorrowBookController {
 			String errorMessage = bookService.addReservedBookToList(session, reservationId);
 			redirectAttributes.addAttribute("errorMessage", errorMessage);
 		} else
-			redirectAttributes.addAttribute("errorMessage", "Nie mo¿na wypo¿yczyæ wiêcej ksi¹¿ek");
+			redirectAttributes.addAttribute("errorMessage",
+					env.getProperty("controller.BorrowBookController.addReservedBookToList.error.1"));
 
 		return "redirect:/borrow-book/borrow-book-choose-books";
 
@@ -286,7 +299,8 @@ public class BorrowBookController {
 			return "redirect:/user/logout";
 
 		bookService.deleteBookFromList(session, bookId);
-		redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka zosta³a usuniêta z listy");
+		redirectAttributes.addAttribute("systemMessage",
+				env.getProperty("controller.BorrowBookController.deleteBookFromList.success.1"));
 
 		return "redirect:/borrow-book/borrow-book-choose-books";
 	}
@@ -302,7 +316,8 @@ public class BorrowBookController {
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
 
 		if (tempBookList.size() < 1) {
-			redirectAttributes.addAttribute("systemMessage", "Lista ksi¹¿ek do wypo¿yczenia jest pusta!!");
+			redirectAttributes.addAttribute("systemMessage",
+					env.getProperty("controller.BorrowBookController.borrowBooks.error.1"));
 			return "redirect:/borrow-book/borrow-book-choose-books";
 		}
 

@@ -29,7 +29,7 @@ public class BookServiceUtilsImpl implements BookServiceUtils {
 	}
 
 	@Override
-	public void updateBook(Book tempBook, Book book) {
+	public void prepareBookToUpdate(Book tempBook, Book book) {
 		tempBook.setAuthor(book.getAuthor());
 		tempBook.setTitle(book.getTitle());
 		tempBook.setIsbn(book.getIsbn());
@@ -40,7 +40,7 @@ public class BookServiceUtilsImpl implements BookServiceUtils {
 	}
 
 	@Override
-	public void saveBook(Book tempBook) {
+	public void prepareBookToSave(Book tempBook) {
 		tempBook.setDateOfAdded(new Date());
 		tempBook.setIsActive(true);
 		tempBook.setIsAvailable(true);

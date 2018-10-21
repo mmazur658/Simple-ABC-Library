@@ -3,6 +3,8 @@ package pl.mazur.simpleabclibrary.service.utils;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import pl.mazur.simpleabclibrary.entity.User;
@@ -10,19 +12,22 @@ import pl.mazur.simpleabclibrary.utils.PasswordUtils;
 import pl.mazur.simpleabclibrary.utils.PeselValidator;
 
 @Component
+@PropertySource("classpath:messages.properties")
 public class UserServiceUtilsImpl implements UserServiceUtils {
 
 	private PasswordUtils passwordUtils;
 	private PeselValidator peselValidator;
+	private Environment env;
 
 	@Autowired
-	public UserServiceUtilsImpl(PasswordUtils passwordUtils, PeselValidator peselValidator) {
+	public UserServiceUtilsImpl(PasswordUtils passwordUtils, PeselValidator peselValidator, Environment env) {
 		this.passwordUtils = passwordUtils;
 		this.peselValidator = peselValidator;
+		this.env = env;
 	}
 
 	@Override
-	public void setAdditionalData(User theUser) {
+	public void setAdditionalUserData(User theUser) {
 		theUser.setActive(true);
 		theUser.setAdmin(false);
 		theUser.setEmployee(false);
@@ -52,23 +57,23 @@ public class UserServiceUtilsImpl implements UserServiceUtils {
 	public String increaseUserAccessLevel(User theUser) {
 		if (!theUser.isAdmin() && !theUser.isEmployee()) {
 			theUser.setEmployee(true);
-			return "Zwiêkszono uprawnienia do poziomu: Pracownik";
+			return env.getProperty("service.utils.UserServiceUtilsImpl.increaseUserAccessLevel.success.1");
 		} else if (!theUser.isAdmin() && theUser.isEmployee()) {
 			theUser.setAdmin(true);
-			return "Zwiêkszono uprawnienia do poziomu: Administrator";
+			return env.getProperty("service.utils.UserServiceUtilsImpl.increaseUserAccessLevel.success.2");
 		} else
-			return "Nie mo¿na zwiêkszyæ uprawnieñ, osi¹gniêto maksymalny poziom";
+			return env.getProperty("service.utils.UserServiceUtilsImpl.increaseUserAccessLevel.error.1");
 	}
 
 	@Override
 	public String decreaseUserAccessLevel(User theUser) {
 		if (theUser.isAdmin() && theUser.isEmployee()) {
 			theUser.setAdmin(false);
-			return "Zmniejszono uprawnienia do poziomu: Pracownik";
+			return env.getProperty("service.utils.UserServiceUtilsImpl.decreaseUserAccessLevel.success.1");
 		} else if (!theUser.isAdmin() && theUser.isEmployee()) {
 			theUser.setEmployee(false);
-			return "Zmniejszono uprawnienia do poziomu: Klient";
+			return env.getProperty("service.utils.UserServiceUtilsImpl.decreaseUserAccessLevel.success.2");
 		} else
-			return "Nie mo¿na zmniejszyæ uprawnieñ, osi¹gniêto minimalny poziom";
+			return env.getProperty("service.utils.UserServiceUtilsImpl.decreaseUserAccessLevel.error.1");
 	}
 }

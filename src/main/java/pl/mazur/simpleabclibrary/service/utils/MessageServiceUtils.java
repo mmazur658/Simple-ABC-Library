@@ -11,6 +11,6 @@ public interface MessageServiceUtils {
 
 	void setReadStatusFalse(Message message, String boxType);
 
-	Message sendMessage(User sender, User recipient, String subject, String text);
+	Message createNewMessage(User sender, User recipient, String subject, String text);
 
 }

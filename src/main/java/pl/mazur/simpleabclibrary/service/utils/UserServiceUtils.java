@@ -4,7 +4,7 @@ import pl.mazur.simpleabclibrary.entity.User;
 
 public interface UserServiceUtils {
 
-	void setAdditionalData(User theUser);
+	void setAdditionalUserData(User theUser);
 
 	void updateUserData(User tempUser, User theUser);
 

@@ -9,7 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,7 +29,6 @@ import pl.mazur.simpleabclibrary.entity.LoggedInUser;
 import pl.mazur.simpleabclibrary.entity.Reservation;
 import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.service.BookService;
-import pl.mazur.simpleabclibrary.service.MessageService;
 import pl.mazur.simpleabclibrary.service.PdfService;
 import pl.mazur.simpleabclibrary.service.ReservationService;
 import pl.mazur.simpleabclibrary.service.UserService;
@@ -38,31 +39,33 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 @Controller
 @Scope("session")
 @RequestMapping("/user")
+@PropertySource("classpath:messages.properties")
+@PropertySource("classpath:library-configuration.properties")
 public class UserController {
 
 	@Autowired
-	UserService userService;
+	private UserService userService;
 
 	@Autowired
-	PdfService pdfService;
+	private PdfService pdfService;
 
 	@Autowired
-	AccessLevelControl accessLevelControl;
+	private Environment env;
 
 	@Autowired
-	ReservationService reservationService;
+	private AccessLevelControl accessLevelControl;
 
 	@Autowired
-	BookService bookService;
+	private ReservationService reservationService;
 
 	@Autowired
-	MessageService messageService;
+	private BookService bookService;
 
 	@Autowired
-	PasswordValidator passwordValidator;
+	private PasswordValidator passwordValidator;
 
 	@Autowired
-	SearchEngineUtils searchEngineUtils;
+	private SearchEngineUtils searchEngineUtils;
 
 	@RequestMapping("/login-page")
 	public String loginPage(
@@ -90,7 +93,8 @@ public class UserController {
 		try {
 			isLoginOK = userService.verificationAndAuthentication(email, thePasswordFromForm);
 		} catch (Exception e) {
-			redirectAttributes.addAttribute("incorrectPasswordMessage", "Nieprawid³owe dane logowania!!");
+			redirectAttributes.addAttribute("incorrectPasswordMessage",
+					env.getProperty("controller.UserController.loginVerifying.error.1"));
 			return "redirect:/user/login-page";
 		}
 
@@ -105,7 +109,8 @@ public class UserController {
 			session.setAttribute("loggedInUser", loggedInUser);
 			return "redirect:/user/main";
 		} else {
-			redirectAttributes.addAttribute("incorrectPasswordMessage", "Nieprawid³owe dane logowania!!");
+			redirectAttributes.addAttribute("incorrectPasswordMessage",
+					env.getProperty("controller.UserController.loginVerifying.error.1"));
 			return "redirect:/user/login-page";
 		}
 	}
@@ -148,7 +153,8 @@ public class UserController {
 		boolean isExist = userService.checkEmailIsExist(theUser.getEmail());
 
 		if (!passwordValidator.validate(theUser.getPassword())) {
-			redirectAttributes.addAttribute("systemMessage", "Has³o nie spe³nia wymagañ");
+			redirectAttributes.addAttribute("systemMessage",
+					env.getProperty("controller.UserController.saveUser.error.1"));
 			return "redirect:/user/create-user-form";
 		}
 		if (isExist) {
@@ -220,7 +226,8 @@ public class UserController {
 		if (!session.getAttribute("oldUserEmail").equals(theUser.getEmail()))
 			isExist = userService.checkEmailIsExist(theUser.getEmail());
 		if (isExist) {
-			redirectAttributes.addAttribute("systemMessage", "Istnieje ju¿ konto dla tego adresu Email");
+			redirectAttributes.addAttribute("systemMessage",
+					env.getProperty("controller.UserController.updateUser.error.1"));
 			return "redirect:/user/user-update-form";
 		}
 
@@ -228,7 +235,8 @@ public class UserController {
 		if (theUser.getPesel() != null || !theUser.getPesel().equals("")) {
 			isPeselCorrect = userService.validatePesel(theUser.getPesel());
 			if (!isPeselCorrect) {
-				redirectAttributes.addAttribute("systemMessage", "Nieprawid³owy PESEL!!");
+				redirectAttributes.addAttribute("systemMessage",
+						env.getProperty("controller.UserController.updateUser.error.2"));
 				return "redirect:/user/user-update-form";
 			}
 		}
@@ -236,7 +244,8 @@ public class UserController {
 		userService.updateUser(theUser);
 
 		session.setAttribute("oldUserEmail", null);
-		redirectAttributes.addAttribute("systemMessage", "Konto zosta³o zaktualizowane, zaloguj siê ponownie");
+		redirectAttributes.addAttribute("systemMessage",
+				env.getProperty("controller.UserController.updateUser.success.1"));
 		return "redirect:/user/user-details";
 
 	}
@@ -265,7 +274,8 @@ public class UserController {
 			return "redirect:/user/logout";
 
 		if (oldPassword.trim().equals(newPassword.trim())) {
-			redirectAttributes.addAttribute("systemMessage", "Nowe has³o nie jest nowe.");
+			redirectAttributes.addAttribute("systemMessage",
+					env.getProperty("controller.UserController.changePassword.error.1"));
 			return "redirect:/user/change-password-form";
 		}
 
@@ -275,10 +285,11 @@ public class UserController {
 
 		if (isOldPasswordCorrect) {
 			userService.changePassword(userId, newPassword.trim());
-			redirectAttributes.addAttribute("systemMessage", "Has³o zosta³o zmienione! - Zaloguj siê ponowanie");
+			redirectAttributes.addAttribute("systemMessage", "controller.UserController.changePassword.success.1");
 			return "redirect:/user/user-details";
 		} else {
-			redirectAttributes.addAttribute("systemMessage", "Nieprawid³owe stare has³o");
+			redirectAttributes.addAttribute("systemMessage",
+					env.getProperty("controller.UserController.changePassword.error.2"));
 			return "redirect:/user/change-password-form";
 		}
 	}
@@ -345,11 +356,14 @@ public class UserController {
 		long amountOfResults = hasAnyParameters ? userService.getAmountOfSearchResult(userSearchParameters)
 				: userService.getAmountOfAllUsers();
 
+		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
+
 		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(userManagementStartResult, amountOfResults,
-				10);
+				searchResultLimit);
 		String resultRange = searchEngineUtils.generateResultRange(userManagementStartResult, amountOfResults,
-				showMoreLinkValue, 10);
-		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(userManagementStartResult, 10);
+				showMoreLinkValue, searchResultLimit);
+		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(userManagementStartResult,
+				searchResultLimit);
 
 		theModel.addAttribute("userManagementStartResult", userManagementStartResult);
 		theModel.addAttribute("amountOfResults", amountOfResults);
@@ -465,4 +479,6 @@ public class UserController {
 
 		return "redirect:/user/user-details";
 	}
+	
+	
 }

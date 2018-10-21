@@ -35,7 +35,7 @@
 				</c:if>
 				<c:if test="${userAccessLevel eq 'Administrator' }">	
 					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" id="dropdown03" data-toggle="dropdown"
+						<a class="nav-link dropdown-toggle " href="#" id="dropdown03" data-toggle="dropdown"
 							 aria-haspopup="true" aria-expanded="false">Administrator</a>
 						<div class="dropdown-menu" aria-labelledby="dropdown03">
 							<a class="dropdown-item" href="${pageContext.request.contextPath}/adminstrator/errors-and-problems'">Błędy i Problemy</a>

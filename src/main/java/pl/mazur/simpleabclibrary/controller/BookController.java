@@ -9,7 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,32 +31,33 @@ import pl.mazur.simpleabclibrary.entity.Reservation;
 import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.PdfService;
 import pl.mazur.simpleabclibrary.service.ReservationService;
-import pl.mazur.simpleabclibrary.service.UserService;
 import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
 import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 
 @Controller
 @Scope("session")
 @RequestMapping("/book")
+@PropertySource("classpath:messages.properties")
+@PropertySource("classpath:library-configuration.properties")
 public class BookController {
 
 	@Autowired
-	BookService bookService;
+	private Environment env;
 
 	@Autowired
-	UserService userService;
+	private BookService bookService;
 
 	@Autowired
-	PdfService pdfService;
+	private PdfService pdfService;
 
 	@Autowired
-	AccessLevelControl accessLevelControl;
+	private AccessLevelControl accessLevelControl;
 
 	@Autowired
-	ReservationService reservationService;
+	private ReservationService reservationService;
 
 	@Autowired
-	SearchEngineUtils searchEngineUtils;
+	private SearchEngineUtils searchEngineUtils;
 
 	@RequestMapping("/main-bookstore")
 	public String mainBookstore(HttpServletRequest request, Model theModel,
@@ -89,9 +92,12 @@ public class BookController {
 		long amountOfResults = hasAnyParameters ? bookService.getAmountOfSearchResult(searchBookParameters)
 				: bookService.getAmountOfAllBooks();
 
-		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(startResult, amountOfResults, 10);
-		String resultRange = searchEngineUtils.generateResultRange(startResult, amountOfResults, showMoreLinkValue, 10);
-		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(startResult, 10);
+		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
+		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(startResult, amountOfResults,
+				searchResultLimit);
+		String resultRange = searchEngineUtils.generateResultRange(startResult, amountOfResults, showMoreLinkValue,
+				searchResultLimit);
+		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(startResult, searchResultLimit);
 
 		List<Reservation> userReservationList = reservationService
 				.getUserReservations((int) session.getAttribute("userId"));
@@ -176,19 +182,24 @@ public class BookController {
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
+		int reservationLimit = Integer.valueOf(env.getProperty("reservation.limit"));
 		int userReservationsCount = (int) session.getAttribute("userReservationsCount");
-		if (userReservationsCount >= 3)
-			redirectAttributes.addAttribute("systemErrorMessage", "Nie mo¿na zarezerwowaæ wiêcej jak 3 ksi¹¿ki");
+
+		if (userReservationsCount >= reservationLimit)
+			redirectAttributes.addAttribute("systemErrorMessage",
+					env.getProperty("controller.BookController.bookReservation.error.1"));
 		else {
 			int userId = (int) session.getAttribute("userId");
 			Book tempBook = bookService.getBook(bookId);
 
 			if (tempBook.getIsAvailable()) {
 				reservationService.createReservation(tempBook, userId);
-				redirectAttributes.addAttribute("systemSuccessMessage", "Rezerwacja zosta³a dodana.");
+				redirectAttributes.addAttribute("systemSuccessMessage",
+						env.getProperty("controller.BookController.bookReservation.success.1"));
 				redirectAttributes.addAttribute("bookId", bookId);
 			} else {
-				redirectAttributes.addAttribute("systemErrorMessage", "Nie mo¿na zarezerwowaæ niedostêpnej ksi¹¿ki.");
+				redirectAttributes.addAttribute("systemErrorMessage",
+						env.getProperty("controller.BookController.bookReservation.error.2"));
 				redirectAttributes.addAttribute("bookId", bookId);
 			}
 		}
@@ -206,7 +217,8 @@ public class BookController {
 
 		Reservation reservation = reservationService.getReservation(reservationId);
 		reservationService.deleteReservationByUser(reservation);
-		redirectAttributes.addAttribute("systemSuccessMessage", "Rezerwacja zosta³a usuniêta");
+		redirectAttributes.addAttribute("systemSuccessMessage",
+				env.getProperty("controller.BookController.deleteReservation.success.1"));
 
 		if (deleteReservationWayBack.equals("main-bookstore"))
 			return "redirect:/book/main-bookstore";
@@ -237,10 +249,12 @@ public class BookController {
 
 		try {
 			bookService.updateBook(book);
-			redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka zosta³a pomyœlnie zaktualizowana!");
+			redirectAttributes.addAttribute("systemMessage",
+					env.getProperty("controller.BookController.updateBook.success.1"));
 		} catch (Exception exc) {
 			exc.printStackTrace();
-			redirectAttributes.addAttribute("systemMessage", "B³¹d aktualizacji ksi¹¿ki!");
+			redirectAttributes.addAttribute("systemMessage",
+					env.getProperty("controller.BookController.updateBook.error.1"));
 		}
 
 		return "redirect:/book/main-bookstore";
@@ -257,10 +271,11 @@ public class BookController {
 		Book tempBook = bookService.getBook(bookId);
 		if (tempBook.getIsAvailable()) {
 			bookService.deleteBook(tempBook);
-			redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka zosta³a usuniêta.");
+			redirectAttributes.addAttribute("systemMessage",
+					env.getProperty("controller.BookController.deleteBook.success.1"));
 		} else {
 			redirectAttributes.addAttribute("systemMessage",
-					"Nie mo¿na usun¹æ wypo¿yczonej / zarezerwowanej ksi¹¿ki !!");
+					env.getProperty("controller.BookController.deleteBook.error.1"));
 		}
 
 		return "redirect:/book/main-bookstore";

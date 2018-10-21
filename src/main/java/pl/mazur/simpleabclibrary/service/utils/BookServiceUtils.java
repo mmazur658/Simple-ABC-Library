@@ -8,8 +8,8 @@ public interface BookServiceUtils {
 
 	BorrowedBook createBorrowedBook(Book tempBook, User tempUser);
 
-	void updateBook(Book tempBook, Book book);
+	void prepareBookToUpdate(Book tempBook, Book book);
 
-	void saveBook(Book tempBook);
+	void prepareBookToSave(Book tempBook);
 
 }

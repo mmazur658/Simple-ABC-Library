@@ -7,9 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import pl.mazur.simpleabclibrary.dao.BookDAO;
+import pl.mazur.simpleabclibrary.dao.MessageDAO;
 import pl.mazur.simpleabclibrary.dao.ReservationDAO;
 import pl.mazur.simpleabclibrary.dao.UserDAO;
 import pl.mazur.simpleabclibrary.entity.Book;
+import pl.mazur.simpleabclibrary.entity.Message;
 import pl.mazur.simpleabclibrary.entity.Reservation;
 import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.service.utils.ReservationServiceUtils;
@@ -32,6 +34,9 @@ public class ReservationServiceImpl implements ReservationService {
 
 	@Autowired
 	private ReservationServiceUtils reservationServiceUtils;
+
+	@Autowired
+	private MessageDAO messageDAO;
 
 	@Override
 	@Transactional
@@ -98,9 +103,10 @@ public class ReservationServiceImpl implements ReservationService {
 
 		Reservation reservation = reservationDAO.getReservation(reservationId);
 		User adminUser = userDAO.getUser(1);
-		reservationServiceUtils.deleteReservationByEmployee(reservation, adminUser);
+		Message message = reservationServiceUtils.prepareReservationToDeleteAndCreateNewMessage(reservation, adminUser);
 
 		reservationDAO.deleteReservationByEmployee(reservation);
+		messageDAO.sendMessage(message);
 		bookDAO.setBookActive(reservationId);
 
 	}

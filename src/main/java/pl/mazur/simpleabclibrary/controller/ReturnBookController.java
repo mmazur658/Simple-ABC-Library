@@ -11,7 +11,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,28 +32,33 @@ import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.PdfService;
 import pl.mazur.simpleabclibrary.service.UserService;
-import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
+import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 
 @Controller
 @Scope("session")
 @RequestMapping("/return-book")
+@PropertySource("classpath:messages.properties")
+@PropertySource("classpath:library-configuration.properties")
 public class ReturnBookController {
 
 	@Autowired
-	BookService bookService;
+	private BookService bookService;
 
 	@Autowired
-	UserService userService;
+	private UserService userService;
 
 	@Autowired
-	PdfService pdfService;
+	private PdfService pdfService;
 
 	@Autowired
-	AccessLevelControl accessLevelControl;
+	private Environment env;
 
 	@Autowired
-	SearchEngineUtils searchEngineUtils;
+	private AccessLevelControl accessLevelControl;
+
+	@Autowired
+	private SearchEngineUtils searchEngineUtils;
 
 	@RequestMapping("/return-book-choose-user")
 	public String borrowBook(
@@ -87,11 +94,12 @@ public class ReturnBookController {
 		long amountOfResults = hasAnyParameters ? userService.getAmountOfSearchResult(userSearchParameters)
 				: userService.getAmountOfAllUsers();
 
+		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
 		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(returnBookStartResult, amountOfResults,
-				10);
+				searchResultLimit);
 		String resultRange = searchEngineUtils.generateResultRange(returnBookStartResult, amountOfResults,
-				showMoreLinkValue, 10);
-		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(returnBookStartResult, 10);
+				showMoreLinkValue, searchResultLimit);
+		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(returnBookStartResult, searchResultLimit);
 
 		session.setAttribute("returnBookStartResult", returnBookStartResult);
 		theModel.addAttribute("returnBookStartResult", returnBookStartResult);
@@ -167,7 +175,8 @@ public class ReturnBookController {
 
 		bookService.deleteReturnedBookFromList(session, bookId);
 
-		redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka zosta³a usuniêta z listy");
+		redirectAttributes.addAttribute("systemMessage",
+				env.getProperty("controller.ReturnBookController.deleteReturnedBookFromList.success.1"));
 
 		return "redirect:/return-book/return-book-choose-books";
 	}
@@ -181,7 +190,8 @@ public class ReturnBookController {
 			return "redirect:/user/logout";
 
 		bookService.addReturnedBookToList(session, bookId);
-		redirectAttributes.addAttribute("systemMessage", "Ksi¹¿ka zosta³a dodana do listy");
+		redirectAttributes.addAttribute("systemMessage",
+				env.getProperty("controller.ReturnBookController.addReturnedBookToList.success.1"));
 
 		return "redirect:/return-book/return-book-choose-books";
 	}
@@ -194,7 +204,8 @@ public class ReturnBookController {
 			return "redirect:/user/logout";
 
 		bookService.addAllBorrowedBookToLiest(session);
-		redirectAttributes.addAttribute("systemMessage", "Wszystkie ksi¹¿ki zosta³y dodane do listy");
+		redirectAttributes.addAttribute("systemMessage",
+				env.getProperty("controller.ReturnBookController.addAllBorrowedBookToList.success.1"));
 
 		return "redirect:/return-book/return-book-choose-books";
 	}
@@ -210,7 +221,8 @@ public class ReturnBookController {
 		List<Book> tempReturnedBookList = (List<Book>) session.getAttribute("tempReturnedBookList");
 
 		if (tempReturnedBookList.size() < 1) {
-			redirectAttributes.addAttribute("systemMessage", "Lista ksi¹¿ek do zwrotu jest pusta!!");
+			redirectAttributes.addAttribute("systemMessage",
+					env.getProperty("controller.ReturnBookController.returnBook.error.1"));
 			return "redirect:/return-book/return-book-choose-books";
 		}
 

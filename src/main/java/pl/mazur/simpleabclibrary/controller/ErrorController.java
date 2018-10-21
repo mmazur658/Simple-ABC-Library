@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Scope("session")
 public class ErrorController {
 
+	@RequestMapping("/error2")
+	public String showTestPage() {
+		return "test-page2";
+	}
+	
 	@RequestMapping("/error")
 	public String showErrorPage(HttpServletRequest request, Model theModel) {
 
