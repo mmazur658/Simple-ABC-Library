@@ -1,8 +1,7 @@
 <%@ page pageEncoding="UTF-8"%>
 <footer class="footer">
-	<div class="container">
-		<span class="text-muted">Simple ABC Libray - Wrocław, Literacka
-			124 - 690372851 - marcin.mazur1024@gmail.com</span>
+	<div class="container" style="text-align:center;">
+		<span class="text-muted">Simple ABC Libray - 690372851 - marcin.mazur1024@gmail.com</span>
 	</div>
 </footer>
 
@@ -25,4 +24,14 @@
 	src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
 	integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
 	crossorigin="anonymous">
+</script>
+<script>
+	window.onscroll = function() {scrollFunction()};
+	function scrollFunction() {
+	  if (document.body.scrollTop > 60 || document.documentElement.scrollTop > 60) {
+	    document.getElementById("main-navbar").style.padding = "10px 0px 10px 10px" ;
+	  } else {
+	    document.getElementById("main-navbar").style.padding = "20px 0px 20px 20px";
+	  }
+	}
 </script>

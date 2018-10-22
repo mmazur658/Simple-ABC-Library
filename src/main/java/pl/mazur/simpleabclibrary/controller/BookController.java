@@ -167,7 +167,7 @@ public class BookController {
 			return "redirect:/user/logout";
 
 		Book tempBook = bookService.getBook(bookId);
-
+		theModel.addAttribute("successMessage", env.getProperty("controller.BookController.confirmBookPage.success.1"));
 		theModel.addAttribute("tempBook", tempBook);
 
 		return "confirm-book-page";

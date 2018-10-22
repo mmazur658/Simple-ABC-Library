@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import pl.mazur.simpleabclibrary.entity.Book;
+import pl.mazur.simpleabclibrary.entity.BorrowedBook;
 import pl.mazur.simpleabclibrary.entity.Reservation;
 import pl.mazur.simpleabclibrary.entity.User;
-import pl.mazur.simpleabclibrary.entity.BorrowedBook;
 
 @Repository
 public class BookDAOImpl implements BookDAO {
@@ -78,8 +78,8 @@ public class BookDAOImpl implements BookDAO {
 	}
 
 	@Override
-	public void updateBook(Book book) {
-		currentSession().update(book);
+	public void updateBook(Book tempBook) {
+		currentSession().update(tempBook);
 	}
 
 	@Override

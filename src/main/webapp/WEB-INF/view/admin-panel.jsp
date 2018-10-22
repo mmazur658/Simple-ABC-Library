@@ -4,13 +4,14 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<%@ include file="/resources/parts/header.jsp" %>  
+	<%@ include file="/resources/parts/header.jsp" %> 
+	<%@ include file="/resources/parts/navbar-style.jsp" %>  
 	<title>Simple ABC Library - Panel Administratora</title>
 </head>
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
-	<div class="container">	
+	<div class="container pt-5 mt-4">	
 	
 	
 	

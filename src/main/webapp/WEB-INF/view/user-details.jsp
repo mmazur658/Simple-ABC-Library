@@ -5,20 +5,18 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<%@ include file="/resources/parts/header.jsp" %>  
+	<%@ include file="/resources/parts/header.jsp" %>
+	<%@ include file="/resources/parts/navbar-style.jsp" %>  
 	<title>Simple ABC Library - Twoje Dane</title>
 </head>
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %> 
 		
 	
-	<div class="container w-50" >
+	<div class="container w-50  pt-5 mt-4" >
 	
-		<c:if test="${not empty systemMessage}">
-			<div class="alert alert-success mt-2 w-50" role="alert">
-		    	<strong>${systemMessage}</strong>
-		  	</div>
-		</c:if>	
+	<c:if test="${not empty systemMessage}">
+		<script>showToastrAlert("info","${systemMessage}");</script></c:if>
 			
 		<table class="table table-borderedless w-75 mb-0" style="text-align: center;">
 			<tr>
@@ -74,7 +72,7 @@
 		    </tr>	  
 		  </tbody>
 		</table>	
-		<a href="${pageContext.request.contextPath}/user/user-update-form" class="btn btn-sm btn-secondary btn-block w-75" role="button" aria-pressed="true" >Aktualizaja Danych</a>
+		<a href="${pageContext.request.contextPath}/user/user-update-form" class="btn btn-sm btn-secondary btn-block w-75 shadow" role="button" aria-pressed="true" >Aktualizaja Danych</a>
 	</div>
 	
 	<%@ include file="/resources/parts/footer.jsp" %> 

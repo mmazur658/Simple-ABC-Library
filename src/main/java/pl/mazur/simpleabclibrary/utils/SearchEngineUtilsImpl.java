@@ -8,12 +8,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class SearchEngineUtilsImpl implements SearchEngineUtils {
 
-	
 	private ForbiddenWords forbiddenWords;
-	
+
 	@Autowired
 	public SearchEngineUtilsImpl(ForbiddenWords forbiddenWords) {
-		this.forbiddenWords=forbiddenWords;
+		this.forbiddenWords = forbiddenWords;
 	}
 
 	@Override
@@ -75,8 +74,8 @@ public class SearchEngineUtilsImpl implements SearchEngineUtils {
 
 			searchParameters[i] = (searchParametersValue[i] == null) ? "" : searchParametersValue[i];
 		}
-		for (int i = 0; i < searchParameters.length-1; i++) {
-			if (forbiddenWords.findForbiddenWords(searchParameters[i])) 
+		for (int i = 0; i < searchParameters.length - 1; i++) {
+			if (forbiddenWords.findForbiddenWords(searchParameters[i]))
 				searchParameters[i] = "";
 		}
 

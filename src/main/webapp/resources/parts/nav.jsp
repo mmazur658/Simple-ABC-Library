@@ -1,6 +1,6 @@
 <%@ page pageEncoding="UTF-8"%>
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-		<a class="navbar-brand" href="${pageContext.request.contextPath}/user/main">Simple ABC Library</a>
+<nav id="main-navbar" class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow" >
+		<a class="navbar-brand nav-item" href="${pageContext.request.contextPath}/user/main">Simple ABC Library</a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse"	data-target="#mainNavbar" aria-controls="mainNavbar"
 			aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>

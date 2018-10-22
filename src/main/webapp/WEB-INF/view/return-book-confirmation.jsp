@@ -4,6 +4,7 @@
 <html lang="en">
 <head>
 	<%@ include file="/resources/parts/header.jsp" %>  
+	<%@ include file="/resources/parts/navbar-style.jsp" %>
 	<title>Simple ABC Library - Potwierdzenie Przyjęcia Książek</title>
 </head>
 <body>
@@ -16,9 +17,9 @@
 					<c:param name="returnedBookInfo" value="${returnedBookInfo}"/>					
 				</c:url>
 	
-		<a href="${generateReturnBookConfirmationLink}" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true" >Wydrukuj Potwierdzenie</a>
-		<a href="${pageContext.request.contextPath}/return-book/return-book-choose-user" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true" >Nowy Zwrot</a>
-		<a href="${pageContext.request.contextPath}/user/main" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true" >Strona Główna</a>
+		<a href="${generateReturnBookConfirmationLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Wydrukuj Potwierdzenie</a>
+		<a href="${pageContext.request.contextPath}/return-book/return-book-choose-user" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Nowy Zwrot</a>
+		<a href="${pageContext.request.contextPath}/user/main" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Strona Główna</a>
 		
 	</div>
 

@@ -5,6 +5,7 @@
 <html lang="en">
 <head>
 	<%@ include file="/resources/parts/header.jsp" %>  
+	<%@ include file="/resources/parts/navbar-style.jsp" %>
 	<title>Simple ABC Library - XYZ</title>
 </head>
 <body>

@@ -12,7 +12,7 @@
 <body>
 	<div class="wrapper">
 		<br><br><br><br><br><br>
-		<div class="container">
+		<div class="container  pt-5 mt-4">
 			
 			<br>
 			${errorMessage}

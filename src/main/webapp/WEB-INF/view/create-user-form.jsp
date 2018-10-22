@@ -14,11 +14,8 @@
 		<img class="mb-3" src="<%=request.getContextPath()%>/resources/image/ABC_new_mini_logo.png" alt="" width="200" height="200">	
 		<h1 class="h3 mb-3 font-weight-normal"> Nowe Konto</h1>
 				
-		<c:if test="${not empty incorrectPasswordMessage}">
-			<div class="alert alert-danger" role="alert">
-		    	<strong>${systemMessage}</strong>
-		  	</div>
-		</c:if>
+		<c:if test="${not empty systemMessage}">
+			<script>showToastrAlert("error","${systemMessage}");</script></c:if>		
 				
 		<label for="inputFirstName" class="sr-only">Imię</label>
 	    <form:input type="text" id="inputFirstName" class="form-control" path="firstName" placeholder="Imię" required="required" />		
@@ -36,8 +33,8 @@
 		<label for="inputConfirmPassword" class="sr-only">Hasło</label>
 		<form:input class="form-control" style="margin-top: -10px;" type="password" path="password" placeholder="Powtórz Hasło" required="required"/>
 				
-		<button class="btn btn-lg btn-secondary btn-block" type="submit">Utwórz Nowe Konto</button>
-		<a href="${pageContext.request.contextPath}/user/login-page" class="btn btn-lg btn-secondary btn-block" role="button" aria-pressed="true">Powrót</a>
+		<button class="btn btn-lg btn-secondary btn-block shadow" type="submit">Utwórz Nowe Konto</button>
+		<a href="${pageContext.request.contextPath}/user/login-page" class="btn btn-lg btn-secondary btn-block shadow" role="button" aria-pressed="true">Powrót</a>
 				
 	</form:form>
 		

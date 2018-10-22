@@ -4,20 +4,17 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<%@ include file="/resources/parts/header.jsp" %>  
+	<%@ include file="/resources/parts/header.jsp" %> 
+	<%@ include file="/resources/parts/navbar-style.jsp" %> 
 	<title>Simple ABC Library - Wybór Książki</title>
 </head>
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 
-	<div class="container">	
-	
+	<div class="container  pt-5 mt-4">	
 	
 	<c:if test="${not empty systemMessage}">
-		<div class="alert alert-primary mt-1" role="alert">
-			<strong>${systemMessage} </strong>
-		</div>
-	</c:if>
+		<script>showToastrAlert("info","${systemMessage}");</script></c:if>
 		
 	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Wybrany Użytkownik</h1>			
 	<table class="table table-hover">
@@ -43,10 +40,10 @@
 
 	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Wybrane Książki</h1>
 	<form action="cancel-book-returning">
-		<button class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4"  type="submit">Anuluj Wydanie</button>	
+		<button class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 shadow"  type="submit">Anuluj Wydanie</button>	
 	</form>	
 	<form action="return-book">	
-		<button class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 mr-1"  type="submit">Zwrot Książek</button>	
+		<button class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 mr-1 shadow"  type="submit">Zwrot Książek</button>	
 	</form>			
 		<table class="table table-hover">
 		  <thead>
@@ -75,7 +72,7 @@
 		</table>
 
 	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Wybrane Książki</h1>	
-	<a href="${pageContext.request.contextPath}/return-book/addAllBorrowedBookToList" class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 mr-1" role="button" aria-pressed="true" >Dodaj Wszystkie</a>
+	<a href="${pageContext.request.contextPath}/return-book/addAllBorrowedBookToList" class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 mr-1 shadow" role="button" aria-pressed="true" >Dodaj Wszystkie</a>
 		<table class="table table-hover">
 		  <thead>
 		    <tr>

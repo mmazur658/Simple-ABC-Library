@@ -5,25 +5,23 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<%@ include file="/resources/parts/header.jsp" %>  
+	<%@ include file="/resources/parts/header.jsp" %> 
+	<%@ include file="/resources/parts/navbar-style.jsp" %> 
 	<title>Simple ABC Library - Zarządzanie Rezerwacjami</title>
 </head>
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
-	<div class="container">	
+	<div class="container pt-5 mt-4">	
 	
-	<c:if test="${not empty systemMessage }">
-		<div class="alert alert-success mt-1" role="alert">
-			<strong>${systemMessage}</strong>
-		</div>
-	</c:if>
+	<c:if test="${not empty systemMessage}">
+		<script>showToastrAlert("info","${systemMessage}");</script></c:if>
 	
 	<h1 class="h3 mb-3 mt-3 font-weight-normal float-left">Rezerwacje</h1>
 
-		<button type="button" class="btn btn-sm btn-secondary float-right mt-4 btn-block w-25" data-toggle="modal" data-target="#searchReservationModal" data-whatever="">Znajdź Rezerwację</button>
+		<button type="button" class="btn btn-sm btn-secondary float-right mt-4 btn-block w-25 shadow" data-toggle="modal" data-target="#searchReservationModal" data-whatever="">Znajdź Rezerwację</button>
 		 <form action ="clearReservationSearchParameters" >
-		 	<button class="btn btn-sm btn-secondary float-right mt-4 mr-1 btn-block w-25" type="submit">Wyczyść Dane Szukania</button>
+		 	<button class="btn btn-sm btn-secondary float-right mt-4 mr-1 btn-block w-25 shadow" type="submit">Wyczyść Dane Szukania</button>
 		 </form>
 		 <div class="modal fade" id="searchReservationModal" tabindex="-1" role="dialog" aria-labelledby="searchReservationModalLabel" aria-hidden="true">
 			  <div class="modal-dialog" role="document">
@@ -44,8 +42,8 @@
 						<input class="form-control" type="text" placeholder="Id Książki" name="bookId" value="<%=(session.getAttribute("bookId")==null) ? "" : session.getAttribute("bookId")%>">
 						<input class="form-control" type="text" placeholder="Tytuł Książki" name="bookTitle" value="<%=(session.getAttribute("bookTitle")==null) ? "" : session.getAttribute("bookTitle")%>">			   
 					 </div>
-			         <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Zamknij</button>
-			         <input class="btn btn-secondary float-right mr-2" type="submit" value="Szukaj">
+			         <button type="button" class="btn btn-secondary float-right shadow" data-dismiss="modal">Zamknij</button>
+			         <input class="btn btn-secondary float-right mr-2 shadow" type="submit" value="Szukaj">
 			   		</form>  
 			      </div>
 			    </div>
@@ -84,8 +82,8 @@
 			 			<td>${tempReservation.book.title }</td>
 			 			<td><fmt:formatDate value="${tempReservation.endDate }" pattern="HH:mm dd-MM"/>	</td>
 			 			<td>
-			 				<button class="btn btn-secondary btn-sm" onclick="window.location.href='${increaseExpDateLink}'">+24h</button>
-			 				<button class="btn btn-secondary btn-sm" onclick="window.location.href='${deleteReservationLink}'">Usuń</button>
+			 				<button class="btn btn-secondary btn-sm shadow" onclick="window.location.href='${increaseExpDateLink}'">+24h</button>
+			 				<button class="btn btn-secondary btn-sm shadow" onclick="window.location.href='${deleteReservationLink}'">Usuń</button>
 			 			</td>
 			 		</tr>			 
 				 </c:forEach>

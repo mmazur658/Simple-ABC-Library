@@ -5,23 +5,21 @@
 <html lang="en">
 <head>
 	<%@ include file="/resources/parts/header.jsp" %>  
+	<%@ include file="/resources/parts/navbar-style.jsp" %>
 	<title>Simple ABC Library - Wybór Użytkownika</title>
 </head>
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
-	<div class="container">	
+	<div class="container  pt-5 mt-4">	
 	
 	<c:if test="${not empty systemMessage}">
-		<div class="alert alert-success" role="alert">
-	    	<strong>${systemMessage}</strong>
-	  	</div>
-	</c:if>
+		<script>showToastrAlert("info","${systemMessage}");</script></c:if>
 	
 	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Użytkownicy</h1>
-	<button type="button" class="btn btn-sm btn-secondary float-right mt-4" data-toggle="modal" data-target="#userSearchModal" data-whatever="">Znajdź Użytkownika</button>
+	<button type="button" class="btn btn-sm btn-secondary float-right mt-4 shadow" data-toggle="modal" data-target="#userSearchModal" data-whatever="">Znajdź Użytkownika</button>
 	<form action ="clearReturnBookUserSearchParameters" >
-		 <button class="btn btn-sm btn-secondary float-right mt-4 mr-1" type="submit">Wyczyść Dane Szukania</button>
+		 <button class="btn btn-sm btn-secondary float-right mt-4 mr-1 shadow" type="submit">Wyczyść Dane Szukania</button>
 	</form>
 	<div class="modal fade" id="userSearchModal" tabindex="-1" role="dialog" aria-labelledby="userSearchModalLabel" aria-hidden="true">
 			  <div class="modal-dialog" role="document">
@@ -41,8 +39,8 @@
 							<input class="form-control" placeholder="Email" type="text" name="returnBookEmail" value = "<%=(session.getAttribute("returnBookEmail")==null) ? "" : session.getAttribute("returnBookEmail")%>">		
 							<input class="form-control" placeholder="PESEL" type="text" name="returnBookPesel" value = "<%=(session.getAttribute("returnBookPesel")==null) ? "" : session.getAttribute("returnBookPesel")%>">
 						</div>
-					<button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Zamknij</button>
-			        <input class="btn btn-secondary float-right mr-2" type="submit" value="Szukaj">
+					<button type="button" class="btn btn-secondary float-right shadow" data-dismiss="modal">Zamknij</button>
+			        <input class="btn btn-secondary float-right mr-2 shadow" type="submit" value="Szukaj">
 				</form> 
 			      </div>
 			    </div>

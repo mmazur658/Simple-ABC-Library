@@ -5,6 +5,7 @@
 <html lang="en">
 <head>
 
+	<%@ include file="/resources/parts/navbar-main-style.jsp" %> 
 	<%@ include file="/resources/parts/header.jsp" %> 
 
 	<title>Simple ABC Library - Strona Główna</title>
@@ -37,5 +38,12 @@
 	
 	<%@ include file="/resources/parts/footer.jsp" %>  
 
+		<script>
+		$(function(){
+			$('.carousel').carousel({
+				  interval: 3000
+			})
+		})
+		</script>
 </body>
 </html>

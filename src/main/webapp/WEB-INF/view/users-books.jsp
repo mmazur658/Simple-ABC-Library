@@ -4,19 +4,20 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<%@ include file="/resources/parts/header.jsp" %>  
+	<%@ include file="/resources/parts/header.jsp" %> 
+	<%@ include file="/resources/parts/navbar-style.jsp" %> 
 	<title>Simple ABC Library - Zmiana Hasła</title>
 </head>
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 
-	<div class="container">
+	<div class="container  pt-5 mt-4">
 	
-		<c:if test="${not empty systemSuccessMessage}">
-			<div class="alert alert-success mt-2 w-50" role="alert">
-		    	<strong>${systemSuccessMessage}</strong>
-		  	</div>
-		</c:if>		
+
+	<c:if test="${not empty systemSuccessMessage}">
+		<script>showToastrAlert("success","${systemSuccessMessage}");</script></c:if>
+	<c:if test="${not empty systemMessage}">
+		<script>showToastrAlert("info","${systemMessage}");</script></c:if>
 	
 		<h1 class="h3 mb-3 mt-3 font-weight-normal">Zarezerwowane Książki</h1>
 		<table class="table table-hover">
@@ -40,7 +41,7 @@
 						<td>${tempReservation.book.title}</td>
 						<td>${tempReservation.book.author }</td>
 						<td><fmt:formatDate value="${tempReservation.endDate }" pattern="hh:mm dd-MM"/></td>
-						<td><button class="btn btn-secondary btn-sm" onclick="window.location.href='${deleteReservationLink}'">Usuń</button></td>
+						<td><button class="btn btn-secondary btn-sm shadow" onclick="window.location.href='${deleteReservationLink}'">Usuń</button></td>
 					</tr>			  
 			  </c:forEach>			  
 			</tbody>

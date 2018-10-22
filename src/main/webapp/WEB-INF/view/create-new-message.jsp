@@ -5,18 +5,16 @@
 <html lang="en">
 <head>
 	<%@ include file="/resources/parts/header.jsp" %>  
+	<%@ include file="/resources/parts/navbar-style.jsp" %>
 	<title>Simple ABC Library - Nowa Wiadomość</title>
 </head>
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
-	<div class="container w-50">	
+	<div class="container w-50  pt-5 mt-4">	
 
 	<c:if test="${not empty systemMessage}">
-		<div class="alert alert-primary mt-2" role="alert">
-		   <strong>${systemMessage}</strong>
-		</div>
-	</c:if>
+		<script>showToastrAlert("info","${systemMessage}");</script></c:if>
 	
 	<form action="send-message" method="POST" id="messageForm" >
 	<table class="table table-sm mt-2">
@@ -38,7 +36,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td colspan="2"><button class="btn btn-sm btn-secondary btn-block mt-2" type="submit">Wyślij</button></td>
+			<td colspan="2"><button class="btn btn-sm btn-secondary btn-block mt-2 shadow" type="submit">Wyślij</button></td>
 		</tr>
 	</table>
 	</form>	

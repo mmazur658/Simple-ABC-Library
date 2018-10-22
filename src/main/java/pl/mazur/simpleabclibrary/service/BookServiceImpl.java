@@ -75,9 +75,9 @@ public class BookServiceImpl implements BookService {
 	@Override
 	@Transactional
 	public void updateBook(Book book) {
-		Book tempBook = bookDAO.getBook(book.getId());
+		Book tempBook = getBook(book.getId());
 		bookServiceUtils.prepareBookToUpdate(tempBook, book);
-		bookDAO.updateBook(book);
+
 	}
 
 	@Override

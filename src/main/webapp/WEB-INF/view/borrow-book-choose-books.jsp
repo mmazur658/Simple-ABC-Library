@@ -6,35 +6,24 @@
 <html lang="en">
 <head>
 	<%@ include file="/resources/parts/header.jsp" %>  
+	<%@ include file="/resources/parts/navbar-style.jsp" %>
 	<title>Simple ABC Library - Wybór Książki</title>
 </head>
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
-	<div class="container">	
+	<div class="container pt-5 mt-4">	
 	
-	<c:if test="${not empty extraMessage }">
-			<div class="alert alert-primary mt-1" role="alert">
-				<strong>${extraMessage}</strong>
-			</div>
-	</c:if>
-	
+	<c:if test="${not empty extraMessage}">
+		<script>showToastrAlert("info","${extraMessage}");</script></c:if>
 	<c:if test="${not empty systemMessage}">
-			<div class="alert alert-primary mt-1" role="alert">
-				<strong>${systemMessage} </strong>
-			</div>
-	</c:if>
-	
+		<script>showToastrAlert("info","${systemMessage}");</script></c:if>
 	<c:if test="${not empty errorMessage}">
-			<div class="alert alert-danger mt-1" role="alert">
-				<strong>${errorMessage}</strong>
-			</div>
-	</c:if>
-	
-<!-- Tablica z wybranym użytkwonikiem - po kliknięciu powórt do wyboru użytkwonika -->
+		<script>showToastrAlert("error","${errorMessage}");</script></c:if>
+
 	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Wybrany Użytkownik</h1>
-<!-- Przycisk, gdzie wchodzisz w rezerwację, gdzie możesz wybrać książkę do dodania -->
-		<button type="button" class="btn btn-sm btn-secondary float-right mt-4 btn-block w-25" data-toggle="modal" data-target="#userReservationList" data-whatever="">Rezerwacje (${fn:length(userReservationList)})</button>
+
+		<button type="button" class="btn btn-sm btn-secondary float-right mt-4 btn-block w-25 shadow" data-toggle="modal" data-target="#userReservationList" data-whatever="">Rezerwacje (${fn:length(userReservationList)})</button>
 			<div class="modal fade" id="userReservationList" tabindex="-1" role="dialog" aria-labelledby="userReservationListLabel" aria-hidden="true">
 			  <div class="modal-dialog modal-lg" role="document">
 			    <div class="modal-content">
@@ -72,13 +61,13 @@
 							</tr>					
 						</c:forEach>	
 					</table>
-			        <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Zamknij</button>
+			        <button type="button" class="btn btn-secondary float-right shadow" data-dismiss="modal">Zamknij</button>
 			      </div>
 			    </div>
 			  </div>
 		</div>
-<!-- Przycisk, gdzie wchodzisz w wypożyczone książki -->
-		<button type="button" class="btn btn-sm btn-secondary float-right mt-4 btn-block w-25 mr-1" data-toggle="modal" data-target="#userBorrowedBookList" data-whatever="">Wypożyczone Książki  (${fn:length(borrowedBookList)})</button>
+
+		<button type="button" class="btn btn-sm btn-secondary float-right mt-4 btn-block w-25 mr-1 shadow" data-toggle="modal" data-target="#userBorrowedBookList" data-whatever="">Wypożyczone Książki  (${fn:length(borrowedBookList)})</button>
 			<div class="modal fade" id="userBorrowedBookList" tabindex="-1" role="dialog" aria-labelledby="userBorrowedBookListLabel" aria-hidden="true">
 			  <div class="modal-dialog modal-lg" role="document">
 			    <div class="modal-content">
@@ -111,7 +100,7 @@
 							  </c:forEach>
 							</tbody>	
 						</table>
-					<button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Zamknij</button>			   	
+					<button type="button" class="btn btn-secondary float-right shadow" data-dismiss="modal">Zamknij</button>			   	
 			      </div>
 			    </div>
 			  </div>
@@ -138,15 +127,15 @@
 		 </tbody>
 	</table>
 
-<!--  tablica z wybranymi książkami, po kliknięciu usuwa -->	
+
 	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Wybrane Książki</h1>
 		
 	<form action="cancel-borrowed-book">
-		<button class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4"  type="submit">Anuluj Wydanie</button>	
+		<button class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 shadow"  type="submit">Anuluj Wydanie</button>	
 	</form>
 	
 	<form action="borrow-books">
-		<button class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 mr-1"  type="submit">Wydaj Książki</button>	
+		<button class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 mr-1 shadow"  type="submit">Wydaj Książki</button>	
 	</form>
 
 
@@ -182,11 +171,11 @@
 				</c:forEach>
 		  </tbody>
 		</table>
-	<!--  tablica z książkami do wyboru, po kliknięciu dodaje -->
+
 	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Księgozbiór</h1>
-	<button type="button" class="btn btn-sm btn-secondary float-right mt-4 btn-block w-25" data-toggle="modal" data-target="#searchBookModal" data-whatever="">Znajdź Książkę</button>
+	<button type="button" class="btn btn-sm btn-secondary float-right mt-4 btn-block w-25 shadow" data-toggle="modal" data-target="#searchBookModal" data-whatever="">Znajdź Książkę</button>
 		 <form action ="clearBookSearchParameters" >
-		 	<button class="btn btn-sm btn-secondary float-right mt-4 mr-1 btn-block w-25" type="submit">Wyczyść Dane Szukania</button>
+		 	<button class="btn btn-sm btn-secondary float-right mt-4 mr-1 btn-block w-25 shadow" type="submit">Wyczyść Dane Szukania</button>
 		 </form>
 		 <div class="modal fade" id="searchBookModal" tabindex="-1" role="dialog" aria-labelledby="searchBookModalLabel" aria-hidden="true">
 			  <div class="modal-dialog" role="document">
@@ -206,8 +195,8 @@
 						<input class="form-control" type="text" placeholder="Wydawca"  name="publisher" value = "<%=(session.getAttribute("borrowBookSeachParamPublisher")== null) ? "" : session.getAttribute("borrowBookSeachParamPublisher")%>"/>
 						<input class="form-control" type="text" placeholder="ISBN"  name="isbn" value = "<%=(session.getAttribute("borrowBookSeachParamIsbn")==null) ? "" : session.getAttribute("borrowBookSeachParamIsbn")%>"/>
 					 </div>
-			         <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Zamknij</button>
-			         <input class="btn btn-secondary float-right mr-2" type="submit" value="Szukaj">
+			         <button type="button" class="btn btn-secondary float-right shadow" data-dismiss="modal">Zamknij</button>
+			         <input class="btn btn-secondary float-right mr-2 shadow" type="submit" value="Szukaj">
 			   		</form>  
 			      </div>
 			    </div>
@@ -277,49 +266,3 @@
 	<%@ include file="/resources/parts/footer.jsp" %> 
 </body>
 </html>
-
-<!--  
-
-					
-
-						
-					<br>
-						
-					<table>	
-						<caption>Zarezerwowane Książki</caption>		
-						<tr>
-							<th id="title-column">Tytuł</th>
-							<th id="author-column">Autor</th>
-							<th id="action-column">Akcja</th>	
-						</tr>			
-
-						<c:choose>
-							<c:when test="${empty userReservationList}">
-								<td colspan="3">Brak Rezerwacji</td>
-							</c:when>
-							<c:otherwise>
-								<c:forEach var="tempReservation" items="${userReservationList}">						
-									<c:url var="addReservedBookLink" value="/borrow-book/addReservedBookToList">					
-											<c:param name="reservationId" value="${tempReservation.id}"/>					
-									</c:url>
-								
-									<tr>
-										<td id="title-column">${tempReservation.book.title }</td>
-										<td id="author-column">${tempReservation.book.author }</td>
-										<c:choose>
-											<c:when test="${isAbleToBorrow == 'true'}">
-												<td id="action-column"><button class="small-button" onclick="window.location.href='${addReservedBookLink}'">Do Wydania</button></td>	
-											</c:when>
-											<c:otherwise>
-												<td id="action-column"> ---</td>
-											</c:otherwise>
-										</c:choose>
-									</tr>					
-								</c:forEach>	
-							</c:otherwise>
-						</c:choose>			
-						
-					</table>
-
-			
- -->

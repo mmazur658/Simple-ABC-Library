@@ -260,8 +260,8 @@ public class BorrowBookController {
 			return "redirect:/user/logout";
 
 		if (isAbleToBorrow) {
-			String errorMessage = bookService.addBookToList(session, bookId);
-			redirectAttributes.addAttribute("errorMessage", errorMessage);
+			String systemMessage = bookService.addBookToList(session, bookId);
+			redirectAttributes.addAttribute("systemMessage", systemMessage);
 		} else
 			redirectAttributes.addAttribute("errorMessage",
 					env.getProperty("controller.BorrowBookController.addBookToList.error.1"));
@@ -322,7 +322,8 @@ public class BorrowBookController {
 		}
 
 		String borrowedBookInfo = bookService.borrowBooks(session);
-
+		theModel.addAttribute("systemMessage",
+				env.getProperty("controller.BorrowBookController.borrowBooks.success.1"));
 		theModel.addAttribute("borrowedBookInfo", borrowedBookInfo);
 		session.setAttribute("isUserAbleToBorrow", false);
 		session.setAttribute("tempBookList", null);

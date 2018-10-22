@@ -5,22 +5,26 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<%@ include file="/resources/parts/header.jsp" %>  
+	<%@ include file="/resources/parts/header.jsp" %> 
+	<%@ include file="/resources/parts/navbar-style.jsp" %> 
 	<title>Simple ABC Library - Potwierdzenie Wydania Książek</title>
 </head>
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
-	<div class="container w-25">	
+	<div class="container w-25 pt-5 mt-4">	
 		<h1 class="h3 m-2 font-weight-normal ">Książki zostały wydane</h1>
+		
+		<c:if test="${not empty systemMessage}">
+			<script>showToastrAlert("success","${systemMessage}");</script></c:if>
 		
 		<c:url var="generateBorrowedBookConfirmationLink" value="/borrow-book/generate-borrowed-book-confirmation">					
 			<c:param name="borrowedBookInfo" value="${borrowedBookInfo}"/>					
 		</c:url>
 	
-		<a href="${generateBorrowedBookConfirmationLink}" class="btn btn-sm btn-secondary btn-block " role="button" aria-pressed="true" >Wydrukuj Potwierdzenie</a>
-		<a href="${pageContext.request.contextPath}/borrow-book/borrow-book-choose-user" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true" >Nowe Wydanie</a>
-		<a href="${pageContext.request.contextPath}/user/main" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true" >Strona Główna</a>
+		<a href="${generateBorrowedBookConfirmationLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Wydrukuj Potwierdzenie</a>
+		<a href="${pageContext.request.contextPath}/borrow-book/borrow-book-choose-user" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Nowe Wydanie</a>
+		<a href="${pageContext.request.contextPath}/user/main" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Strona Główna</a>
 		
 	</div>
 

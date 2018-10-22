@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private SearchEngineUtils searchEngineUtils;
-	
+
 	@Autowired
 	private UserServiceUtils userServiceUtils;
 
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public void updateUser(User theUser) {
 		User tempUser = userDAO.getUser(theUser.getId());
-		userServiceUtils.updateUserData(tempUser,theUser);
+		userServiceUtils.updateUserData(tempUser, theUser);
 		userDAO.updateUser(tempUser);
 	}
 
@@ -95,7 +95,7 @@ public class UserServiceImpl implements UserService {
 		String searchType = "from User where ";
 		String[] fieldsName = { "id", "firstName", "lastName", "email", "pesel" };
 		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(userSearchParameters, searchType, fieldsName);
-		
+
 		return userDAO.getUserSearchResult(hql, startResult);
 	}
 
@@ -106,7 +106,7 @@ public class UserServiceImpl implements UserService {
 		String searchType = "SELECT COUNT(*) FROM User where ";
 		String[] fieldsName = { "id", "firstName", "lastName", "email", "pesel" };
 		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(userSearchParameters, searchType, fieldsName);
-		
+
 		return userDAO.getAmountOfSearchResult(hql);
 	}
 
@@ -123,7 +123,7 @@ public class UserServiceImpl implements UserService {
 		User theUser = userDAO.getUser(increaseAccessLevelUserId);
 		String systemMessage = userServiceUtils.increaseUserAccessLevel(theUser);
 		userDAO.updateUser(theUser);
-		
+
 		return systemMessage;
 	}
 
@@ -134,7 +134,7 @@ public class UserServiceImpl implements UserService {
 		User theUser = userDAO.getUser(decreaseAccessLevelUserId);
 		String systemMessage = userServiceUtils.decreaseUserAccessLevel(theUser);
 		userDAO.updateUser(theUser);
-		
+
 		return systemMessage;
 	}
 

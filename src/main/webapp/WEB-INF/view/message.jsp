@@ -4,19 +4,17 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<%@ include file="/resources/parts/header.jsp" %>  
+	<%@ include file="/resources/parts/header.jsp" %> 
+	<%@ include file="/resources/parts/navbar-style.jsp" %> 
 	<title>Simple ABC Library - XYZ</title>
 </head>
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
-	<div class="container w-50">	
+	<div class="container w-50 pt-5 mt-4">	
 
 	<c:if test="${not empty systemMessage}">
-		<div class="alert alert-primary mt-2" role="alert">
-		   <strong>${systemMessage}</strong>
-		</div>
-	</c:if>
+		<script>showToastrAlert("info","${systemMessage}");</script></c:if>
 
 	<c:url var="closeMessageAndSetStatusUnreadLink" value="/message-module/close-message-and-set-status">					
 		<c:param name="messageId" value="${message.id}"/>	
@@ -59,15 +57,15 @@
 	
 	<table class="table table-sm mt-2">
 		<tr>
-			<td class="message-b-btn"><a href="${replyMessageLink}" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true" >Odpowiedz</a></td>
-			<td class="message-b-btn"><a href="${closeMessageAndSetStatusUnreadLink}" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true" >Nieprzeczytane</a></td>
+			<td class="message-b-btn"><a href="${replyMessageLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Odpowiedz</a></td>
+			<td class="message-b-btn"><a href="${closeMessageAndSetStatusUnreadLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Nieprzeczytane</a></td>
 			<td class="message-b-btn">	
 				<c:choose>
 					<c:when test="${modelBoxType == 'sent' }">
-						<a href="${pageContext.request.contextPath}/message-module/message-box-sent" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true">Powrót</a>
+						<a href="${pageContext.request.contextPath}/message-module/message-box-sent" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true">Powrót</a>
 					</c:when>
 					<c:otherwise>
-						<a href="${pageContext.request.contextPath}/message-module/message-box-inbox" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true">Powrót</a>
+						<a href="${pageContext.request.contextPath}/message-module/message-box-inbox" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true">Powrót</a>
 					</c:otherwise>
 				</c:choose>
 			</td>

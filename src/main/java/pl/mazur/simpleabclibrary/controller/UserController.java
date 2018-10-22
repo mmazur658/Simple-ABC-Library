@@ -419,7 +419,7 @@ public class UserController {
 	}
 
 	@RequestMapping("/users-books")
-	public String usersBooks(@RequestParam(required = false, name = "systemSuccessMessage") String systemSuccessMessage,
+	public String usersBooks(@RequestParam(required = false, name = "systemMessage") String systemMessage,
 			HttpServletRequest request, Model theModel) {
 
 		HttpSession session = request.getSession();
@@ -430,7 +430,7 @@ public class UserController {
 		List<Reservation> reservationList = reservationService.getUserReservations(theUserId);
 		List<BorrowedBook> borrowedBookList = bookService.getUserBorrowedBookList(theUserId);
 
-		theModel.addAttribute("systemSuccessMessage", systemSuccessMessage);
+		theModel.addAttribute("systemMessage", systemMessage);
 		theModel.addAttribute("reservationList", reservationList);
 		theModel.addAttribute("borrowedBookList", borrowedBookList);
 
@@ -479,6 +479,5 @@ public class UserController {
 
 		return "redirect:/user/user-details";
 	}
-	
-	
+
 }

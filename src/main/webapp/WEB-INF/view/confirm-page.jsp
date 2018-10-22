@@ -4,6 +4,7 @@
 <html lang="en">
 <head>	
 	<%@ include file="/resources/parts/header.jsp" %> 
+	<%@ include file="/resources/parts/navbar-style.jsp" %>
 	<link type="text/css" rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/signin.css" />
 	<title>Simple ABC Library</title>
 </head>
@@ -27,11 +28,11 @@
 					<div class="alert alert-success" role="alert">
 						<strong>Witaj ${theUser.firstName} ${theUser.lastName}. Konto zostało utworzone!</strong>
 					</div>
-					<a href="${accountConfirmationLink}" class="btn btn-lg btn-secondary btn-block" role="button" aria-pressed="true">Potwierdzenie</a>
+					<a href="${accountConfirmationLink}" class="btn btn-lg btn-secondary btn-block shadow" role="button" aria-pressed="true">Potwierdzenie</a>
 
 				</c:otherwise>
 			</c:choose>	
-	     <a href="${pageContext.request.contextPath}/user/login-page" class="btn btn-lg btn-secondary btn-block" role="button" aria-pressed="true">Przejdz do logowania</a>
+	     <a href="${pageContext.request.contextPath}/user/login-page" class="btn btn-lg btn-secondary btn-block shadow" role="button" aria-pressed="true">Przejdz do logowania</a>
 	     
 	</div>
 	<%@ include file="/resources/parts/footer-starter.jsp" %> 

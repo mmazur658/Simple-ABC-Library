@@ -6,22 +6,20 @@
 <html lang="en">
 <head>
 	<%@ include file="/resources/parts/header.jsp" %>  
+	<%@ include file="/resources/parts/navbar-style.jsp" %>
 	<title>Simple ABC Library - Wiadomości</title>
 </head>
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
-	<div class="container">	
+	<div class="container pt-5 mt-4">	
 	
-		<c:if test="${not empty systemMessage}">
-			<div class="alert alert-primary mt-2" role="alert">
-		    	<strong>${systemMessage}</strong>
-		  	</div>
-		</c:if>
+	<c:if test="${not empty systemMessage}">
+		<script>showToastrAlert("info","${systemMessage}");</script></c:if>
 	
 	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Skrzynka Odbiorcza</h1>
-	<button class="btn btn-sm btn-block w-25 btn-secondary float-right mt-4" onclick="window.location.href='${pageContext.request.contextPath}/message-module/create-new-message'">Nowa wiadomość</button>
-	<button class="btn btn-sm btn-block w-25 btn-secondary float-right mt-4 mr-1" onclick="window.location.href='${pageContext.request.contextPath}/message-module/message-box-sent'">Wysłane</button>
+	<button class="btn btn-sm btn-block w-25 btn-secondary float-right mt-4 shadow" onclick="window.location.href='${pageContext.request.contextPath}/message-module/create-new-message'">Nowa wiadomość</button>
+	<button class="btn btn-sm btn-block w-25 btn-secondary float-right mt-4 mr-1 shadow" onclick="window.location.href='${pageContext.request.contextPath}/message-module/message-box-sent'">Wysłane</button>
 	
 	<table class="table table-hover table-sm">
 		  <thead>
@@ -67,8 +65,8 @@
 			</c:choose>
 					
 			<td>
-				<button class="btn btn-secondary btn-sm" onclick="window.location.href='${deleteMessageLink}'">Usuń</button>
-				<button class="btn btn-secondary btn-sm" onclick="window.location.href='${readUnreadMessageLink}'">P/N</button>
+				<button class="btn btn-secondary btn-sm shadow" onclick="window.location.href='${deleteMessageLink}'">Usuń</button>
+				<button class="btn btn-secondary btn-sm shadow"  onclick="window.location.href='${readUnreadMessageLink}'">P/N</button>
 			</td>						
 		</tr>
 		

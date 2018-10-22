@@ -5,13 +5,17 @@
 <html lang="en">
 <head>
 	<%@ include file="/resources/parts/header.jsp" %> 
+	<%@ include file="/resources/parts/navbar-style.jsp" %>
 	<title>Simple ABC Library - Zmiana Hasła</title>
 </head>
 <body>
 
 	<%@ include file="/resources/parts/nav.jsp" %>
 	  
-	<div class="container w-25">	
+	<div class="container w-25 pt-5 mt-4">	
+	
+		<c:if test="${not empty systemMessage}">
+			<script>showToastrAlert("error","${systemMessage}");</script></c:if>
 	
 		<form class="form-signin" action="changePassword" method="POST">
 			<h1 class="h3 mb-3 mt-2 font-weight-normal">Nowe Hasło</h1>			
@@ -21,13 +25,9 @@
 			       required >
 			<input class="form-control" id="confirm_password" type="password" name="password" placeholder="Potwierdź Nowe Hasło" required="required"/>  
 			<input class="form-control" type="hidden" name="changePasswordFormUserId" value="${changePasswordUserId }"/>   
-			<button class="btn btn-lg btn-secondary btn-block mt-2" type="submit">Zmień Hasło</button>
+			<button class="btn btn-lg btn-secondary btn-block mt-2 shadow" type="submit">Zmień Hasło</button>
 		</form>			
-		<c:if test="${not empty systemMessage}">
-			<div class="alert alert-danger mt-2" role="alert">
-		    	<strong>${systemMessage}</strong>
-		  	</div>
-		</c:if>	
+
 	</div>
 	
 <%@ include file="/resources/parts/footer.jsp" %> 

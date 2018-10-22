@@ -6,17 +6,15 @@
 <html lang="en">
 <head>
 	<%@ include file="/resources/parts/header.jsp" %>  
+	<%@ include file="/resources/parts/navbar-style.jsp" %>
 	<title>Simple ABC Library - Aktualizaca Danych</title>
 </head>
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 
-	<div class="container w-25">	
-		<c:if test="${not empty systemMessage}">
-			<div class="alert alert-danger mt-2" role="alert">
-		    	<strong>${systemMessage}</strong>
-		  	</div>
-		</c:if>	
+	<div class="container w-25  pt-5 mt-4">	
+	<c:if test="${not empty systemMessage}">
+		<script>showToastrAlert("error","${systemMessage}");</script></c:if>
 		
 		<form:form class="form-signin" action="update-user" modelAttribute="user" method="POST">
 			<h1 class="h3 m-2 font-weight-normal ">Aktualizacja Danych</h1>
@@ -29,7 +27,7 @@
 			<form:input class="form-control" type="text" path="houseNumber" placeholder="Numer Domu"/>
 			<form:input class="form-control" type="text" path="city" placeholder="Miasto"/>
 			<form:input class="form-control" type="text" path="postalCode" placeholder="Kod Pocztowy"/>
-			<button class="btn btn-lg btn-secondary btn-block mt-2" type="submit">Zapisz</button>
+			<button class="btn btn-lg btn-secondary btn-block mt-2 shadow" type="submit">Zapisz</button>
 		</form:form> 
 
 	</div>

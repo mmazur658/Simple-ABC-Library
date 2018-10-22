@@ -5,23 +5,18 @@
 <html lang="en">
 <head>
 	<%@ include file="/resources/parts/header.jsp" %>  
+	<%@ include file="/resources/parts/navbar-style.jsp" %> 
 	<title>Simple ABC Library - Szczegóły Książki</title>
 </head>
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
-	<div class="container w-50">	
+	<div class="container w-50 pt-5 mt-4">	
 	
 		<c:if test="${not empty systemSuccessMessage}">
-			<div class="alert alert-success mt-2" role="alert">
-		    	<strong>${systemSuccessMessage}</strong>
-		  	</div>
-		</c:if>	
+			<script>showToastrAlert("success","${systemSuccessMessage}");</script></c:if>
 		<c:if test="${not empty systemErrorMessage}">
-			<div class="alert alert-danger mt-2" role="alert">
-		    	<strong>${systemErrorMessage}</strong>
-		  	</div>
-		</c:if>	
+			<script>showToastrAlert("error","${systemErrorMessage}");</script></c:if>	
 	
 		<table class="table table-borderedless mb-0" style="text-align: center;">
 			<tr>
@@ -81,11 +76,11 @@
 			<c:param name="bookId" value="${tempBook.id}"/>					
 		</c:url>
 		
-		<a href="${reservationLink}" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true" >Rezerwuj</a>
+		<a href="${reservationLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Rezerwuj</a>
 		<c:if test="${userAccessLevel eq 'Employee' or  userAccessLevel eq 'Administrator' }">	
-			<a href="${updateLink}" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true" >Aktualizacja</a>
-			<a href="${deleteLink}" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true" >Usuń</a>
-			<a href="${generateLabelLink}" class="btn btn-sm btn-secondary btn-block" role="button" aria-pressed="true" >Etykieta</a>
+			<a href="${updateLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Aktualizacja</a>
+			<a href="${deleteLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Usuń</a>
+			<a href="${generateLabelLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Etykieta</a>
 		</c:if>
 	</div>
 
