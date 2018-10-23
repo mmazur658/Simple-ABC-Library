@@ -42,12 +42,12 @@ public class ReservationController {
 
 	@RequestMapping("/reservation-management")
 	public String reservationPage(@RequestParam(required = false, name = "systemMessage") String systemMessage,
-			@RequestParam(required = false, name = "customerId") String customerId,
-			@RequestParam(required = false, name = "customerFirstName") String customerFirstName,
-			@RequestParam(required = false, name = "customerLastName") String customerLastName,
-			@RequestParam(required = false, name = "customerPesel") String customerPesel,
-			@RequestParam(required = false, name = "bookId") String bookId,
-			@RequestParam(required = false, name = "bookTitle") String bookTitle,
+			@RequestParam(required = false, name = "customerId") String reservationCustomerId,
+			@RequestParam(required = false, name = "customerFirstName") String reservationCustomerFirstName,
+			@RequestParam(required = false, name = "customerLastName") String reservationCustomerLastName,
+			@RequestParam(required = false, name = "customerPesel") String reservationCustomerPesel,
+			@RequestParam(required = false, name = "bookId") String reservationBookId,
+			@RequestParam(required = false, name = "bookTitle") String reservationBookTitle,
 			@RequestParam(required = false, name = "startResult") Integer reservationStartResult,
 			HttpServletRequest request, Model theModel) {
 
@@ -55,10 +55,10 @@ public class ReservationController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		String[] searchParametersName = { "customerId", "customerFirstName", "customerLastName", "customerPesel",
-				"bookId", "bookTitle" };
-		String[] searchParametersValue = { customerId, customerFirstName, customerLastName, customerPesel, bookId,
-				bookTitle };
+		String[] searchParametersName = { "reservationCustomerId", "reservationCustomerFirstName", "reservationCustomerLastName", "reservationCustomerPesel",
+				"reservationManagementBookId", "reservationBookTitle" };
+		String[] searchParametersValue = { reservationCustomerId, reservationCustomerFirstName, reservationCustomerLastName, reservationCustomerPesel, reservationBookId,
+				reservationBookTitle };
 		String[] reservationSearchParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
 				searchParametersValue);
 
@@ -102,8 +102,8 @@ public class ReservationController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		String[] searchParametersName = { "customerId", "customerFirstName", "customerLastName", "customerPesel",
-				"bookId", "bookTitle", "reservationStartResult" };
+		String[] searchParametersName = { "reservationCustomerId", "reservationCustomerFirstName", "reservationCustomerLastName", "reservationCustomerPesel",
+				"reservationManagementBookId", "reservationBookTitle" };
 		searchEngineUtils.clearSearchParameters(session, searchParametersName);
 
 		return "redirect:/reservation/reservation-management";

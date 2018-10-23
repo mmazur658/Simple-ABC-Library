@@ -140,7 +140,7 @@ public class ReservationServiceImpl implements ReservationService {
 	public List<Reservation> reservationSearchResult(String[] reservationSearchParameters, Integer startResult) {
 
 		String searchType = "from Reservation where ";
-		String[] fieldsName = { "user.id", "user.firstName", "user.lastName", "user.pesel", "book.id,", "book.title" };
+		String[] fieldsName = { "user.id", "user.firstName", "user.lastName", "user.pesel", "book.id", "book.title" };
 		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(reservationSearchParameters, searchType,
 				fieldsName);
 

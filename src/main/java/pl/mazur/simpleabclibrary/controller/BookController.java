@@ -73,8 +73,8 @@ public class BookController {
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		String[] searchParametersName = { "bookSeachParamTitle", "bookSeachParamAuthor", "bookSeachParamPublisher",
-				"bookSeachParamIsbn", "bookSeachParamId" };
+		String[] searchParametersName = { "bookSearchParamTitle", "bookSearchParamAuthor", "bookSearchParamPublisher",
+				"bookSearchParamIsbn", "bookSearchParamId" };
 		String[] searchParametersValue = { title, author, publisher, isbn, bookId };
 
 		String[] searchBookParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
@@ -124,9 +124,9 @@ public class BookController {
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		String[] searchParameters = { "bookSeachParamTitle", "bookSeachParamId", "bookSeachParamAuthor",
-				"bookSeachParamPublisher", "bookSeachParamIsbn", "bookSeachParamIsAvailable" };
-		searchEngineUtils.clearSearchParameters(session, searchParameters);
+		String[] searchParametersName = { "bookSearchParamTitle", "bookSearchParamAuthor", "bookSearchParamPublisher",
+				"bookSearchParamIsbn", "bookSearchParamId" };
+		searchEngineUtils.clearSearchParameters(session, searchParametersName);
 
 		return "redirect:/book/main-bookstore";
 	}

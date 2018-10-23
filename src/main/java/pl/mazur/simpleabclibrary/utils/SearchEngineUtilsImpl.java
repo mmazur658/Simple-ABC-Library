@@ -68,10 +68,13 @@ public class SearchEngineUtilsImpl implements SearchEngineUtils {
 
 			if (searchParametersValue[i] != null)
 				session.setAttribute(searchParametersName[i], searchParametersValue[i]);
+			
+			
 
-			if ((searchParametersValue[i] == null) && !(session.getAttribute(searchParametersName[i]) == null))
+			if ((searchParametersValue[i] == null) && !(session.getAttribute(searchParametersName[i]) == null)) {
+				System.out.println(searchParametersName[i]+": "+searchParametersValue[i]);
 				searchParametersValue[i] = (String) session.getAttribute(searchParametersName[i]);
-
+			}
 			searchParameters[i] = (searchParametersValue[i] == null) ? "" : searchParametersValue[i];
 		}
 		for (int i = 0; i < searchParameters.length - 1; i++) {
