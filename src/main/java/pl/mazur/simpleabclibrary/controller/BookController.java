@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -37,7 +38,7 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 @Controller
 @Scope("session")
 @RequestMapping("/book")
-@PropertySource("classpath:messages.properties")
+@PropertySource("classpath:systemMessages.properties")
 @PropertySource("classpath:library-configuration.properties")
 public class BookController {
 
@@ -160,14 +161,16 @@ public class BookController {
 	}
 
 	@RequestMapping("/confirm-book-page")
-	public String confirmBookPage(@RequestParam("bookId") int bookId, Model theModel, HttpServletRequest request) {
+	public String confirmBookPage(@RequestParam("bookId") int bookId, Model theModel, HttpServletRequest request,
+			Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		Book tempBook = bookService.getBook(bookId);
-		theModel.addAttribute("successMessage", env.getProperty("controller.BookController.confirmBookPage.success.1"));
+		theModel.addAttribute("successMessage",
+				env.getProperty(locale.getLanguage() + ".controller.BookController.confirmBookPage.success.1"));
 		theModel.addAttribute("tempBook", tempBook);
 
 		return "confirm-book-page";
@@ -176,7 +179,7 @@ public class BookController {
 
 	@RequestMapping("/reservation")
 	public String bookReservation(@RequestParam("bookId") int bookId, HttpServletRequest request,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -187,7 +190,7 @@ public class BookController {
 
 		if (userReservationsCount >= reservationLimit)
 			redirectAttributes.addAttribute("systemErrorMessage",
-					env.getProperty("controller.BookController.bookReservation.error.1"));
+					env.getProperty(locale.getLanguage() + ".controller.BookController.bookReservation.error.1"));
 		else {
 			int userId = (int) session.getAttribute("userId");
 			Book tempBook = bookService.getBook(bookId);
@@ -195,11 +198,11 @@ public class BookController {
 			if (tempBook.getIsAvailable()) {
 				reservationService.createReservation(tempBook, userId);
 				redirectAttributes.addAttribute("systemSuccessMessage",
-						env.getProperty("controller.BookController.bookReservation.success.1"));
+						env.getProperty(locale.getLanguage() + ".controller.BookController.bookReservation.success.1"));
 				redirectAttributes.addAttribute("bookId", bookId);
 			} else {
 				redirectAttributes.addAttribute("systemErrorMessage",
-						env.getProperty("controller.BookController.bookReservation.error.2"));
+						env.getProperty(locale.getLanguage() + ".controller.BookController.bookReservation.error.2"));
 				redirectAttributes.addAttribute("bookId", bookId);
 			}
 		}
@@ -209,7 +212,7 @@ public class BookController {
 	@RequestMapping("/deleteReservation")
 	public String deleteReservation(@RequestParam("reservationId") int reservationId,
 			@RequestParam(required = false, name = "deleteReservationWayBack") String deleteReservationWayBack,
-			HttpServletRequest request, RedirectAttributes redirectAttributes) {
+			HttpServletRequest request, RedirectAttributes redirectAttributes, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -218,7 +221,7 @@ public class BookController {
 		Reservation reservation = reservationService.getReservation(reservationId);
 		reservationService.deleteReservationByUser(reservation);
 		redirectAttributes.addAttribute("systemSuccessMessage",
-				env.getProperty("controller.BookController.deleteReservation.success.1"));
+				env.getProperty(locale.getLanguage() + ".controller.BookController.deleteReservation.success.1"));
 
 		if (deleteReservationWayBack.equals("main-bookstore"))
 			return "redirect:/book/main-bookstore";
@@ -227,7 +230,8 @@ public class BookController {
 	}
 
 	@RequestMapping("/updateBook")
-	public String updateBookForm(@RequestParam("bookId") int bookId, Model theModel, HttpServletRequest request) {
+	public String updateBookForm(@RequestParam("bookId") int bookId, Model theModel, HttpServletRequest request,
+			Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -241,7 +245,7 @@ public class BookController {
 
 	@PostMapping("/update-book")
 	public String updateBook(@ModelAttribute("book") Book book, RedirectAttributes redirectAttributes,
-			HttpServletRequest request) {
+			HttpServletRequest request, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -250,11 +254,11 @@ public class BookController {
 		try {
 			bookService.updateBook(book);
 			redirectAttributes.addAttribute("systemMessage",
-					env.getProperty("controller.BookController.updateBook.success.1"));
+					env.getProperty(locale.getLanguage() + ".controller.BookController.updateBook.success.1"));
 		} catch (Exception exc) {
 			exc.printStackTrace();
 			redirectAttributes.addAttribute("systemMessage",
-					env.getProperty("controller.BookController.updateBook.error.1"));
+					env.getProperty(locale.getLanguage() + ".controller.BookController.updateBook.error.1"));
 		}
 
 		return "redirect:/book/main-bookstore";
@@ -262,7 +266,7 @@ public class BookController {
 
 	@RequestMapping("/deleteBook")
 	public String deleteBook(@RequestParam("bookId") int bookId, RedirectAttributes redirectAttributes,
-			HttpServletRequest request) {
+			HttpServletRequest request, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -272,10 +276,10 @@ public class BookController {
 		if (tempBook.getIsAvailable()) {
 			bookService.deleteBook(tempBook);
 			redirectAttributes.addAttribute("systemMessage",
-					env.getProperty("controller.BookController.deleteBook.success.1"));
+					env.getProperty(locale.getLanguage() + ".controller.BookController.deleteBook.success.1"));
 		} else {
 			redirectAttributes.addAttribute("systemMessage",
-					env.getProperty("controller.BookController.deleteBook.error.1"));
+					env.getProperty(locale.getLanguage() + ".controller.BookController.deleteBook.error.1"));
 		}
 
 		return "redirect:/book/main-bookstore";
@@ -283,7 +287,7 @@ public class BookController {
 
 	@RequestMapping("/book-details")
 	public String bookDetails(@RequestParam(required = false, name = "bookId") Integer bookId, Model theModel,
-			HttpServletRequest request,
+			HttpServletRequest request, Locale locale,
 			@RequestParam(required = false, name = "systemErrorMessage") String systemErrorMessage,
 			@RequestParam(required = false, name = "systemSuccessMessage") String systemSuccessMessage) {
 

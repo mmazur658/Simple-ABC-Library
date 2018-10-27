@@ -1,6 +1,7 @@
 package pl.mazur.simpleabclibrary.service.utils;
 
 import java.util.Date;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
@@ -12,7 +13,7 @@ import pl.mazur.simpleabclibrary.utils.PasswordUtils;
 import pl.mazur.simpleabclibrary.utils.PeselValidator;
 
 @Component
-@PropertySource("classpath:messages.properties")
+@PropertySource("classpath:systemMessages.properties")
 public class UserServiceUtilsImpl implements UserServiceUtils {
 
 	private PasswordUtils passwordUtils;
@@ -54,26 +55,32 @@ public class UserServiceUtilsImpl implements UserServiceUtils {
 	}
 
 	@Override
-	public String increaseUserAccessLevel(User theUser) {
+	public String increaseUserAccessLevel(User theUser, Locale locale) {
 		if (!theUser.isAdmin() && !theUser.isEmployee()) {
 			theUser.setEmployee(true);
-			return env.getProperty("service.utils.UserServiceUtilsImpl.increaseUserAccessLevel.success.1");
+			return env.getProperty(
+					locale.getLanguage() + ".service.utils.UserServiceUtilsImpl.increaseUserAccessLevel.success.1");
 		} else if (!theUser.isAdmin() && theUser.isEmployee()) {
 			theUser.setAdmin(true);
-			return env.getProperty("service.utils.UserServiceUtilsImpl.increaseUserAccessLevel.success.2");
+			return env.getProperty(
+					locale.getLanguage() + ".service.utils.UserServiceUtilsImpl.increaseUserAccessLevel.success.2");
 		} else
-			return env.getProperty("service.utils.UserServiceUtilsImpl.increaseUserAccessLevel.error.1");
+			return env.getProperty(
+					locale.getLanguage() + ".service.utils.UserServiceUtilsImpl.increaseUserAccessLevel.error.1");
 	}
 
 	@Override
-	public String decreaseUserAccessLevel(User theUser) {
+	public String decreaseUserAccessLevel(User theUser, Locale locale) {
 		if (theUser.isAdmin() && theUser.isEmployee()) {
 			theUser.setAdmin(false);
-			return env.getProperty("service.utils.UserServiceUtilsImpl.decreaseUserAccessLevel.success.1");
+			return env.getProperty(
+					locale.getLanguage() + ".service.utils.UserServiceUtilsImpl.decreaseUserAccessLevel.success.1");
 		} else if (!theUser.isAdmin() && theUser.isEmployee()) {
 			theUser.setEmployee(false);
-			return env.getProperty("service.utils.UserServiceUtilsImpl.decreaseUserAccessLevel.success.2");
+			return env.getProperty(
+					locale.getLanguage() + ".service.utils.UserServiceUtilsImpl.decreaseUserAccessLevel.success.2");
 		} else
-			return env.getProperty("service.utils.UserServiceUtilsImpl.decreaseUserAccessLevel.error.1");
+			return env.getProperty(
+					locale.getLanguage() + ".service.utils.UserServiceUtilsImpl.decreaseUserAccessLevel.error.1");
 	}
 }

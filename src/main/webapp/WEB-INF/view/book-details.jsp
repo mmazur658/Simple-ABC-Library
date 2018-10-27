@@ -1,16 +1,37 @@
 <%@ page pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix = "fmt" uri = "http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+
 <!doctype html>
-<html lang="en">
+<html lang="pl">
+
 <head>
 	<%@ include file="/resources/parts/header.jsp" %>  
 	<%@ include file="/resources/parts/navbar-style.jsp" %> 
-	<title>Simple ABC Library - Szczegóły Książki</title>
+	<title><spring:message code="view.add-book-form.title" /></title>
 </head>
+
 <body>
+
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
+		<spring:message var="heading" code="view.book-details.heading" />
+		<spring:message var="id" code="book.id" />
+		<spring:message var="title" code="book.title" />
+		<spring:message var="author" code="book.author" />
+		<spring:message var="language" code="book.language" />
+		<spring:message var="publisher" code="book.publisher" />
+		<spring:message var="pages" code="book.pages" />
+		<spring:message var="isbn" code="book.isbn" />
+		<spring:message var="availability" code="label.availability" />
+		<spring:message var="available" code="label.available" />
+		<spring:message var="unavailable" code="label.unavailable" />
+		<spring:message var="reserveButton" code="button.reserve" />
+		<spring:message var="updateButton" code="button.update" />
+		<spring:message var="deleteButton" code="button.delete" />
+		<spring:message var="prinLabelButton" code="button.label" />
+
 	<div class="container w-50 pt-5 mt-4">	
 	
 		<c:if test="${not empty systemSuccessMessage}">
@@ -20,44 +41,44 @@
 	
 		<table class="table table-borderedless mb-0" style="text-align: center;">
 			<tr>
-			<td><h1 class="h3 mb-0 font-weight-normal ">Szczegóły Książki</h1></td>
+			<td><h1 class="h3 mb-0 font-weight-normal ">${heading }</h1></td>
 			</tr>
 		</table>
 		<table class="table table-sm table-bordered">
 		  <tbody>
 		    <tr>
-		      <th scope="row">Id: </th>
+		      <th scope="row">${id }</th>
 		      <td>${tempBook.id}</td>	
 		    </tr>
 		    <tr>
-		      <th scope="row">Tytuł: </th>
+		      <th scope="row">${title } </th>
 		      <td>${tempBook.title}</td>	
 		    </tr>
 		    <tr>
-		      <th scope="row">Autor: </th>
+		      <th scope="row">${author } </th>
 		      <td>${tempBook.author}</td>	
 		    </tr>
 		    <tr>
-		      <th scope="row">Język: </th>
+		      <th scope="row">${language }</th>
 		      <td>${tempBook.language}</td>	
 		    </tr>		   
 		    <tr>
-		      <th scope="row">Wydawca: </th>
+		      <th scope="row">${publisher}</th>
 		      <td>${tempBook.publisher}</td>	
 		    </tr>		   
 		    <tr>
-		      <th scope="row">Strony: </th>
+		      <th scope="row">${pages } </th>
 		      <td>${tempBook.pages}</td>	
 		    </tr>	
 		    <tr>
-		      <th scope="row">ISBN: </th>
+		      <th scope="row">${isbn } </th>
 		      <td>${tempBook.isbn}</td>	
 		    </tr>			    		   
 		    <tr>
-		      <th scope="row">Dostępność: </th>
+		      <th scope="row">${availability }</th>
 		      <c:choose>
-					<c:when test="${tempBook.isAvailable}"><td>Dostępna</td></c:when>
-					<c:otherwise> <td>Niedostępna</td> </c:otherwise>
+					<c:when test="${tempBook.isAvailable}"><td>${available }</td></c:when>
+					<c:otherwise> <td>${unavailable }</td> </c:otherwise>
 			</c:choose>		
 		    </tr>			    
 		  </tbody>
@@ -76,11 +97,11 @@
 			<c:param name="bookId" value="${tempBook.id}"/>					
 		</c:url>
 		
-		<a href="${reservationLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Rezerwuj</a>
+		<a href="${reservationLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >${ reserveButton}</a>
 		<c:if test="${userAccessLevel eq 'Employee' or  userAccessLevel eq 'Administrator' }">	
-			<a href="${updateLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Aktualizacja</a>
-			<a href="${deleteLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Usuń</a>
-			<a href="${generateLabelLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Etykieta</a>
+			<a href="${updateLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >${ updateButton}</a>
+			<a href="${deleteLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >${ deleteButton}</a>
+			<a href="${generateLabelLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >${prinLabelButton }</a>
 		</c:if>
 	</div>
 

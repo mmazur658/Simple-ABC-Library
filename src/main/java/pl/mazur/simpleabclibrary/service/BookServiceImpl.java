@@ -2,6 +2,7 @@ package pl.mazur.simpleabclibrary.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpSession;
 
@@ -20,7 +21,7 @@ import pl.mazur.simpleabclibrary.service.utils.BookServiceUtils;
 import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 
 @Service
-@PropertySource("classpath:messages.properties")
+@PropertySource("classpath:systemMessages.properties")
 public class BookServiceImpl implements BookService {
 
 	@Autowired
@@ -242,7 +243,7 @@ public class BookServiceImpl implements BookService {
 	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional
-	public String addBookToList(HttpSession session, int bookId) {
+	public String addBookToList(HttpSession session, int bookId, Locale locale) {
 
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
 		Book theBook = bookDAO.getBook(bookId);
@@ -254,17 +255,17 @@ public class BookServiceImpl implements BookService {
 		}
 
 		if (isAllreadyOnTheList)
-			return env.getProperty("service.BookServiceImpl.addBookToList.error.1");
+			return env.getProperty(locale.getLanguage() + ".service.BookServiceImpl.addBookToList.error.1");
 		else {
 			tempBookList.add(theBook);
 			session.setAttribute("tempBookList", tempBookList);
-			return env.getProperty("service.BookServiceImpl.addBookToList.success.1");
+			return env.getProperty(locale.getLanguage() + ".service.BookServiceImpl.addBookToList.success.1");
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public String addReservedBookToList(HttpSession session, int reservationId) {
+	public String addReservedBookToList(HttpSession session, int reservationId, Locale locale) {
 
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
 		Reservation reservation = reservationService.getReservation(reservationId);
@@ -277,12 +278,12 @@ public class BookServiceImpl implements BookService {
 		}
 
 		if (isAllreadyOnTheList) {
-			return env.getProperty("service.BookServiceImpl.addReservedBookToList.error.1");
+			return env.getProperty(locale.getLanguage() + ".service.BookServiceImpl.addReservedBookToList.error.1");
 		} else {
 			reservationService.deleteReservationInOrderToCreateBorrowedBook(reservation);
 			tempBookList.add(theBook);
 			session.setAttribute("tempBookList", tempBookList);
-			return env.getProperty("service.BookServiceImpl.addReservedBookToList.success.1");
+			return env.getProperty(locale.getLanguage() + ".service.BookServiceImpl.addReservedBookToList.success.1");
 		}
 	}
 

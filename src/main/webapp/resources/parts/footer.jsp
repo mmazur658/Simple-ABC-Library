@@ -1,7 +1,7 @@
 <%@ page pageEncoding="UTF-8"%>
 <footer class="footer">
 	<div class="container" style="text-align:center;">
-		<span class="text-muted">Simple ABC Libray - 690372851 - marcin.mazur1024@gmail.com</span>
+		<span class="text-muted">Simple ABC Library - 690372851 - marcin.mazur1024@gmail.com</span>
 	</div>
 </footer>
 

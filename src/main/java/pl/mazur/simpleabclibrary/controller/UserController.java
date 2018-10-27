@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -39,7 +40,7 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 @Controller
 @Scope("session")
 @RequestMapping("/user")
-@PropertySource("classpath:messages.properties")
+@PropertySource("classpath:systemMessages.properties")
 @PropertySource("classpath:library-configuration.properties")
 public class UserController {
 
@@ -69,11 +70,11 @@ public class UserController {
 
 	@RequestMapping("/login-page")
 	public String loginPage(
-			@RequestParam(required = false, name = "incorrectPasswordMessage") String incorrectPasswordRequestMessage,
+			@RequestParam(required = false, name = "incorrectPasswordMessage") String incorrectPasswordMessage,
 			Model theModel, HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
-		theModel.addAttribute("incorrectPasswordMessage", incorrectPasswordRequestMessage);
+		theModel.addAttribute("incorrectPasswordMessage", incorrectPasswordMessage);
 
 		if (session.getAttribute("userId") != null) {
 			return "redirect:/user/main";
@@ -83,18 +84,20 @@ public class UserController {
 	}
 
 	@RequestMapping("/login")
-	public String loginVerifying(@RequestParam("email") String email,
+	public String loginVerifying(@RequestParam("email") String email, Locale locale,
 			@RequestParam("password") String thePasswordFromForm, HttpServletRequest request,
 			RedirectAttributes redirectAttributes) {
 
 		HttpSession session = request.getSession();
+
+		System.out.println(locale.getLanguage() + ".controller.UserController.loginVerifying.error.1");
 
 		boolean isLoginOK = false;
 		try {
 			isLoginOK = userService.verificationAndAuthentication(email, thePasswordFromForm);
 		} catch (Exception e) {
 			redirectAttributes.addAttribute("incorrectPasswordMessage",
-					env.getProperty("controller.UserController.loginVerifying.error.1"));
+					env.getProperty(locale.getLanguage() + ".controller.UserController.loginVerifying.error.1"));
 			return "redirect:/user/login-page";
 		}
 
@@ -110,7 +113,7 @@ public class UserController {
 			return "redirect:/user/main";
 		} else {
 			redirectAttributes.addAttribute("incorrectPasswordMessage",
-					env.getProperty("controller.UserController.loginVerifying.error.1"));
+					env.getProperty(locale.getLanguage() + ".controller.UserController.loginVerifying.error.1"));
 			return "redirect:/user/login-page";
 		}
 	}
@@ -148,13 +151,13 @@ public class UserController {
 
 	@RequestMapping("/saveUser")
 	public String saveUser(@ModelAttribute("user") User theUser, Model theModel, HttpServletRequest request,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes, Locale locale) {
 
 		boolean isExist = userService.checkEmailIsExist(theUser.getEmail());
 
 		if (!passwordValidator.validate(theUser.getPassword())) {
 			redirectAttributes.addAttribute("systemMessage",
-					env.getProperty("controller.UserController.saveUser.error.1"));
+					env.getProperty(locale.getLanguage() + ".controller.UserController.saveUser.error.1"));
 			return "redirect:/user/create-user-form";
 		}
 		if (isExist) {
@@ -216,7 +219,7 @@ public class UserController {
 
 	@RequestMapping("/update-user")
 	public String updateUser(@ModelAttribute("user") User theUser, HttpServletRequest request, Model theModel,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -227,7 +230,7 @@ public class UserController {
 			isExist = userService.checkEmailIsExist(theUser.getEmail());
 		if (isExist) {
 			redirectAttributes.addAttribute("systemMessage",
-					env.getProperty("controller.UserController.updateUser.error.1"));
+					env.getProperty(locale.getLanguage() + ".controller.UserController.updateUser.error.1"));
 			return "redirect:/user/user-update-form";
 		}
 
@@ -236,7 +239,7 @@ public class UserController {
 			isPeselCorrect = userService.validatePesel(theUser.getPesel());
 			if (!isPeselCorrect) {
 				redirectAttributes.addAttribute("systemMessage",
-						env.getProperty("controller.UserController.updateUser.error.2"));
+						env.getProperty(locale.getLanguage() + ".controller.UserController.updateUser.error.2"));
 				return "redirect:/user/user-update-form";
 			}
 		}
@@ -245,7 +248,7 @@ public class UserController {
 
 		session.setAttribute("oldUserEmail", null);
 		redirectAttributes.addAttribute("systemMessage",
-				env.getProperty("controller.UserController.updateUser.success.1"));
+				env.getProperty(locale.getLanguage() + ".controller.UserController.updateUser.success.1"));
 		return "redirect:/user/user-details";
 
 	}
@@ -267,7 +270,7 @@ public class UserController {
 	@RequestMapping("/changePassword")
 	public String changePassword(@RequestParam("old-password") String oldPassword,
 			@RequestParam("password") String newPassword, HttpServletRequest request,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -275,7 +278,7 @@ public class UserController {
 
 		if (oldPassword.trim().equals(newPassword.trim())) {
 			redirectAttributes.addAttribute("systemMessage",
-					env.getProperty("controller.UserController.changePassword.error.1"));
+					env.getProperty(locale.getLanguage() + ".controller.UserController.changePassword.error.1"));
 			return "redirect:/user/change-password-form";
 		}
 
@@ -289,7 +292,7 @@ public class UserController {
 			return "redirect:/user/user-details";
 		} else {
 			redirectAttributes.addAttribute("systemMessage",
-					env.getProperty("controller.UserController.changePassword.error.2"));
+					env.getProperty(locale.getLanguage() + ".controller.UserController.changePassword.error.2"));
 			return "redirect:/user/change-password-form";
 		}
 	}
@@ -453,13 +456,13 @@ public class UserController {
 
 	@RequestMapping("/increase-access-level")
 	public String increaseAccessLevel(@RequestParam("increaseAccessLevelUserId") int increaseAccessLevelUserId,
-			RedirectAttributes redirectAttributes, HttpServletRequest request) {
+			RedirectAttributes redirectAttributes, HttpServletRequest request, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isAdmin((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		String systemMessage = userService.increaseUserAccessLevel(increaseAccessLevelUserId);
+		String systemMessage = userService.increaseUserAccessLevel(increaseAccessLevelUserId, locale);
 		redirectAttributes.addAttribute("systemMessage", systemMessage);
 
 		return "redirect:/user/user-details";
@@ -468,13 +471,13 @@ public class UserController {
 
 	@RequestMapping("/decrease-access-level")
 	public String decreaseAccessLevel(@RequestParam("decreaseAccessLevelUserId") int decreaseAccessLevelUserId,
-			RedirectAttributes redirectAttributes, HttpServletRequest request) {
+			RedirectAttributes redirectAttributes, HttpServletRequest request, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isAdmin((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		String systemMessage = userService.decreaseUserAccessLevel(decreaseAccessLevelUserId);
+		String systemMessage = userService.decreaseUserAccessLevel(decreaseAccessLevelUserId, locale);
 		redirectAttributes.addAttribute("systemMessage", systemMessage);
 
 		return "redirect:/user/user-details";

@@ -1,33 +1,47 @@
 <%@ page pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix = "fmt" uri = "http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <!doctype html>
-<html lang="en">
+<html lang="pl">
+
 <head>
 	<%@ include file="/resources/parts/header.jsp" %>  
 	<%@ include file="/resources/parts/navbar-style.jsp" %>
-	<title>Simple ABC Library - Wiadomości</title>
+	<title><spring:message code="view.message-box-inbox.title"/></title>
 </head>
+
 <body>
+
 	<%@ include file="/resources/parts/nav.jsp" %>  
+	
+	<spring:message var="heading" code="view.message-box-inbox.heading"/>
+	<spring:message var="newMessage" code="message.new"/>
+	<spring:message var="sent" code="label.sent"/>
+	<spring:message var="date" code="message.date"/>
+	<spring:message var="sender" code="message.sender"/>
+	<spring:message var="subject" code="message.subject"/>
+	<spring:message var="action" code="label.action"/>
+	<spring:message var="smalldeletebutton" code="button.delete.small"/>
+	<spring:message var="smallreadunreadbutton" code="button.read.unread.small"/>
 	
 	<div class="container pt-5 mt-4">	
 	
 	<c:if test="${not empty systemMessage}">
 		<script>showToastrAlert("info","${systemMessage}");</script></c:if>
 	
-	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Skrzynka Odbiorcza</h1>
-	<button class="btn btn-sm btn-block w-25 btn-secondary float-right mt-4 shadow" onclick="window.location.href='${pageContext.request.contextPath}/message-module/create-new-message'">Nowa wiadomość</button>
-	<button class="btn btn-sm btn-block w-25 btn-secondary float-right mt-4 mr-1 shadow" onclick="window.location.href='${pageContext.request.contextPath}/message-module/message-box-sent'">Wysłane</button>
+	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">${heading}</h1>
+	<button class="btn btn-sm btn-block w-25 btn-secondary float-right mt-4 shadow" onclick="window.location.href='${pageContext.request.contextPath}/message-module/create-new-message'">${newMessage }</button>
+	<button class="btn btn-sm btn-block w-25 btn-secondary float-right mt-4 mr-1 shadow" onclick="window.location.href='${pageContext.request.contextPath}/message-module/message-box-sent'">${sent }</button>
 	
 	<table class="table table-hover table-sm">
 		  <thead>
 		    <tr>
-		      <th scope="col">Data</th>
-		      <th scope="col">Nadawca</th>
-		      <th scope="col">Temat</th>
-		      <th scope="col">Akcja</th>
+		      <th scope="col">${date}</th>
+		      <th scope="col">${sender}</th>
+		      <th scope="col">${subject}</th>
+		      <th scope="col">${action}</th>
 		    </tr>
 		</thead>
 		<tbody>
@@ -65,8 +79,8 @@
 			</c:choose>
 					
 			<td>
-				<button class="btn btn-secondary btn-sm shadow" onclick="window.location.href='${deleteMessageLink}'">Usuń</button>
-				<button class="btn btn-secondary btn-sm shadow"  onclick="window.location.href='${readUnreadMessageLink}'">P/N</button>
+				<button class="btn btn-secondary btn-sm shadow" onclick="window.location.href='${deleteMessageLink}'">${smalldeletebutton}</button>
+				<button class="btn btn-secondary btn-sm shadow"  onclick="window.location.href='${readUnreadMessageLink}'">${smallreadunreadbutton }</button>
 			</td>						
 		</tr>
 		
@@ -85,7 +99,7 @@
 			
 			  <ul class="pagination justify-content-end">
 			    <li class="page-item"><a class="page-link text-dark" href="${showLessLink}"> <<< </a></li>
-			    <li class="page-item"><p class="page-link text-dark" >${resultRange} z ${amountOfResults}</p></li>
+			    <li class="page-item"><p class="page-link text-dark" >${resultRange} - ${amountOfResults}</p></li>
 			    <li class="page-item"><a class="page-link text-dark" href="${showMoreLink}"> >>> </a></li>
 			  </ul>
 		</nav>

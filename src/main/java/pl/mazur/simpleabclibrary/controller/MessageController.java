@@ -1,6 +1,7 @@
 package pl.mazur.simpleabclibrary.controller;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -26,7 +27,7 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 @Controller
 @Scope("session")
 @RequestMapping("/message-module")
-@PropertySource("classpath:messages.properties")
+@PropertySource("classpath:systemMessages.properties")
 @PropertySource("classpath:library-configuration.properties")
 public class MessageController {
 
@@ -123,7 +124,7 @@ public class MessageController {
 
 	@RequestMapping("/deleteMessage")
 	public String deleteMessage(@RequestParam("messageId") int messageId, @RequestParam("boxType") String boxType,
-			HttpServletRequest request, RedirectAttributes redirectAttributes) {
+			HttpServletRequest request, RedirectAttributes redirectAttributes, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -131,7 +132,7 @@ public class MessageController {
 
 		messageService.deleteMessage(messageId, boxType);
 		redirectAttributes.addAttribute("systemMessage",
-				env.getProperty("controller.MessageController.deleteMessage.success.1"));
+				env.getProperty(locale.getLanguage() + ".controller.MessageController.deleteMessage.success.1"));
 
 		if (boxType.equals("sent"))
 			return "redirect:/message-module/message-box-sent";
@@ -141,7 +142,7 @@ public class MessageController {
 
 	@RequestMapping("/readUnreadMessage")
 	public String readUnreadMessage(@RequestParam("messageId") int messageId, @RequestParam("boxType") String boxType,
-			HttpServletRequest request, RedirectAttributes redirectAttributes) {
+			HttpServletRequest request, RedirectAttributes redirectAttributes, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -149,7 +150,7 @@ public class MessageController {
 
 		messageService.changeReadStatus(messageId, boxType);
 		redirectAttributes.addAttribute("systemMessage",
-				env.getProperty("controller.MessageController.readUnreadMessage.success.1"));
+				env.getProperty(locale.getLanguage() + ".controller.MessageController.readUnreadMessage.success.1"));
 
 		if (boxType.equals("sent"))
 			return "redirect:/message-module/message-box-sent";
@@ -216,7 +217,8 @@ public class MessageController {
 
 	@PostMapping("/send-message")
 	public String sendMessage(@RequestParam("recipient") String email, @RequestParam("subject") String subject,
-			@RequestParam("textArea") String text, RedirectAttributes redirectAttributesa, HttpServletRequest request) {
+			Locale locale, @RequestParam("textArea") String text, RedirectAttributes redirectAttributesa,
+			HttpServletRequest request) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -224,13 +226,13 @@ public class MessageController {
 
 		if (!userService.checkEmailIsExist(email)) {
 			redirectAttributesa.addAttribute("systemMessage",
-					env.getProperty("controller.MessageController.sendMessage.error.1"));
+					env.getProperty(locale.getLanguage() + ".controller.MessageController.sendMessage.error.1"));
 			return "redirect:/message-module/message";
 		}
 
 		messageService.sendMessage((int) session.getAttribute("userId"), email, subject, text);
 		redirectAttributesa.addAttribute("systemMessage",
-				env.getProperty("controller.MessageController.sendMessage.success.1"));
+				env.getProperty(locale.getLanguage() + ".controller.MessageController.sendMessage.success.1"));
 
 		return "redirect:/message-module/message-box-inbox";
 

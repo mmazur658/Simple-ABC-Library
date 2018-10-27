@@ -1,19 +1,26 @@
 <%@ page pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <!doctype html>
-<html lang="en">
+<html lang="pl">
+
 <head>
 	<%@ include file="/resources/parts/header.jsp" %> 
 	<%@ include file="/resources/parts/navbar-style.jsp" %> 
-	<title>Simple ABC Library - Potwierdzenie Wydania Książek</title>
+	<title>	<spring:message code="view.borrow-book-confirmation.title"/></title>
 </head>
+
 <body>
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
+	<spring:message var="heading" code="view.borrow-book-confirmation.heading"/>
+	<spring:message var="printConfirmationButton" code="button.print.confirm"/>
+	<spring:message var="borrowMoreBooks" code="button.borrow.more"/>
+	<spring:message var="mainPage" code="label.main.page"/>
+	
 	<div class="container w-25 pt-5 mt-4">	
-		<h1 class="h3 m-2 font-weight-normal ">Książki zostały wydane</h1>
+		<h1 class="h3 m-2 font-weight-normal ">${heading }</h1>
 		
 		<c:if test="${not empty systemMessage}">
 			<script>showToastrAlert("success","${systemMessage}");</script></c:if>
@@ -22,9 +29,9 @@
 			<c:param name="borrowedBookInfo" value="${borrowedBookInfo}"/>					
 		</c:url>
 	
-		<a href="${generateBorrowedBookConfirmationLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Wydrukuj Potwierdzenie</a>
-		<a href="${pageContext.request.contextPath}/borrow-book/borrow-book-choose-user" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Nowe Wydanie</a>
-		<a href="${pageContext.request.contextPath}/user/main" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >Strona Główna</a>
+		<a href="${generateBorrowedBookConfirmationLink}" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >${printConfirmationButton }</a>
+		<a href="${pageContext.request.contextPath}/borrow-book/borrow-book-choose-user" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >${borrowMoreBooks }</a>
+		<a href="${pageContext.request.contextPath}/user/main" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true" >${mainPage }</a>
 		
 	</div>
 

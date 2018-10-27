@@ -1,30 +1,50 @@
 <%@ page pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix = "fmt" uri = "http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+
 <!doctype html>
-<html lang="en">
+<html lang="pl">
+
 <head>
 	<%@ include file="/resources/parts/header.jsp" %> 
 	<%@ include file="/resources/parts/navbar-style.jsp" %> 
-	<title>Simple ABC Library - Wybór Książki</title>
+	<title><spring:message code="view.return-book-choose-books.title"/></title>
 </head>
+
 <body>
+
 	<%@ include file="/resources/parts/nav.jsp" %>  
+	
+	<spring:message var="selectedUser" code="label.selected.user"/>
+	<spring:message var="selectedBooks" code="label.selected.books"/>
+	<spring:message var="userId" code="user.id"/>
+	<spring:message var="userFirstName" code="user.first.name"/>
+	<spring:message var="userLastName" code="user.last.name"/>
+	<spring:message var="userEmail" code="user.email"/>
+	<spring:message var="userPesel" code="user.pesel"/>
+	<spring:message var="cancelButton" code="button.cancel"/>
+	<spring:message var="returnBooksButton" code="button.return.book"/>
+	<spring:message var="bookId" code="book.id"/>
+	<spring:message var="bookTitle" code="book.title"/>
+	<spring:message var="bookAuthor" code="book.author"/>
+	<spring:message var="bookIsbn" code="book.isbn"/>
+	<spring:message var="addAllButton" code="button.add.all"/>
 
 	<div class="container  pt-5 mt-4">	
 	
 	<c:if test="${not empty systemMessage}">
 		<script>showToastrAlert("info","${systemMessage}");</script></c:if>
 		
-	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Wybrany Użytkownik</h1>			
+	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">${selectedUser }</h1>			
 	<table class="table table-hover">
 		<thead>
 		  	<tr>
-		    	<th scope="col">Id</th>
-		      	<th scope="col">Imię</th>
-		      	<th scope="col">Nazwisko</th>
-		      	<th scope="col">Email</th>
-		      	<th scope="col">Pesel</th>
+		    	<th scope="col">${userId }</th>
+		      	<th scope="col">${userFirstName }</th>
+		      	<th scope="col">${userLastName }</th>
+		      	<th scope="col">${userEmail }</th>
+		      	<th scope="col">${userPesel }</th>
 		    </tr>
 		 </thead>
 		 <tbody>
@@ -38,20 +58,20 @@
 		 </tbody>
 	</table>	
 
-	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Wybrane Książki</h1>
+	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">${selectedBooks }</h1>
 	<form action="cancel-book-returning">
-		<button class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 shadow"  type="submit">Anuluj Wydanie</button>	
+		<button class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 shadow"  type="submit">${cancelButton }</button>	
 	</form>	
 	<form action="return-book">	
-		<button class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 mr-1 shadow"  type="submit">Zwrot Książek</button>	
+		<button class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 mr-1 shadow"  type="submit">${returnBooksButton }</button>	
 	</form>			
 		<table class="table table-hover">
 		  <thead>
 		    <tr>
-		      <th scope="col">ID</th>
-		      <th scope="col">Tytuł</th>
-		      <th scope="col">Author</th>
-		      <th scope="col">ISBN</th>
+		      <th scope="col">${bookId }</th>
+		      <th scope="col">${bookTitle }</th>
+		      <th scope="col">${bookAuthor }</th>
+		      <th scope="col">${bookIsbn }</th>
 		    </tr>
 		  </thead>
 		  <tbody>
@@ -71,15 +91,15 @@
 		  </tbody>
 		</table>
 
-	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Wybrane Książki</h1>	
-	<a href="${pageContext.request.contextPath}/return-book/addAllBorrowedBookToList" class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 mr-1 shadow" role="button" aria-pressed="true" >Dodaj Wszystkie</a>
+	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">${selectedBooks }</h1>	
+	<a href="${pageContext.request.contextPath}/return-book/addAllBorrowedBookToList" class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 mr-1 shadow" role="button" aria-pressed="true" >${addAllButton }</a>
 		<table class="table table-hover">
 		  <thead>
 		    <tr>
-		      <th scope="col">ID</th>
-		      <th scope="col">Tytuł</th>
-		      <th scope="col">Author</th>
-		      <th scope="col">ISBN</th>
+		      <th scope="col">${bookId }</th>
+		      <th scope="col">${bookTitle }</th>
+		      <th scope="col">${bookAuthor }</th>
+		      <th scope="col">${bookIsbn }</th>
 		    </tr>
 		  </thead>
 		  <tbody>

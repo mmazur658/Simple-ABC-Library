@@ -1,18 +1,23 @@
 <%@ page pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<!doctype html>
-<html lang="en">
-<head>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
+<!doctype html>
+<html lang="pl">
+
+<head>
 	<%@ include file="/resources/parts/navbar-main-style.jsp" %> 
 	<%@ include file="/resources/parts/header.jsp" %> 
-
-	<title>Simple ABC Library - Strona Główna</title>
-
+	<title><spring:message code="view.main-page.title"/></title>
 </head>
+
 <body>
-	<%@ include file="/resources/parts/nav.jsp" %>  		
+
+	<%@ include file="/resources/parts/nav.jsp" %>  	
+	
+	<spring:message var="previous" code="label.previous"/>
+	<spring:message var="next" code="label.next"/>
 	
 	<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
 	  <div class="carousel-inner">
@@ -28,11 +33,11 @@
 	  </div>
 	  <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
 	    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-	    <span class="sr-only">Previous</span>
+	    <span class="sr-only">${previous }</span>
 	  </a>
 	  <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
 	    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-	    <span class="sr-only">Next</span>
+	    <span class="sr-only">${next }</span>
 	  </a>
 	</div>
 	

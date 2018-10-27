@@ -1,6 +1,7 @@
 package pl.mazur.simpleabclibrary.service;
 
 import java.util.List;
+import java.util.Locale;
 
 import pl.mazur.simpleabclibrary.entity.User;
 
@@ -30,9 +31,9 @@ public interface UserService {
 
 	public long getAmountOfAllUsers();
 
-	public String increaseUserAccessLevel(Integer increaseAccessLevelUserId);
+	public String increaseUserAccessLevel(Integer increaseAccessLevelUserId, Locale locale);
 
-	public String decreaseUserAccessLevel(Integer decreaseAccessLevelUserId);
+	public String decreaseUserAccessLevel(Integer decreaseAccessLevelUserId, Locale locale);
 
 	public String getUserAccessLevel(User theUser);
 

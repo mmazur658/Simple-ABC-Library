@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -41,7 +42,7 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 @Controller
 @Scope("session")
 @RequestMapping("/borrow-book")
-@PropertySource("classpath:messages.properties")
+@PropertySource("classpath:systemMessages.properties")
 @PropertySource("classpath:library-configuration.properties")
 public class BorrowBookController {
 
@@ -147,7 +148,7 @@ public class BorrowBookController {
 			@RequestParam(required = false, name = "isAbleToBorrow") boolean isAbleToBorrow,
 			@RequestParam(required = false, name = "extraMessage") String extraMessage,
 			@RequestParam(required = false, name = "borrowBookChooseBookStartResult") Integer borrowBookChooseBookStartResult,
-			Model theModel, HttpServletRequest request) {
+			Model theModel, HttpServletRequest request, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -180,10 +181,12 @@ public class BorrowBookController {
 
 		if (borrowedBookList.size() + tempBookList.size() >= borrowedBookLimit) {
 			isAbleToBorrow = false;
-			extraMessage = env.getProperty("controller.BorrowBookController.borrowBookChooseBooks.error.1");
+			extraMessage = env.getProperty(
+					locale.getLanguage() + ".controller.BorrowBookController.borrowBookChooseBooks.error.1");
 		} else
-			extraMessage = env.getProperty("controller.BorrowBookController.borrowBookChooseBooks.success.1"
-					+ (borrowedBookLimit - borrowedBookList.size() - tempBookList.size()));
+			extraMessage = env.getProperty(
+					locale.getLanguage() + ".controller.BorrowBookController.borrowBookChooseBooks.success.1"
+							+ (borrowedBookLimit - borrowedBookList.size() - tempBookList.size()));
 
 		if (isAbleToBorrow) {
 			for (BorrowedBook borrowedBook : borrowedBookList) {
@@ -191,7 +194,8 @@ public class BorrowBookController {
 				Long expTimeMillis = borrowedBook.getExpectedEndDate().getTime();
 				if (currentTimeMillis > expTimeMillis) {
 					isAbleToBorrow = false;
-					extraMessage = env.getProperty("controller.BorrowBookController.borrowBookChooseBooks.error.2");
+					extraMessage = env.getProperty(
+							locale.getLanguage() + ".controller.BorrowBookController.borrowBookChooseBooks.error.2");
 					break;
 				}
 			}
@@ -253,18 +257,18 @@ public class BorrowBookController {
 	@RequestMapping("/addBookToList")
 	public String addBookToList(@RequestParam("bookId") int bookId,
 			@RequestParam("isAbleToBorrow") boolean isAbleToBorrow, HttpServletRequest request,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		if (isAbleToBorrow) {
-			String systemMessage = bookService.addBookToList(session, bookId);
+			String systemMessage = bookService.addBookToList(session, bookId, locale);
 			redirectAttributes.addAttribute("systemMessage", systemMessage);
 		} else
 			redirectAttributes.addAttribute("errorMessage",
-					env.getProperty("controller.BorrowBookController.addBookToList.error.1"));
+					env.getProperty(locale.getLanguage() + ".controller.BorrowBookController.addBookToList.error.1"));
 
 		return "redirect:/borrow-book/borrow-book-choose-books";
 
@@ -273,18 +277,18 @@ public class BorrowBookController {
 	@RequestMapping("/addReservedBookToList")
 	public String addReservedBookToList(@RequestParam("reservationId") int reservationId,
 			@RequestParam("isAbleToBorrow") boolean isAbleToBorrow, HttpServletRequest request,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		if (isAbleToBorrow) {
-			String errorMessage = bookService.addReservedBookToList(session, reservationId);
+			String errorMessage = bookService.addReservedBookToList(session, reservationId, locale);
 			redirectAttributes.addAttribute("errorMessage", errorMessage);
 		} else
-			redirectAttributes.addAttribute("errorMessage",
-					env.getProperty("controller.BorrowBookController.addReservedBookToList.error.1"));
+			redirectAttributes.addAttribute("errorMessage", env.getProperty(
+					locale.getLanguage() + ".controller.BorrowBookController.addReservedBookToList.error.1"));
 
 		return "redirect:/borrow-book/borrow-book-choose-books";
 
@@ -292,21 +296,22 @@ public class BorrowBookController {
 
 	@RequestMapping("/deleteBookFromList")
 	public String deleteBookFromList(@RequestParam("bookId") int bookId, HttpServletRequest request,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		bookService.deleteBookFromList(session, bookId);
-		redirectAttributes.addAttribute("systemMessage",
-				env.getProperty("controller.BorrowBookController.deleteBookFromList.success.1"));
+		redirectAttributes.addAttribute("systemMessage", env
+				.getProperty(locale.getLanguage() + ".controller.BorrowBookController.deleteBookFromList.success.1"));
 
 		return "redirect:/borrow-book/borrow-book-choose-books";
 	}
 
 	@RequestMapping("/borrow-books")
-	public String borrowBooks(HttpServletRequest request, RedirectAttributes redirectAttributes, Model theModel) {
+	public String borrowBooks(HttpServletRequest request, RedirectAttributes redirectAttributes, Model theModel,
+			Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -317,13 +322,13 @@ public class BorrowBookController {
 
 		if (tempBookList.size() < 1) {
 			redirectAttributes.addAttribute("systemMessage",
-					env.getProperty("controller.BorrowBookController.borrowBooks.error.1"));
+					env.getProperty(locale.getLanguage() + ".controller.BorrowBookController.borrowBooks.error.1"));
 			return "redirect:/borrow-book/borrow-book-choose-books";
 		}
 
 		String borrowedBookInfo = bookService.borrowBooks(session);
 		theModel.addAttribute("systemMessage",
-				env.getProperty("controller.BorrowBookController.borrowBooks.success.1"));
+				env.getProperty(locale.getLanguage() + ".controller.BorrowBookController.borrowBooks.success.1"));
 		theModel.addAttribute("borrowedBookInfo", borrowedBookInfo);
 		session.setAttribute("isUserAbleToBorrow", false);
 		session.setAttribute("tempBookList", null);

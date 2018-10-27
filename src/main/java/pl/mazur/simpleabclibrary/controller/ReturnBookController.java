@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +39,7 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 @Controller
 @Scope("session")
 @RequestMapping("/return-book")
-@PropertySource("classpath:messages.properties")
+@PropertySource("classpath:systemMessages.properties")
 @PropertySource("classpath:library-configuration.properties")
 public class ReturnBookController {
 
@@ -61,14 +62,13 @@ public class ReturnBookController {
 	private SearchEngineUtils searchEngineUtils;
 
 	@RequestMapping("/return-book-choose-user")
-	public String borrowBook(
+	public String borrowBook(Locale locale, Model theModel, HttpServletRequest request,
 			@RequestParam(required = false, name = "returnBookSelectedUserId") String returnBookSelectedUserId,
 			@RequestParam(required = false, name = "returnBookFirstName") String returnBookFirstName,
 			@RequestParam(required = false, name = "returnBookLastName") String returnBookLastName,
 			@RequestParam(required = false, name = "returnBookEmail") String returnBookEmail,
 			@RequestParam(required = false, name = "returnBookPesel") String returnBookPesel,
-			@RequestParam(required = false, name = "returnBookStartResult") Integer returnBookStartResult,
-			Model theModel, HttpServletRequest request) {
+			@RequestParam(required = false, name = "returnBookStartResult") Integer returnBookStartResult) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -94,7 +94,7 @@ public class ReturnBookController {
 		long amountOfResults = hasAnyParameters ? userService.getAmountOfSearchResult(userSearchParameters)
 				: userService.getAmountOfAllUsers();
 
-		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
+		int searchResultLimit = Integer.valueOf(env.getProperty(locale.getLanguage() + ".search.result.limit"));
 		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(returnBookStartResult, amountOfResults,
 				searchResultLimit);
 		String resultRange = searchEngineUtils.generateResultRange(returnBookStartResult, amountOfResults,
@@ -145,7 +145,7 @@ public class ReturnBookController {
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping("/return-book-choose-books")
-	public String returnBookChooseBooks(HttpServletRequest request, Model theModel,
+	public String returnBookChooseBooks(HttpServletRequest request, Model theModel, Locale locale,
 			@RequestParam(required = false, name = "systemMessage") String systemMessage) {
 
 		HttpSession session = request.getSession();
@@ -167,7 +167,7 @@ public class ReturnBookController {
 
 	@RequestMapping("/deleteReturnedBookFromList")
 	public String deleteReturnedBookFromList(@RequestParam("bookId") int bookId, HttpServletRequest request,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -175,43 +175,45 @@ public class ReturnBookController {
 
 		bookService.deleteReturnedBookFromList(session, bookId);
 
-		redirectAttributes.addAttribute("systemMessage",
-				env.getProperty("controller.ReturnBookController.deleteReturnedBookFromList.success.1"));
+		redirectAttributes.addAttribute("systemMessage", env.getProperty(
+				locale.getLanguage() + ".controller.ReturnBookController.deleteReturnedBookFromList.success.1"));
 
 		return "redirect:/return-book/return-book-choose-books";
 	}
 
 	@RequestMapping("/addReturnedBookToList")
 	public String addReturnedBookToList(@RequestParam("bookId") int bookId, HttpServletRequest request,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		bookService.addReturnedBookToList(session, bookId);
-		redirectAttributes.addAttribute("systemMessage",
-				env.getProperty("controller.ReturnBookController.addReturnedBookToList.success.1"));
+		redirectAttributes.addAttribute("systemMessage", env.getProperty(
+				locale.getLanguage() + ".controller.ReturnBookController.addReturnedBookToList.success.1"));
 
 		return "redirect:/return-book/return-book-choose-books";
 	}
 
 	@RequestMapping("/addAllBorrowedBookToList")
-	public String addAllBorrowedBookToList(HttpServletRequest request, RedirectAttributes redirectAttributes) {
+	public String addAllBorrowedBookToList(HttpServletRequest request, RedirectAttributes redirectAttributes,
+			Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		bookService.addAllBorrowedBookToLiest(session);
-		redirectAttributes.addAttribute("systemMessage",
-				env.getProperty("controller.ReturnBookController.addAllBorrowedBookToList.success.1"));
+		redirectAttributes.addAttribute("systemMessage", env.getProperty(
+				locale.getLanguage() + ".controller.ReturnBookController.addAllBorrowedBookToList.success.1"));
 
 		return "redirect:/return-book/return-book-choose-books";
 	}
 
 	@RequestMapping("/return-book")
-	public String returnBook(HttpServletRequest request, RedirectAttributes redirectAttributes, Model theModel) {
+	public String returnBook(HttpServletRequest request, RedirectAttributes redirectAttributes, Model theModel,
+			Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -222,7 +224,7 @@ public class ReturnBookController {
 
 		if (tempReturnedBookList.size() < 1) {
 			redirectAttributes.addAttribute("systemMessage",
-					env.getProperty("controller.ReturnBookController.returnBook.error.1"));
+					env.getProperty(locale.getLanguage() + ".controller.ReturnBookController.returnBook.error.1"));
 			return "redirect:/return-book/return-book-choose-books";
 		}
 

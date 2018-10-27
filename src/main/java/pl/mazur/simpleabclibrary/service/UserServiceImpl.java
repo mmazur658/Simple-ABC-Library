@@ -1,6 +1,7 @@
 package pl.mazur.simpleabclibrary.service;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -118,10 +119,10 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public String increaseUserAccessLevel(Integer increaseAccessLevelUserId) {
+	public String increaseUserAccessLevel(Integer increaseAccessLevelUserId, Locale locale) {
 
 		User theUser = userDAO.getUser(increaseAccessLevelUserId);
-		String systemMessage = userServiceUtils.increaseUserAccessLevel(theUser);
+		String systemMessage = userServiceUtils.increaseUserAccessLevel(theUser, locale);
 		userDAO.updateUser(theUser);
 
 		return systemMessage;
@@ -129,10 +130,10 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public String decreaseUserAccessLevel(Integer decreaseAccessLevelUserId) {
+	public String decreaseUserAccessLevel(Integer decreaseAccessLevelUserId, Locale locale) {
 
 		User theUser = userDAO.getUser(decreaseAccessLevelUserId);
-		String systemMessage = userServiceUtils.decreaseUserAccessLevel(theUser);
+		String systemMessage = userServiceUtils.decreaseUserAccessLevel(theUser, locale);
 		userDAO.updateUser(theUser);
 
 		return systemMessage;

@@ -1,31 +1,46 @@
 <%@ page pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <!doctype html>
-<html lang="en">
+<html lang="pl">
+
 <head>
 	<%@ include file="/resources/parts/header.jsp" %>  
 	<%@ include file="/resources/parts/navbar-style.jsp" %>
-	<title>Simple ABC Library - Wybór Użytkownika</title>
+	<title><spring:message code="view.return-book-choose-user.title"/></title>
 </head>
+
 <body>
+
 	<%@ include file="/resources/parts/nav.jsp" %>  
 	
+	<spring:message var="heading" code="view.return-book-choose-user.heading"/>
+	<spring:message var="findUser" code="button.find.user"/>
+	<spring:message var="clearSerPam" code="button.clear.ser.par"/>
+	<spring:message var="userId" code="user.id"/>
+	<spring:message var="userFirstName" code="user.first.name"/>
+	<spring:message var="userLastName" code="user.last.name"/>
+	<spring:message var="userEmail" code="user.email"/>
+	<spring:message var="userPesel" code="user.pesel"/>
+	<spring:message var="closeButton" code="button.close"/>
+	<spring:message var="searchButton" code="button.search"/>
+
 	<div class="container  pt-5 mt-4">	
 	
 	<c:if test="${not empty systemMessage}">
 		<script>showToastrAlert("info","${systemMessage}");</script></c:if>
 	
-	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">Użytkownicy</h1>
-	<button type="button" class="btn btn-sm btn-secondary float-right mt-4 shadow" data-toggle="modal" data-target="#userSearchModal" data-whatever="">Znajdź Użytkownika</button>
+	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">${heading }</h1>
+	<button type="button" class="btn btn-sm btn-secondary float-right mt-4 shadow" data-toggle="modal" data-target="#userSearchModal" data-whatever="">${findUser }</button>
 	<form action ="clearReturnBookUserSearchParameters" >
-		 <button class="btn btn-sm btn-secondary float-right mt-4 mr-1 shadow" type="submit">Wyczyść Dane Szukania</button>
+		 <button class="btn btn-sm btn-secondary float-right mt-4 mr-1 shadow" type="submit">${clearSerPam }</button>
 	</form>
 	<div class="modal fade" id="userSearchModal" tabindex="-1" role="dialog" aria-labelledby="userSearchModalLabel" aria-hidden="true">
 			  <div class="modal-dialog" role="document">
 			    <div class="modal-content">
 			      <div class="modal-header">
-			        <h5 class="modal-title" id="userSearchModalLabel">Znajdź Użytkownika</h5>
+			        <h5 class="modal-title" id="userSearchModalLabel">${findUser }</h5>
 			        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 			          <span aria-hidden="true">&times;</span>
 			        </button>
@@ -33,14 +48,14 @@
 			      <div class="modal-body">
 			      <form action="return-book-choose-user">	
 						<div class="form-group">
-							<input class="form-control" placeholder="ID" type="text" name="returnBookSelectedUserId" value = "<%=(session.getAttribute("returnBookSelectedUserId")==null) ? "" : session.getAttribute("returnBookSelectedUserId")%>">
-				 			<input class="form-control" placeholder="Imię" type="text" name="returnBookFirstName" value = "<%=(session.getAttribute("returnBookFirstName")==null) ? "" : session.getAttribute("returnBookFirstName")%>">			
-							<input class="form-control" placeholder="Nazwisko" type="text" name="returnBookLastName" value = "<%=(session.getAttribute("returnBookLastName")==null) ? "" : session.getAttribute("returnBookLastName")%>">	
-							<input class="form-control" placeholder="Email" type="text" name="returnBookEmail" value = "<%=(session.getAttribute("returnBookEmail")==null) ? "" : session.getAttribute("returnBookEmail")%>">		
-							<input class="form-control" placeholder="PESEL" type="text" name="returnBookPesel" value = "<%=(session.getAttribute("returnBookPesel")==null) ? "" : session.getAttribute("returnBookPesel")%>">
+							<input class="form-control" placeholder="${userId }" type="text" name="returnBookSelectedUserId" value = "<%=(session.getAttribute("returnBookSelectedUserId")==null) ? "" : session.getAttribute("returnBookSelectedUserId")%>">
+				 			<input class="form-control" placeholder="${userFirstName }" type="text" name="returnBookFirstName" value = "<%=(session.getAttribute("returnBookFirstName")==null) ? "" : session.getAttribute("returnBookFirstName")%>">			
+							<input class="form-control" placeholder="${userLastName }" type="text" name="returnBookLastName" value = "<%=(session.getAttribute("returnBookLastName")==null) ? "" : session.getAttribute("returnBookLastName")%>">	
+							<input class="form-control" placeholder="${userEmail }" type="text" name="returnBookEmail" value = "<%=(session.getAttribute("returnBookEmail")==null) ? "" : session.getAttribute("returnBookEmail")%>">		
+							<input class="form-control" placeholder="${userPesel }" type="text" name="returnBookPesel" value = "<%=(session.getAttribute("returnBookPesel")==null) ? "" : session.getAttribute("returnBookPesel")%>">
 						</div>
-					<button type="button" class="btn btn-secondary float-right shadow" data-dismiss="modal">Zamknij</button>
-			        <input class="btn btn-secondary float-right mr-2 shadow" type="submit" value="Szukaj">
+					<button type="button" class="btn btn-secondary float-right shadow" data-dismiss="modal">${closeButton }</button>
+			        <input class="btn btn-secondary float-right mr-2 shadow" type="submit" value="${searchButton }">
 				</form> 
 			      </div>
 			    </div>
@@ -50,11 +65,11 @@
 		<table class="table table-hover">
 		  <thead>
 		    <tr>
-		      <th scope="col">Id</th>
-		      <th scope="col">Imię</th>
-		      <th scope="col">Nazwisko</th>
-		      <th scope="col">Email</th>
-		      <th scope="col">Pesel</th>
+		      <th scope="col">${userId }</th>
+		      <th scope="col">${userFirstName }</th>
+		      <th scope="col">${userLastName }</th>
+		      <th scope="col">${userEmail }</th>
+		      <th scope="col">${userPesel }</th>
 		    </tr>
 		  </thead>
 		  <tbody>
@@ -86,7 +101,7 @@
 			
 			  <ul class="pagination justify-content-end">
 			    <li class="page-item"><a class="page-link text-dark" href="${showLessLink}"> <<< </a></li>
-			    <li class="page-item"><p class="page-link text-dark" >${resultRange} z ${amountOfResults}</p></li>
+			    <li class="page-item"><p class="page-link text-dark" >${resultRange} - ${amountOfResults}</p></li>
 			    <li class="page-item"><a class="page-link text-dark" href="${showMoreLink}"> >>> </a></li>
 			  </ul>
 		</nav>	

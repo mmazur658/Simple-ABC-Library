@@ -1,33 +1,52 @@
 <%@ page pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix = "fmt" uri = "http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <!doctype html>
-<html lang="en">
+<html lang="pl">
+
 <head>
 	<%@ include file="/resources/parts/header.jsp" %> 
 	<%@ include file="/resources/parts/navbar-style.jsp" %> 
-	<title>Simple ABC Library - Zarządzanie Rezerwacjami</title>
+	<title><spring:message code="view.reservation-management.title"/></title>
 </head>
+
 <body>
+
 	<%@ include file="/resources/parts/nav.jsp" %>  
+	
+	<spring:message var="heading" code="view.reservation-management.heading"/>
+	<spring:message var="findReservation" code="button.find.reservation"/>
+	<spring:message var="clearSerPar" code="button.clear.ser.par"/>
+	<spring:message var="userId" code="user.id"/>
+	<spring:message var="userFirstName" code="user.first.name"/>
+	<spring:message var="userLastName" code="user.last.name"/>
+	<spring:message var="userPesel" code="user.pesel"/>
+	<spring:message var="bookId" code="book.id"/>
+	<spring:message var="bookTitle" code="book.title"/>
+	<spring:message var="closeButton" code="button.close"/>
+	<spring:message var="findButton" code="button.find.book"/>
+	<spring:message var="endDate" code="book.end.date"/>
+	<spring:message var="action" code="label.action"/>
+	<spring:message var="smallDeleteButton" code="button.delete.small"/>
 	
 	<div class="container pt-5 mt-4">	
 	
 	<c:if test="${not empty systemMessage}">
 		<script>showToastrAlert("info","${systemMessage}");</script></c:if>
 	
-	<h1 class="h3 mb-3 mt-3 font-weight-normal float-left">Rezerwacje</h1>
+	<h1 class="h3 mb-3 mt-3 font-weight-normal float-left">${heading}</h1>
 
-		<button type="button" class="btn btn-sm btn-secondary float-right mt-4 btn-block w-25 shadow" data-toggle="modal" data-target="#searchReservationModal" data-whatever="">Znajdź Rezerwację</button>
+		<button type="button" class="btn btn-sm btn-secondary float-right mt-4 btn-block w-25 shadow" data-toggle="modal" data-target="#searchReservationModal" data-whatever="">${findReservation }</button>
 		 <form action ="clearReservationSearchParameters" >
-		 	<button class="btn btn-sm btn-secondary float-right mt-4 mr-1 btn-block w-25 shadow" type="submit">Wyczyść Dane Szukania</button>
+		 	<button class="btn btn-sm btn-secondary float-right mt-4 mr-1 btn-block w-25 shadow" type="submit">${clearSerPar }</button>
 		 </form>
 		 <div class="modal fade" id="searchReservationModal" tabindex="-1" role="dialog" aria-labelledby="searchReservationModalLabel" aria-hidden="true">
 			  <div class="modal-dialog" role="document">
 			    <div class="modal-content">
 			      <div class="modal-header">
-			        <h5 class="modal-title" id="searchReservationModalLabel">Znajdź Rezerwację</h5>
+			        <h5 class="modal-title" id="searchReservationModalLabel">${findReservation }</h5>
 			        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 			          <span aria-hidden="true">&times;</span>
 			        </button>
@@ -35,15 +54,15 @@
 			      <div class="modal-body">
 			        <form action="reservation-management" method="post">
 			          <div class="form-group">	
-			          	<input class="form-control" type="text" placeholder="ID Użytkownika" name="customerId" value="<%=(session.getAttribute("customerId")==null) ? "" : session.getAttribute("customerId")%>">
-						<input class="form-control" type="text" placeholder="Imię Użytkownika" name="customerFirstName" value="<%=(session.getAttribute("customerFirstName")==null) ? "" : session.getAttribute("customerFirstName")%>">
-						<input class="form-control" type="text" placeholder="Nazwisko Użytkownika" name="customerLastName" value="<%=(session.getAttribute("customerLastName")==null) ? "" : session.getAttribute("customerLastName")%>">
-						<input class="form-control" type="text" placeholder="PESEL Użytkwonika" name="customerPesel" value="<%=(session.getAttribute("customerPesel")==null) ? "" : session.getAttribute("customerPesel")%>">
-						<input class="form-control" type="text" placeholder="Id Książki" name="bookId" value="<%=(session.getAttribute("bookId")==null) ? "" : session.getAttribute("bookId")%>">
-						<input class="form-control" type="text" placeholder="Tytuł Książki" name="bookTitle" value="<%=(session.getAttribute("bookTitle")==null) ? "" : session.getAttribute("bookTitle")%>">			   
+			          	<input class="form-control" type="text" placeholder="${userId }" name="customerId" value="<%=(session.getAttribute("customerId")==null) ? "" : session.getAttribute("customerId")%>">
+						<input class="form-control" type="text" placeholder="${userFirstName}" name="customerFirstName" value="<%=(session.getAttribute("customerFirstName")==null) ? "" : session.getAttribute("customerFirstName")%>">
+						<input class="form-control" type="text" placeholder="${userLastName}" name="customerLastName" value="<%=(session.getAttribute("customerLastName")==null) ? "" : session.getAttribute("customerLastName")%>">
+						<input class="form-control" type="text" placeholder="${userPesel}" name="customerPesel" value="<%=(session.getAttribute("customerPesel")==null) ? "" : session.getAttribute("customerPesel")%>">
+						<input class="form-control" type="text" placeholder="${bookId}" name="bookId" value="<%=(session.getAttribute("bookId")==null) ? "" : session.getAttribute("bookId")%>">
+						<input class="form-control" type="text" placeholder="${bookTitle}" name="bookTitle" value="<%=(session.getAttribute("bookTitle")==null) ? "" : session.getAttribute("bookTitle")%>">			   
 					 </div>
-			         <button type="button" class="btn btn-secondary float-right shadow" data-dismiss="modal">Zamknij</button>
-			         <input class="btn btn-secondary float-right mr-2 shadow" type="submit" value="Szukaj">
+			         <button type="button" class="btn btn-secondary float-right shadow" data-dismiss="modal">${closeButton }</button>
+			         <input class="btn btn-secondary float-right mr-2 shadow" type="submit" value="${findButton }">
 			   		</form>  
 			      </div>
 			    </div>
@@ -53,13 +72,13 @@
 		<table class="table table-hover">
 			<thead>
 				<tr>
-					<th scope="col">Id Użyt.</th>
-					<th scope="col">Imię i Nazwisko</th>
-					<th scope="col">Pesel</th>
-					<th scope="col">Id Ksi.</th>
-					<th scope="col">Tytuł</th>
-					<th scope="col">Data Końca</th>
-					<th scope="col">Akcja</th>
+					<th scope="col">${userId }</th>
+					<th scope="col">${userFirstName} ${userLastName}</th>
+					<th scope="col">${userPesel}</th>
+					<th scope="col">${bookId}</th>
+					<th scope="col">${bookTitle}</th>
+					<th scope="col">${endDate}</th>
+					<th scope="col">${action }</th>
 				</tr>
 			 </thead>
 			 <tbody>
@@ -83,7 +102,7 @@
 			 			<td><fmt:formatDate value="${tempReservation.endDate }" pattern="HH:mm dd-MM"/>	</td>
 			 			<td>
 			 				<button class="btn btn-secondary btn-sm shadow" onclick="window.location.href='${increaseExpDateLink}'">+24h</button>
-			 				<button class="btn btn-secondary btn-sm shadow" onclick="window.location.href='${deleteReservationLink}'">Usuń</button>
+			 				<button class="btn btn-secondary btn-sm shadow" onclick="window.location.href='${deleteReservationLink}'">${smallDeleteButton}</button>
 			 			</td>
 			 		</tr>			 
 				 </c:forEach>
@@ -101,7 +120,7 @@
 			
 			  <ul class="pagination justify-content-end">
 			    <li class="page-item"><a class="page-link text-dark" href="${showLessLink}"> <<< </a></li>
-			    <li class="page-item"><p class="page-link text-dark" >${resultRange} z ${amountOfResults}</p></li>
+			    <li class="page-item"><p class="page-link text-dark" >${resultRange} - ${amountOfResults}</p></li>
 			    <li class="page-item"><a class="page-link text-dark" href="${showMoreLink}"> >>> </a></li>
 			  </ul>
 		</nav>

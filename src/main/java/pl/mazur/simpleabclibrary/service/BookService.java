@@ -2,12 +2,13 @@ package pl.mazur.simpleabclibrary.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpSession;
 
 import pl.mazur.simpleabclibrary.entity.Book;
-import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.entity.BorrowedBook;
+import pl.mazur.simpleabclibrary.entity.User;
 
 public interface BookService {
 
@@ -51,11 +52,10 @@ public interface BookService {
 
 	public void deleteBookFromList(HttpSession session, int bookId);
 
-	public String addBookToList(HttpSession session, int bookId);
+	public String addBookToList(HttpSession session, int bookId, Locale locale);
 
-	public String addReservedBookToList(HttpSession session, int reservationId);
+	public String addReservedBookToList(HttpSession session, int reservationId, Locale locale);
 
 	public String borrowBooks(HttpSession session);
-
 
 }

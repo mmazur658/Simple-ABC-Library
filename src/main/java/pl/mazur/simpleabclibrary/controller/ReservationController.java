@@ -1,6 +1,7 @@
 package pl.mazur.simpleabclibrary.controller;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -24,7 +25,7 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 @Controller
 @Scope("session")
 @RequestMapping("/reservation")
-@PropertySource("classpath:messages.properties")
+@PropertySource("classpath:systemMessages.properties")
 @PropertySource("classpath:library-configuration.properties")
 public class ReservationController {
 
@@ -55,10 +56,11 @@ public class ReservationController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		String[] searchParametersName = { "reservationCustomerId", "reservationCustomerFirstName", "reservationCustomerLastName", "reservationCustomerPesel",
-				"reservationManagementBookId", "reservationBookTitle" };
-		String[] searchParametersValue = { reservationCustomerId, reservationCustomerFirstName, reservationCustomerLastName, reservationCustomerPesel, reservationBookId,
-				reservationBookTitle };
+		String[] searchParametersName = { "reservationCustomerId", "reservationCustomerFirstName",
+				"reservationCustomerLastName", "reservationCustomerPesel", "reservationManagementBookId",
+				"reservationBookTitle" };
+		String[] searchParametersValue = { reservationCustomerId, reservationCustomerFirstName,
+				reservationCustomerLastName, reservationCustomerPesel, reservationBookId, reservationBookTitle };
 		String[] reservationSearchParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
 				searchParametersValue);
 
@@ -102,8 +104,9 @@ public class ReservationController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		String[] searchParametersName = { "reservationCustomerId", "reservationCustomerFirstName", "reservationCustomerLastName", "reservationCustomerPesel",
-				"reservationManagementBookId", "reservationBookTitle" };
+		String[] searchParametersName = { "reservationCustomerId", "reservationCustomerFirstName",
+				"reservationCustomerLastName", "reservationCustomerPesel", "reservationManagementBookId",
+				"reservationBookTitle" };
 		searchEngineUtils.clearSearchParameters(session, searchParametersName);
 
 		return "redirect:/reservation/reservation-management";
@@ -111,22 +114,22 @@ public class ReservationController {
 
 	@RequestMapping("/delete-reservation")
 	public String deleteReservation(@RequestParam("reservationId") int reservationId, HttpServletRequest request,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
 		reservationService.deleteReservationByEmployee(reservationId);
-		redirectAttributes.addAttribute("systemMessage",
-				env.getProperty("controller.ReservationController.deleteReservation.success.1"));
+		redirectAttributes.addAttribute("systemMessage", env
+				.getProperty(locale.getLanguage() + ".controller.ReservationController.deleteReservation.success.1"));
 
 		return "redirect:/reservation/reservation-management";
 	}
 
 	@RequestMapping("/increase-exp-date")
 	public String increaseExpDate(@RequestParam("reservationId") int reservationId, HttpServletRequest request,
-			RedirectAttributes redirectAttributes) {
+			RedirectAttributes redirectAttributes, Locale locale) {
 
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
@@ -134,7 +137,7 @@ public class ReservationController {
 
 		reservationService.increaseExpirationDate(reservationId);
 		redirectAttributes.addAttribute("systemMessage",
-				env.getProperty("controller.ReservationController.increaseExpDate.success.1"));
+				env.getProperty(locale.getLanguage() + ".controller.ReservationController.increaseExpDate.success.1"));
 
 		return "redirect:/reservation/reservation-management";
 	}
