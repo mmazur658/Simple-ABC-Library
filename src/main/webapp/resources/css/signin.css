@@ -12,6 +12,14 @@ body {
   padding-bottom: 40px;
   background-color: #f5f5f5;
 }
+body {
+    opacity: 1;
+    transition: 1.5s opacity;
+}
+body.fade-out {
+    opacity: 0;
+    transition: none;
+}
 
 .form-signin {
   width: 100%;

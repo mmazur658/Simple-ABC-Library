@@ -80,6 +80,7 @@ public class BookController {
 
 		String[] searchBookParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
 				searchParametersValue);
+		
 		boolean hasAnyParameters = searchEngineUtils.hasTableAnyParameters(searchBookParameters);
 
 		if (startResult == null)

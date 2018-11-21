@@ -41,3 +41,11 @@ body, html {
 	border-radius: 4px;
 	padding: 8px;
 }
+body {
+    opacity: 1;
+    transition: 1.5s opacity;
+}
+body.fade-out {
+    opacity: 0;
+    transition: none;
+}

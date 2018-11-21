@@ -13,7 +13,7 @@
 </head>
 
 <body>
-
+<script>document.body.className += ' fade-out';</script>
 	<%@ include file="/resources/parts/nav.jsp" %>  	
 	
 	<spring:message var="previous" code="label.previous"/>
@@ -43,12 +43,18 @@
 	
 	<%@ include file="/resources/parts/footer.jsp" %>  
 
-		<script>
-		$(function(){
-			$('.carousel').carousel({
-				  interval: 3000
-			})
+<script>
+	$(function(){
+		$('.carousel').carousel({
+			  interval: 3000;
 		})
-		</script>
+	})
+</script>
+		
+<script>
+$(function() {
+    $('body').removeClass('fade-out');
+});
+</script>
 </body>
 </html>

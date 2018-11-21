@@ -1,7 +1,3 @@
-/**
- * 
- */
-
 function showToastrAlert(alertType, messageText) {
 	$(function() {
 		toastr[alertType](messageText)

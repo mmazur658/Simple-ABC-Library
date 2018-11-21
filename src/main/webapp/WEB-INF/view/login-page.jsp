@@ -8,12 +8,13 @@
 <head>
 	<%@ include file="/resources/parts/header.jsp" %> 
 	<link type="text/css" rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/signin.css" />
+	<link type="text/css" rel="stylesheet" href="<%=request.getContextPath()%>/resources/css/cookiealert.css">
 	<style>		.btn{  border-radius: 0px;  }	</style>
 	<title><spring:message code="view.login-page.title" /></title>
 </head>
 
 <body class="text-center">
-
+<script>document.body.className += ' fade-out';</script>
 <div class="container">
     <form class="form-signin" action="login" method="post">
       <img class="mb-3 shadow-lg" style="border-radius: 50%;" src="<%=request.getContextPath()%>/resources/image/ABC_new_mini_logo.png" alt="Simpel ABC Library Logo" width="200" height="200">
@@ -37,8 +38,23 @@
     		<img class="mb-3" style="opacity: 0.7;" src="<%=request.getContextPath()%>/resources/image/poland-flag.png" alt="Poland Flag" >
     	</a>
     </div>
+    
+    <!-- COOKIES -->
+	<div class="alert text-center cookiealert" role="alert">
+	
+	    <b><spring:message code="cookie.title"/></b><spring:message code="cookie.text"/>
+	
+	    <button type="button" class="btn btn-secondary btn-sm acceptcookies" aria-label="Close">
+	     <spring:message code="cookie.button"/> </button>
+	</div>
+	<!-- /COOKIES -->
 
 <%@ include file="/resources/parts/footer-starter.jsp" %> 
-
+<script src="<%=request.getContextPath()%>/resources/js/cookiealert-standalone.js"></script>
+<script>
+$(function() {
+    $('body').removeClass('fade-out');
+});
+</script>
 </body>
 </html>

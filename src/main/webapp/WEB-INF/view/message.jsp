@@ -24,7 +24,7 @@
 	<spring:message var="unread" code="message.unread"/>
 	<spring:message var="back-button" code="button.back"/>
 	
-	<div class="container w-50 pt-5 mt-4">	
+	<div class="container w-50 pt-5 mt-5">	
 
 	<c:if test="${not empty systemMessage}">
 		<script>showToastrAlert("info","${systemMessage}");</script></c:if>
@@ -75,10 +75,10 @@
 			<td class="message-b-btn">	
 				<c:choose>
 					<c:when test="${modelBoxType == 'sent' }">
-						<a href="${pageContext.request.contextPath}/message-module/message-box-sent" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true">${back-button }</a>
+						<a href="${pageContext.request.contextPath}/message-module/message-box-sent" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true">${back-button}</a>
 					</c:when>
 					<c:otherwise>
-						<a href="${pageContext.request.contextPath}/message-module/message-box-inbox" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true">${back-button }</a>
+						<a href="${pageContext.request.contextPath}/message-module/message-box-inbox" class="btn btn-sm btn-secondary btn-block shadow" role="button" aria-pressed="true">${back-button}</a>
 					</c:otherwise>
 				</c:choose>
 			</td>
