@@ -94,7 +94,7 @@ public class ReturnBookController {
 		long amountOfResults = hasAnyParameters ? userService.getAmountOfSearchResult(userSearchParameters)
 				: userService.getAmountOfAllUsers();
 
-		int searchResultLimit = Integer.valueOf(env.getProperty(locale.getLanguage() + ".search.result.limit"));
+		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
 		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(returnBookStartResult, amountOfResults,
 				searchResultLimit);
 		String resultRange = searchEngineUtils.generateResultRange(returnBookStartResult, amountOfResults,

@@ -18,6 +18,7 @@
 	
 	<spring:message var="selectedUser" code="label.selected.user"/>
 	<spring:message var="selectedBooks" code="label.selected.books"/>
+	<spring:message var="borrowedBooks" code="label.borrowed.books"/>
 	<spring:message var="userId" code="user.id"/>
 	<spring:message var="userFirstName" code="user.first.name"/>
 	<spring:message var="userLastName" code="user.last.name"/>
@@ -91,7 +92,7 @@
 		  </tbody>
 		</table>
 
-	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">${selectedBooks }</h1>	
+	<h1 class="h3 mb-3 mt-3 font-weight-bold float-left">${borrowedBooks }</h1>	
 	<a href="${pageContext.request.contextPath}/return-book/addAllBorrowedBookToList" class="btn btn-sm btn-secondary btn-block w-25 float-right mt-4 mr-1 shadow" role="button" aria-pressed="true" >${addAllButton }</a>
 		<table class="table table-hover">
 		  <thead>

@@ -30,7 +30,7 @@
 	
 		<form class="form-signin" action="changePassword" method="POST">
 			<h1 class="h3 mb-3 mt-2 font-weight-normal">${heading }</h1>			
-			<input class="form-control" id="oldPassword" type="password" name="${oldPassword }" placeholder="Stare Hasło"/>
+			<input class="form-control" id="oldPassword" type="password" name="" placeholder="${oldPassword }"/>
 			<input class="form-control" id="password" type="password" id="password" placeholder="${newPassword }" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" 
 				   title="${passwordRules }"
 			       required >
