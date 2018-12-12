@@ -5,20 +5,20 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-import pl.mazur.simpleabclibrary.utils.PasswordUtilImpl;
+import pl.mazur.simpleabclibrary.utils.PasswordUtilsImpl;
 
 class PasswordUtilImplTest {
 
 	String password = "HLop78^%";
 	String encryptedPassword;
-	PasswordUtilImpl passwordUtilImpl = new PasswordUtilImpl();
+	PasswordUtilsImpl passwordUtilImpl = new PasswordUtilsImpl();
 
 	@Test
 	void shouldReturnTrueWhenPasswordsAreTheSame() {
 
 		encryptedPassword = passwordUtilImpl.encryptPassword(password);
 
-		assertTrue(passwordUtilImpl.checkPassword(password, encryptedPassword));
+		assertTrue(passwordUtilImpl.isPasswordCorrect(password, encryptedPassword));
 
 	}
 
@@ -27,7 +27,7 @@ class PasswordUtilImplTest {
 
 		encryptedPassword = passwordUtilImpl.encryptPassword(password);
 
-		assertFalse(passwordUtilImpl.checkPassword("P@ssw0rd", encryptedPassword));
+		assertFalse(passwordUtilImpl.isPasswordCorrect("P@ssw0rd", encryptedPassword));
 
 	}
 

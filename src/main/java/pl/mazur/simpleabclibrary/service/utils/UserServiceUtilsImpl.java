@@ -12,14 +12,42 @@ import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.utils.PasswordUtils;
 import pl.mazur.simpleabclibrary.utils.PeselValidator;
 
+/**
+ * Utility class used to perform operations for user service classes.
+ * 
+ * @author Marcin Mazur
+ *
+ */
 @Component
 @PropertySource("classpath:systemMessages.properties")
 public class UserServiceUtilsImpl implements UserServiceUtils {
 
+	/**
+	 * The PasswordUtils interface
+	 */
 	private PasswordUtils passwordUtils;
+
+	/**
+	 * The PeselValidator interface
+	 */
 	private PeselValidator peselValidator;
+
+	/**
+	 * The Environment interface
+	 */
 	private Environment env;
 
+	/**
+	 * Constructs a UserServiceUtilsImpl with the PasswordUtils, PeselValidator and
+	 * Environment.
+	 * 
+	 * @param passwordUtils
+	 *            The PasswordUtils interface
+	 * @param peselValidator
+	 *            The PeselValidator interface
+	 * @param env
+	 *            The Environment interface
+	 */
 	@Autowired
 	public UserServiceUtilsImpl(PasswordUtils passwordUtils, PeselValidator peselValidator, Environment env) {
 		this.passwordUtils = passwordUtils;
@@ -29,9 +57,9 @@ public class UserServiceUtilsImpl implements UserServiceUtils {
 
 	@Override
 	public void setAdditionalUserData(User theUser) {
-		theUser.setActive(true);
-		theUser.setAdmin(false);
-		theUser.setEmployee(false);
+		theUser.setIsActive(true);
+		theUser.setIsAdmin(false);
+		theUser.setIsEmployee(false);
 		theUser.setStartDate(new Date());
 		theUser.setPassword(passwordUtils.encryptPassword(theUser.getPassword().trim()));
 	}
@@ -56,12 +84,12 @@ public class UserServiceUtilsImpl implements UserServiceUtils {
 
 	@Override
 	public String increaseUserAccessLevel(User theUser, Locale locale) {
-		if (!theUser.isAdmin() && !theUser.isEmployee()) {
-			theUser.setEmployee(true);
+		if (!theUser.getIsAdmin() && !theUser.getIsEmployee()) {
+			theUser.setIsEmployee(true);
 			return env.getProperty(
 					locale.getLanguage() + ".service.utils.UserServiceUtilsImpl.increaseUserAccessLevel.success.1");
-		} else if (!theUser.isAdmin() && theUser.isEmployee()) {
-			theUser.setAdmin(true);
+		} else if (!theUser.getIsAdmin() && theUser.getIsEmployee()) {
+			theUser.setIsAdmin(true);
 			return env.getProperty(
 					locale.getLanguage() + ".service.utils.UserServiceUtilsImpl.increaseUserAccessLevel.success.2");
 		} else
@@ -71,12 +99,12 @@ public class UserServiceUtilsImpl implements UserServiceUtils {
 
 	@Override
 	public String decreaseUserAccessLevel(User theUser, Locale locale) {
-		if (theUser.isAdmin() && theUser.isEmployee()) {
-			theUser.setAdmin(false);
+		if (theUser.getIsAdmin() && theUser.getIsEmployee()) {
+			theUser.setIsAdmin(false);
 			return env.getProperty(
 					locale.getLanguage() + ".service.utils.UserServiceUtilsImpl.decreaseUserAccessLevel.success.1");
-		} else if (!theUser.isAdmin() && theUser.isEmployee()) {
-			theUser.setEmployee(false);
+		} else if (!theUser.getIsAdmin() && theUser.getIsEmployee()) {
+			theUser.setIsEmployee(false);
 			return env.getProperty(
 					locale.getLanguage() + ".service.utils.UserServiceUtilsImpl.decreaseUserAccessLevel.success.2");
 		} else

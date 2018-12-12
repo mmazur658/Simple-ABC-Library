@@ -11,20 +11,30 @@ import org.springframework.stereotype.Repository;
 
 import pl.mazur.simpleabclibrary.entity.Reservation;
 
+/**
+ * Repository class for performing database operations on Reservation objects.
+ * 
+ * @author Marcin Mazur
+ *
+ */
 @Repository
 public class ReservationDAOImpl implements ReservationDAO {
 
-	@Autowired
+	/**
+	 * The SessionFactory interface
+	 */
 	private SessionFactory sessionFactory;
 
+	/**
+	 * Constructs a ReservationDAOImpl with the SessionFactory.
+	 * 
+	 * @param sessionFactory
+	 *            The SessionFactory interface
+	 */
 	@Autowired
-	BookDAO bookDAO;
-
-	@Autowired
-	UserDAO userDAO;
-
-	@Autowired
-	MessageDAO messageDAO;
+	public ReservationDAOImpl(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
+	}
 
 	protected Session currentSession() {
 		return sessionFactory.getCurrentSession();
@@ -37,7 +47,7 @@ public class ReservationDAOImpl implements ReservationDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Reservation> getUserReservations(int userId) {
+	public List<Reservation> getListOfReservationByUserId(int userId) {
 
 		List<Reservation> userReservationsList = new ArrayList<>();
 		String hql = "from Reservation where user.id=:id and isActive=true ORDER BY id ASC";
@@ -49,18 +59,13 @@ public class ReservationDAOImpl implements ReservationDAO {
 	}
 
 	@Override
-	public Reservation getReservation(int reservationId) {
+	public Reservation getReservationById(int reservationId) {
 		return currentSession().get(Reservation.class, reservationId);
-	}
-
-	@Override
-	public void deleteReservationInOrderToCreateBorrowedBook(Reservation reservation) {
-		currentSession().update(reservation);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Reservation> getAllReservation(boolean isActive) {
+	public List<Reservation> getListOfAllActiveReservation(boolean isActive) {
 
 		List<Reservation> reservationList = new ArrayList<>();
 		String hql = "from Reservation where isActive=:isActive ORDER BY id ASC";
@@ -71,44 +76,9 @@ public class ReservationDAOImpl implements ReservationDAO {
 		return reservationList;
 	}
 
-	@Override
-	public void deleteReservationDueToOutdated(Reservation reservation) {
-		currentSession().update(reservation);
-	}
-
-	@Override
-	public void increaseExpirationDate(Reservation reservation) {
-		currentSession().update(reservation);
-	}
-
-	@Override
-	public void deleteReservationByEmployee(Reservation reservation) {
-		currentSession().update(reservation);
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
-	public long getAmountOfSearchResult(String hql) {
-		Query<Long> theQuery = currentSession().createQuery(hql);
-		Long count = (Long) theQuery.uniqueResult();
-
-		return count;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public long getAmountOfAllReservation() {
-
-		String hql = "select count(*) from Reservation WHERE isActive = true ORDER BY id ASC";
-		Query<Long> theQuery = currentSession().createQuery(hql);
-		Long count = (Long) theQuery.uniqueResult();
-
-		return count;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<Reservation> getAllReservation(Integer startResult) {
+	public List<Reservation> getListOfAllReservation(Integer startResult) {
 
 		List<Reservation> reservationList = new ArrayList<>();
 		String hql = "from Reservation where isActive = true ORDER BY id ASC";
@@ -122,7 +92,7 @@ public class ReservationDAOImpl implements ReservationDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<Reservation> reservationSearchResult(String hql, Integer startResult) {
+	public List<Reservation> getListOfReservationForGivenSearchParams(String hql, Integer startResult) {
 
 		List<Reservation> reservationList = new ArrayList<>();
 		try {
@@ -138,7 +108,8 @@ public class ReservationDAOImpl implements ReservationDAO {
 	}
 
 	@Override
-	public void deleteReservationByUser(Reservation reservation) {
+	public void updateReservation(Reservation reservation) {
 		currentSession().update(reservation);
+
 	}
 }

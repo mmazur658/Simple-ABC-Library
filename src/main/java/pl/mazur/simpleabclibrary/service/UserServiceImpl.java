@@ -11,26 +11,77 @@ import pl.mazur.simpleabclibrary.dao.UserDAO;
 import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.service.utils.UserServiceUtils;
 import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
+import pl.mazur.simpleabclibrary.utils.PasswordUtils;
 import pl.mazur.simpleabclibrary.utils.PeselValidator;
 import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 
+/**
+ * Service Class for managing User objects.
+ * 
+ * @author Marcin Mazur
+ *
+ */
 @Service
 public class UserServiceImpl implements UserService {
 
-	@Autowired
+	/**
+	 * The UserDAO interface
+	 */
 	private UserDAO userDAO;
 
-	@Autowired
+	/**
+	 * The PeselValidator interface
+	 */
 	private PeselValidator peselValidator;
 
-	@Autowired
-	private AccessLevelControl loginAndAccessLevelCheck;
+	/**
+	 * The AccessLevelControl interface
+	 */
+	private AccessLevelControl accessLevelControl;
 
-	@Autowired
+	/**
+	 * The SearchEngineUtils interface
+	 */
 	private SearchEngineUtils searchEngineUtils;
 
-	@Autowired
+	/**
+	 * The UserServiceUtils interface
+	 */
 	private UserServiceUtils userServiceUtils;
+
+	/**
+	 * The PasswordUtils interface
+	 */
+	private PasswordUtils passwordUtils;
+
+	/**
+	 * Constructs a UserServiceImpl with the UserDAO, PeselValidator,
+	 * AccessLevelControl, SearchEngineUtils, UserServiceUtils and PasswordUtils.
+	 * 
+	 * @param userDAO
+	 *            The UserDAO interface
+	 * @param peselValidator
+	 *            The PeselValidator interface
+	 * @param accessLevelControl
+	 *            The AccessLevelControl interface
+	 * @param searchEngineUtils
+	 *            The SearchEngineUtils interface
+	 * @param userServiceUtils
+	 *            The UserServiceUtils interface
+	 * @param passwordUtils
+	 *            The PasswordUtils interface
+	 */
+	@Autowired
+	public UserServiceImpl(UserDAO userDAO, PeselValidator peselValidator, AccessLevelControl accessLevelControl,
+			SearchEngineUtils searchEngineUtils, UserServiceUtils userServiceUtils, PasswordUtils passwordUtils) {
+
+		this.userDAO = userDAO;
+		this.peselValidator = peselValidator;
+		this.accessLevelControl = accessLevelControl;
+		this.searchEngineUtils = searchEngineUtils;
+		this.userServiceUtils = userServiceUtils;
+		this.passwordUtils = passwordUtils;
+	}
 
 	@Override
 	@Transactional
@@ -41,89 +92,73 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public User getUser(int theId) {
-		return userDAO.getUser(theId);
+	public User getUserById(int theId) {
+		return userDAO.getUserById(theId);
 	}
 
 	@Override
 	@Transactional
-	public boolean checkEmailIsExist(String email) {
-		return userDAO.checkEmailIsExist(email);
+	public boolean isEmailCorrect(String email) {
+		return userDAO.isEmailUnique(email);
 	}
 
 	@Override
 	@Transactional
-	public boolean verificationAndAuthentication(String email, String password) {
-		return userDAO.verificationAndAuthentication(email, password);
+	public boolean isEmailAndPasswordCorrect(String email, String password) {
+		return userDAO.isEmailAndPasswordCorrect(email, password);
 	}
 
 	@Override
 	@Transactional
-	public User getUser(String email) {
-		return userDAO.getUser(email.trim());
+	public User getUserByEmail(String email) {
+		return userDAO.getUserByEmail(email.trim());
 	}
 
 	@Override
 	@Transactional
 	public void updateUser(User theUser) {
-		User tempUser = userDAO.getUser(theUser.getId());
+		User tempUser = userDAO.getUserById(theUser.getId());
 		userServiceUtils.updateUserData(tempUser, theUser);
-		userDAO.updateUser(tempUser);
+
 	}
 
 	@Override
-	public boolean validatePesel(String pesel) {
+	public boolean isPeselCorrect(String pesel) {
 		return peselValidator.validatePesel(pesel);
 	}
 
 	@Override
 	@Transactional
 	public void changePassword(int userId, String newPassword) {
-		userDAO.changePassword(userId, newPassword);
+
+		User tempUser = userDAO.getUserById(userId);
+		tempUser.setPassword(passwordUtils.encryptPassword(newPassword));
 
 	}
 
 	@Override
 	@Transactional
-	public List<User> getAllUsers(int startResult) {
-		return userDAO.getAllUsers(startResult);
+	public List<User> getListOfAllUsers(int startResult) {
+		return userDAO.getListOfAllUsers(startResult);
 	}
 
 	@Override
 	@Transactional
-	public List<User> getUserSearchResult(String[] userSearchParameters, int startResult) {
+	public List<User> getListOfUserByGivenSearchParams(String[] userSearchParameters, int startResult) {
 
 		String searchType = "from User where ";
 		String[] fieldsName = { "id", "firstName", "lastName", "email", "pesel" };
 		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(userSearchParameters, searchType, fieldsName);
 
-		return userDAO.getUserSearchResult(hql, startResult);
-	}
-
-	@Override
-	@Transactional
-	public long getAmountOfSearchResult(String[] userSearchParameters) {
-
-		String searchType = "SELECT COUNT(*) FROM User where ";
-		String[] fieldsName = { "id", "firstName", "lastName", "email", "pesel" };
-		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(userSearchParameters, searchType, fieldsName);
-
-		return userDAO.getAmountOfSearchResult(hql);
-	}
-
-	@Override
-	@Transactional
-	public long getAmountOfAllUsers() {
-		return userDAO.getAmountOfAllUsers();
+		return userDAO.getListOfUserForGivenSearchParams(hql, startResult);
 	}
 
 	@Override
 	@Transactional
 	public String increaseUserAccessLevel(Integer increaseAccessLevelUserId, Locale locale) {
 
-		User theUser = userDAO.getUser(increaseAccessLevelUserId);
+		User theUser = userDAO.getUserById(increaseAccessLevelUserId);
 		String systemMessage = userServiceUtils.increaseUserAccessLevel(theUser, locale);
-		userDAO.updateUser(theUser);
 
 		return systemMessage;
 	}
@@ -132,15 +167,14 @@ public class UserServiceImpl implements UserService {
 	@Transactional
 	public String decreaseUserAccessLevel(Integer decreaseAccessLevelUserId, Locale locale) {
 
-		User theUser = userDAO.getUser(decreaseAccessLevelUserId);
+		User theUser = userDAO.getUserById(decreaseAccessLevelUserId);
 		String systemMessage = userServiceUtils.decreaseUserAccessLevel(theUser, locale);
-		userDAO.updateUser(theUser);
 
 		return systemMessage;
 	}
 
 	@Override
 	public String getUserAccessLevel(User theUser) {
-		return loginAndAccessLevelCheck.getUserAccessLevel(theUser);
+		return accessLevelControl.getUserAccessLevel(theUser);
 	}
 }

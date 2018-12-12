@@ -15,26 +15,66 @@ import pl.mazur.simpleabclibrary.service.MessageService;
 import pl.mazur.simpleabclibrary.service.ReservationService;
 import pl.mazur.simpleabclibrary.service.UserService;
 
+/**
+ * Utility class used to manage reservation reminders.
+ * 
+ * @author Marcin
+ *
+ */
 @Component
 @EnableScheduling
 public class ReservationControl {
 
-	@Autowired
-	MessageService messageService;
+	/**
+	 * The MessageService interface
+	 */
+	private MessageService messageService;
 
-	@Autowired
-	UserService userService;
+	/**
+	 * The UserService interface
+	 */
+	private UserService userService;
 
-	@Autowired
-	ReservationService reservationService;
+	/**
+	 * The ReservationService interface
+	 */
+	private ReservationService reservationService;
 
+	/**
+	 * Constructs a ReservationControl with the MessageService, UserService and
+	 * ReservationService.
+	 * 
+	 * @param messageService
+	 *            The MessageService interface
+	 * @param userService
+	 *            The UserService interface
+	 * @param reservationService
+	 *            The ReservationService interface
+	 */
+	@Autowired
+	public ReservationControl(MessageService messageService, UserService userService,
+			ReservationService reservationService) {
+		this.messageService = messageService;
+		this.userService = userService;
+		this.reservationService = reservationService;
+	}
+
+	/**
+	 * Creates and returns the message with given parameters.
+	 * 
+	 * @param theUser
+	 *            The User containing the recipient
+	 * @param bookTitle
+	 *            The String containing the title of the book
+	 * @return A Message representing the message with given parameters
+	 */
 	public Message createNewMessage(User theUser, String bookTitle) {
 
 		Message theMessage = new Message();
 		theMessage.setRecipient(theUser);
 		theMessage.setRecipientIsActive(true);
 		theMessage.setRecipientIsRead(false);
-		theMessage.setSender(userService.getUser(1));
+		theMessage.setSender(userService.getUserById(1));
 		theMessage.setSenderIsActive(false);
 		theMessage.setSenderIsRead(true);
 		theMessage.setStartDate(new Date());
@@ -45,6 +85,14 @@ public class ReservationControl {
 
 	}
 
+	/**
+	 * Returns TRUE if the start date of reservation + 48h is lower than present
+	 * time.
+	 * 
+	 * @param reservationStartDate
+	 *            The Date containing the reservation date of created
+	 * @return A boolean representing the result
+	 */
 	public boolean isReservationExpired(Date reservationStartDate) {
 
 		Long currentTimeMillis = System.currentTimeMillis();
@@ -55,11 +103,16 @@ public class ReservationControl {
 			return false;
 	}
 
-	// miliseconds * seconds * minutes * hour * day
-	@Scheduled(fixedRate = 1000 * 60 * 60) // 1h
+	/**
+	 * Gets the list of all active reservations and check, if they are expired.
+	 * 
+	 */
+	@Scheduled(fixedRate = 1000 * 60 * 60) // 1h // Milliseconds * seconds * minutes * hour * day
 	public void checkReservations() {
 
-		List<Reservation> reservationList = reservationService.getAllReservation(true);
+		// Get the list of all borrowed book
+		List<Reservation> reservationList = reservationService.getListOfAllReservationsByReservationStatus(true);
+
 		Message message;
 
 		for (Reservation reservation : reservationList) {

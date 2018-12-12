@@ -39,6 +39,23 @@ import pl.mazur.simpleabclibrary.service.UserService;
 import pl.mazur.simpleabclibrary.utils.AccessLevelControl;
 import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 
+/**
+ * The controller class is used to return the view depending on the user
+ * request. This controller contains the views of: <br>
+ * <ul>
+ * <li>"borrow-book-choose-user"</li>
+ * <li>"borrow-book-choose-books"</li>
+ * <li>"borrow-book-confirmation"</li>
+ * </ul>
+ * 
+ * <br>
+ * <br>
+ * 
+ * This controller also perform the actions on the books.
+ * 
+ * @author Marcin Mazur
+ *
+ */
 @Controller
 @Scope("session")
 @RequestMapping("/borrow-book")
@@ -46,29 +63,107 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 @PropertySource("classpath:library-configuration.properties")
 public class BorrowBookController {
 
-	@Autowired
+	/**
+	 * The BookService interface
+	 */
 	private BookService bookService;
 
-	@Autowired
+	/**
+	 * The UserService interface
+	 */
 	private UserService userService;
 
-	@Autowired
+	/**
+	 * The Environment interface
+	 */
 	private Environment env;
 
-	@Autowired
+	/**
+	 * The PdfService interface
+	 */
 	private PdfService pdfService;
 
-	@Autowired
+	/**
+	 * The AccessLevelControl interface
+	 */
 	private AccessLevelControl accessLevelControl;
 
-	@Autowired
+	/**
+	 * The ReservationService interface
+	 */
 	private ReservationService reservationService;
 
-	@Autowired
+	/**
+	 * The SearchEngineUtils interface
+	 */
 	private SearchEngineUtils searchEngineUtils;
 
+	/**
+	 * Constructs a BorrowBookController with the BookService, UserService,
+	 * Environment, PdfService, AccessLevelControl, ReservationService and
+	 * SearchEngineUtils.
+	 * 
+	 * @param bookService
+	 *            The BookService interface
+	 * @param userService
+	 *            The UserService interface
+	 * @param env
+	 *            The Environment interface
+	 * @param pdfService
+	 *            The PdfService interface
+	 * @param accessLevelControl
+	 *            The AccessLevelControl interface
+	 * @param reservationService
+	 *            The ReservationService interface
+	 * @param searchEngineUtils
+	 *            The SearchEngineUtils interface
+	 */
+	@Autowired
+	public BorrowBookController(BookService bookService, UserService userService, Environment env,
+			PdfService pdfService, AccessLevelControl accessLevelControl, ReservationService reservationService,
+			SearchEngineUtils searchEngineUtils) {
+
+		this.bookService = bookService;
+		this.userService = userService;
+		this.env = env;
+		this.pdfService = pdfService;
+		this.accessLevelControl = accessLevelControl;
+		this.reservationService = reservationService;
+		this.searchEngineUtils = searchEngineUtils;
+
+	}
+
+	/**
+	 * Returns the view of "borrow-book-choose-user" with model attributes:<br>
+	 * <ul>
+	 * <li>borrowBookStartResult - The value of first index of the results</li>
+	 * <li>amountOfResults - The number of total results</li>
+	 * <li>showMoreLinkValue - The value of "showMoreLink"</li>
+	 * <li>resultRange - The description of pagination</li>
+	 * <li>showLessLinkValue - The value of "showLessLink"</li>
+	 * <li>usersList - The list of User objects</li>
+	 * </ul>
+	 * 
+	 * @param borrowBookSelectedUserId
+	 *            The String containing the id of the user
+	 * @param borrowBookFirstName
+	 *            The String containing the first name of the user
+	 * @param borrowBookLastName
+	 *            The String containing the last name of the user
+	 * @param borrowBookEmail
+	 *            The String containing the email of the user
+	 * @param borrowBookPesel
+	 *            The String containing the PESEL of the user
+	 * @param borrowBookStartResult
+	 *            The Integer containing the first index of the results
+	 * @param theModel
+	 *            The Model containing the data passed to the view
+	 * @param request
+	 *            The HttpServletRequest containing the HttpSession
+	 * @return The String representing the name of the view
+	 */
 	@RequestMapping("/borrow-book-choose-user")
-	public String borrowBook(
+	public String showBorrowBookForm(
 			@RequestParam(required = false, name = "borrowBookSelectedUserId") String borrowBookSelectedUserId,
 			@RequestParam(required = false, name = "borrowBookFirstName") String borrowBookFirstName,
 			@RequestParam(required = false, name = "borrowBookLastName") String borrowBookLastName,
@@ -77,39 +172,49 @@ public class BorrowBookController {
 			@RequestParam(required = false, name = "borrowBookStartResult") Integer borrowBookStartResult,
 			Model theModel, HttpServletRequest request) {
 
+		// Get user's session and check whether the user is permitted to see this view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
+		// The Arrays containing the names and values of search parameters
 		String[] searchParametersName = { "borrowBookSelectedUserId", "borrowBookFirstName", "borrowBookLastName",
 				"borrowBookEmail", "borrowBookPesel" };
 		String[] searchParametersValue = { borrowBookSelectedUserId, borrowBookFirstName, borrowBookLastName,
 				borrowBookEmail, borrowBookPesel };
 
+		// The Array containing the search parameters ready to search
 		String[] userSearchParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
 				searchParametersValue);
-		boolean hasAnyParameters = searchEngineUtils.hasTableAnyParameters(userSearchParameters);
 
+		// Get the borrowBookStartResult from the session. If session doesn't contain
+		// that attribute set default value
 		if (borrowBookStartResult == null)
 			borrowBookStartResult = (Integer) session.getAttribute("borrowBookStartResult");
 		if (borrowBookStartResult == null)
 			borrowBookStartResult = 0;
 		session.setAttribute("borrowBookStartResult", borrowBookStartResult);
 
+		// Check whether the userSearchParameters array contains any parameters and get
+		// the results and number of the results.
+		boolean hasAnyParameters = searchEngineUtils.hasTableAnyParameters(userSearchParameters);
 		List<User> usersList = hasAnyParameters
-				? userService.getUserSearchResult(userSearchParameters, borrowBookStartResult)
-				: userService.getAllUsers(borrowBookStartResult);
-		long amountOfResults = hasAnyParameters ? userService.getAmountOfSearchResult(userSearchParameters)
-				: userService.getAmountOfAllUsers();
+				? userService.getListOfUserByGivenSearchParams(userSearchParameters, borrowBookStartResult)
+				: userService.getListOfAllUsers(borrowBookStartResult);
+		long amountOfResults = usersList.size();
 
+		// Get showMoreLinkValue, resultRange and showLessLinkValue
 		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
 		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(borrowBookStartResult, amountOfResults,
 				searchResultLimit);
 		String resultRange = searchEngineUtils.generateResultRange(borrowBookStartResult, amountOfResults,
 				showMoreLinkValue, searchResultLimit);
 		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(borrowBookStartResult, searchResultLimit);
+
+		// Create an empty list of Books
 		List<Book> tempBookList = new ArrayList<>();
 
+		// Set model and session attributes
 		session.setAttribute("borrowBookStartResult", borrowBookStartResult);
 		session.setAttribute("tempBookList", tempBookList);
 		theModel.addAttribute("borrowBookStartResult", borrowBookStartResult);
@@ -122,13 +227,23 @@ public class BorrowBookController {
 		return "borrow-book-choose-user";
 	}
 
+	/**
+	 * Cleans the search parameters and redirects to the view of
+	 * "borrow-book-choose-user".
+	 * 
+	 * @param request
+	 *            The HttpServletRequest containing the HttpSession
+	 * @return The String representing the name of the view
+	 */
 	@RequestMapping("/clearUserSearchParameters")
 	public String clearUserSearchParameters(HttpServletRequest request) {
 
+		// Get user's session and check whether the user is permitted to see this view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
+		// Clean search parameters
 		String[] searchParametersName = { "borrowBookStartResult", "borrowBookSelectedUserId", "borrowBookFirstName",
 				"borrowBookLastName", "borrowBookEmail", "borrowBookPesel" };
 		searchEngineUtils.clearSearchParameters(session, searchParametersName);
@@ -136,8 +251,63 @@ public class BorrowBookController {
 		return "redirect:/borrow-book/borrow-book-choose-user";
 	}
 
+	/**
+	 * Returns the view of "borrow-book-choose-books" with model attributes:<br>
+	 * <ul>
+	 * <li>borrowBookChooseBookStartResult - The value of first index of the
+	 * results</li>
+	 * <li>showMoreLinkValue - The value of "showMoreLink"</li>
+	 * <li>showLessLinkValue - The value of "showLessLink"</li>
+	 * <li>resultRange - The description of pagination</li>
+	 * <li>amountOfResults - The number of total results</li>
+	 * <li>isAbleToBorrow - The user status determines whether the user is able to
+	 * borrow more books</li>
+	 * <li>borrowedBookList - The list of the borrowed books</li>
+	 * <li>userReservationList - The list of user's reservations</li>
+	 * <li>tempBookList - The temporary list of the books</li>
+	 * <li>bookList - The list of the books</li>
+	 * <li>theUser - The User object</li>
+	 * <li>systemMessage - The one of the system messages</li>
+	 * <li>extraMessage - The one of the system messages</li>
+	 * <li>errorMessage - TThe one of the system messages</li>
+	 * </ul>
+	 * 
+	 * 
+	 * @param selectedUserId
+	 *            The String containing the id of the user
+	 * @param title
+	 *            The String containing the title of the book
+	 * @param errorMessage
+	 *            The String containing the system message
+	 * @param bookId
+	 *            The String containing the id of the book
+	 * @param author
+	 *            The String containing the author of the book
+	 * @param publisher
+	 *            The String containing the publisher of the book
+	 * @param isbn
+	 *            The String containing the ISBN of the book
+	 * @param systemMessage
+	 *            The String containing the system message
+	 * @param isAbleToBorrow
+	 *            The boolean containing the status determines whether the user is
+	 *            able to borrow more books
+	 * @param extraMessage
+	 *            The String containing the system message
+	 * @param borrowBookChooseBookStartResult
+	 *            The Integer containing the first index of the results
+	 * @param theModel
+	 *            The Model containing the data passed to the view
+	 * @param request
+	 *            The HttpServletRequest containing the HttpSession
+	 * @param locale
+	 *            The Locale containing the user's locale
+	 * @return The String representing the name of the view
+	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping("/borrow-book-choose-books")
-	public String borrowBookChooseBooks(@RequestParam(required = false, name = "selectedUserId") String selectedUserId,
+	public String showBorrowBookChooseBooksForm(
+			@RequestParam(required = false, name = "selectedUserId") String selectedUserId,
 			@RequestParam(required = false, name = "title") String title,
 			@RequestParam(required = false, name = "errorMessage") String errorMessage,
 			@RequestParam(required = false, name = "bookId") String bookId,
@@ -150,18 +320,23 @@ public class BorrowBookController {
 			@RequestParam(required = false, name = "borrowBookChooseBookStartResult") Integer borrowBookChooseBookStartResult,
 			Model theModel, HttpServletRequest request, Locale locale) {
 
+		// Get user's session and check whether the user is permitted to see this view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
+		// Set borrowBookStartResult to null
 		session.setAttribute("borrowBookStartResult", null);
 
+		// Get the borrowBookChooseBookStartResult from the session. If session doesn't
+		// contain that attribute set default value
 		if (borrowBookChooseBookStartResult == null)
 			borrowBookChooseBookStartResult = (Integer) session.getAttribute("borrowBookChooseBookStartResult");
 		if (borrowBookChooseBookStartResult == null)
 			borrowBookChooseBookStartResult = 0;
 		session.setAttribute("borrowBookStartResult", borrowBookChooseBookStartResult);
 
+		// If the requested param selectedUserId is null, get the id from the session
 		int theUserId;
 		if (selectedUserId == null)
 			theUserId = Integer.valueOf((String) session.getAttribute("selectedUserId"));
@@ -170,15 +345,19 @@ public class BorrowBookController {
 			theUserId = Integer.valueOf(selectedUserId);
 		}
 
-		User user = userService.getUser(theUserId);
-		List<BorrowedBook> borrowedBookList = bookService.getUserBorrowedBookList(user.getId());
-		@SuppressWarnings("unchecked")
+		// Get the user with given id
+		User user = userService.getUserById(theUserId);
+
+		// Get the list of BorrowedBook, Book and Reservation for given user id
+		List<BorrowedBook> borrowedBookList = bookService.getListOfBorrowedBooksByUserId(user.getId());
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
-		List<Reservation> tempReservationList = reservationService.getUserReservations(theUserId);
+		List<Reservation> tempReservationList = reservationService.getListOfReservationByUserId(theUserId);
 
+		// Get the limit of borrowed books
 		int borrowedBookLimit = Integer.valueOf(env.getProperty("borrowed.book.limit"));
-		isAbleToBorrow = true;
 
+		// Check whether the user is able to borrow more books
+		isAbleToBorrow = true;
 		if (borrowedBookList.size() + tempBookList.size() >= borrowedBookLimit) {
 			isAbleToBorrow = false;
 			extraMessage = env.getProperty(
@@ -188,6 +367,7 @@ public class BorrowBookController {
 					locale.getLanguage() + ".controller.BorrowBookController.borrowBookChooseBooks.success.1"
 							+ (borrowedBookLimit - borrowedBookList.size() - tempBookList.size()));
 
+		// Check whether the user has book expired book
 		if (isAbleToBorrow) {
 			for (BorrowedBook borrowedBook : borrowedBookList) {
 				Long currentTimeMillis = System.currentTimeMillis();
@@ -201,19 +381,24 @@ public class BorrowBookController {
 			}
 		}
 
+		// The Arrays containing the name and the values of search parameters
 		String[] searchParametersName = { "borrowBookSeachParamTitle", "borrowBookSeachParamId",
 				"borrowBookSeachParamAuthor", "borrowBookSeachParamIsbn", "borrowBookSeachParamPublisher" };
 		String[] searchParametersValue = { title, bookId, author, isbn, publisher };
+
+		// The Array containing the search parameters ready to search
 		String[] searchBookParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
 				searchParametersValue);
+
+		// Check whether the searchBookParameters array contains any parameters and get
+		// the results and number of the results.
 		boolean hasAnyParameters = searchEngineUtils.hasTableAnyParameters(searchBookParameters);
-
 		List<Book> booksList = hasAnyParameters
-				? bookService.bookSearchResult(searchBookParameters, borrowBookChooseBookStartResult)
-				: bookService.getAllBooks(borrowBookChooseBookStartResult);
-		long amountOfResults = hasAnyParameters ? bookService.getAmountOfSearchResult(searchBookParameters)
-				: bookService.getAmountOfAllBooks();
+				? bookService.getListOfBooksForGivenSearchParams(searchBookParameters, borrowBookChooseBookStartResult)
+				: bookService.getListOfAllBooks(borrowBookChooseBookStartResult);
+		long amountOfResults = booksList.size();
 
+		// Get showMoreLinkValue, resultRange and showLessLinkValue
 		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
 		long showMoreLinkValue = searchEngineUtils.generateShowMoreLinkValue(borrowBookChooseBookStartResult,
 				amountOfResults, searchResultLimit);
@@ -222,8 +407,9 @@ public class BorrowBookController {
 		long showLessLinkValue = searchEngineUtils.generateShowLessLinkValue(borrowBookChooseBookStartResult,
 				searchResultLimit);
 
-		theModel.addAttribute("borrowBookChooseBookStartResult", borrowBookChooseBookStartResult);
+		// Get the list of the reservation
 		session.setAttribute("borrowBookChooseBookStartResult", borrowBookChooseBookStartResult);
+		theModel.addAttribute("borrowBookChooseBookStartResult", borrowBookChooseBookStartResult);
 		theModel.addAttribute("showMoreLinkValue", showMoreLinkValue);
 		theModel.addAttribute("showLessLinkValue", showLessLinkValue);
 		theModel.addAttribute("resultRange", resultRange);
@@ -241,28 +427,61 @@ public class BorrowBookController {
 		return "borrow-book-choose-books";
 	}
 
+	/**
+	 * Cleans the search parameters and redirects to the view of
+	 * "borrow-book-choose-books".
+	 * 
+	 * @param request
+	 *            The HttpServletRequest containing the HttpSession
+	 * @return The String representing the name of the view
+	 */
 	@RequestMapping("/clearBookSearchParameters")
 	public String clearBookSearchParameters(HttpServletRequest request) {
 
+		// Get user's session and check whether the user is permitted to see this view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
+		// Clear search parameters
 		String[] searchParametersName = { "borrowBookChooseBookStartResult", "title", "id", "author" };
 		searchEngineUtils.clearSearchParameters(session, searchParametersName);
 
 		return "redirect:/borrow-book/borrow-book-choose-books";
 	}
 
+	/**
+	 * Adds the book with given id to the list and redirects to the view of
+	 * "borrow-book-choose-books" with redirect attributes:<br>
+	 * <ul>
+	 * <li>systemMessage- The one of the system messages</li>
+	 * <li>errorMessage- The one of the system messages</li>
+	 * </ul>
+	 * 
+	 * @param bookId
+	 *            The int containing the id of the boos
+	 * @param isAbleToBorrow
+	 *            The boolean containing the status determines whether the user is
+	 *            able to borrow more books
+	 * @param request
+	 *            The HttpServletRequest containing the HttpSession
+	 * @param redirectAttributes
+	 *            The RedirectAttributes containing the system messages
+	 * @param locale
+	 *            The Locale containing the user's locale
+	 * @return The String representing the name of the view
+	 */
 	@RequestMapping("/addBookToList")
 	public String addBookToList(@RequestParam("bookId") int bookId,
 			@RequestParam("isAbleToBorrow") boolean isAbleToBorrow, HttpServletRequest request,
 			RedirectAttributes redirectAttributes, Locale locale) {
 
+		// Get user's session and check whether the user is permitted to see this view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
+		// Add the book with given id to the list if the user is able to borrow
 		if (isAbleToBorrow) {
 			String systemMessage = bookService.addBookToList(session, bookId, locale);
 			redirectAttributes.addAttribute("systemMessage", systemMessage);
@@ -274,15 +493,38 @@ public class BorrowBookController {
 
 	}
 
+	/**
+	 * Adds the reserved book to the list and redirects to the view of
+	 * "borrow-book-choose-books" with redirect attributes:<br>
+	 * <ul>
+	 * <li>systemMessage- The one of the system messages</li>
+	 * <li>errorMessage- The one of the system messages</li>
+	 * </ul>
+	 * 
+	 * @param reservationId
+	 *            The int containing the id of the reservation
+	 * @param isAbleToBorrow
+	 *            The boolean containing the status determines whether the user is
+	 *            able to borrow more books
+	 * @param request
+	 *            The HttpServletRequest containing the HttpSession
+	 * @param redirectAttributes
+	 *            The RedirectAttributes containing the system messages
+	 * @param locale
+	 *            The Locale containing the user's locale
+	 * @return The String representing the name of the view
+	 */
 	@RequestMapping("/addReservedBookToList")
 	public String addReservedBookToList(@RequestParam("reservationId") int reservationId,
 			@RequestParam("isAbleToBorrow") boolean isAbleToBorrow, HttpServletRequest request,
 			RedirectAttributes redirectAttributes, Locale locale) {
 
+		// Get user's session and check whether the user is permitted to see this view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
+		// Add the reserved book to the list if user is able to borrow
 		if (isAbleToBorrow) {
 			String errorMessage = bookService.addReservedBookToList(session, reservationId, locale);
 			redirectAttributes.addAttribute("errorMessage", errorMessage);
@@ -294,14 +536,33 @@ public class BorrowBookController {
 
 	}
 
+	/**
+	 * Deletes the book from the list and redirects to the view of
+	 * "borrow-book-choose-books" with redirect attributes:<br>
+	 * <ul>
+	 * <li>systemMessage- The one of the system messages</li>
+	 * </ul>
+	 * 
+	 * @param bookId
+	 *            The int containing the id of the book
+	 * @param request
+	 *            The HttpServletRequest containing the HttpSession
+	 * @param redirectAttributes
+	 *            The RedirectAttributes containing the system messages
+	 * @param locale
+	 *            The Locale containing the user's locale
+	 * @return The String representing the name of the view
+	 */
 	@RequestMapping("/deleteBookFromList")
 	public String deleteBookFromList(@RequestParam("bookId") int bookId, HttpServletRequest request,
 			RedirectAttributes redirectAttributes, Locale locale) {
 
+		// Get user's session and check whether the user is permitted to see this view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
+		// Remove the book from the list
 		bookService.deleteBookFromList(session, bookId);
 		redirectAttributes.addAttribute("systemMessage", env
 				.getProperty(locale.getLanguage() + ".controller.BorrowBookController.deleteBookFromList.success.1"));
@@ -309,24 +570,46 @@ public class BorrowBookController {
 		return "redirect:/borrow-book/borrow-book-choose-books";
 	}
 
+	/**
+	 * Returns the view of "borrow-book-confirmation" with model attributes:<br>
+	 * <ul>
+	 * <li>borrowedBookInfo - The information displayed on the web page</li>
+	 * <li>systemMessage- The one of the system messages</li>
+	 * </ul>
+	 * 
+	 * @param request
+	 *            The HttpServletRequest containing the HttpSession
+	 * @param redirectAttributes
+	 *            The RedirectAttributes containing the system messages
+	 * @param theModel
+	 *            The Model containing the data passed to the view
+	 * @param locale
+	 *            The Locale containing the user's locale
+	 * @return The String representing the name of the view
+	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping("/borrow-books")
 	public String borrowBooks(HttpServletRequest request, RedirectAttributes redirectAttributes, Model theModel,
 			Locale locale) {
 
+		// Get user's session and check whether the user is permitted to see this view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		@SuppressWarnings("unchecked")
+		// Get the list of Books from the session
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
 
+		// Check the size of the list. If it smaller then 1 return the system error
+		// message
 		if (tempBookList.size() < 1) {
 			redirectAttributes.addAttribute("systemMessage",
 					env.getProperty(locale.getLanguage() + ".controller.BorrowBookController.borrowBooks.error.1"));
 			return "redirect:/borrow-book/borrow-book-choose-books";
 		}
-
 		String borrowedBookInfo = bookService.borrowBooks(session);
+
+		// Get the list of the reservation
 		theModel.addAttribute("systemMessage",
 				env.getProperty(locale.getLanguage() + ".controller.BorrowBookController.borrowBooks.success.1"));
 		theModel.addAttribute("borrowedBookInfo", borrowedBookInfo);
@@ -337,6 +620,17 @@ public class BorrowBookController {
 
 	}
 
+	/**
+	 * Returns the confirmation as a PDF File
+	 * 
+	 * @param borrowedBookInfo
+	 *            The String containing the information about borrowed books
+	 * @param request
+	 *            The HttpServletRequest containing the HttpSession
+	 * @return The String representing the name of the view
+	 * @throws FileNotFoundException
+	 *             A FileNotFoundException is thrown then the file can not be found.
+	 */
 	@RequestMapping("/generate-borrowed-book-confirmation")
 	public ResponseEntity<InputStreamResource> generateBorrowedBookConfirmation(
 			@RequestParam("borrowedBookInfo") String borrowedBookInfo, HttpServletRequest request)
@@ -347,16 +641,17 @@ public class BorrowBookController {
 		int bookId;
 		StringTokenizer st = new StringTokenizer(borrowedBookInfo);
 		List<Book> bookList = new ArrayList<>();
-		User tempUser = userService.getUser(Integer.valueOf(st.nextToken()));
+		User tempUser = userService.getUserById(Integer.valueOf(st.nextToken()));
 
 		while (st.hasMoreTokens()) {
 			bookId = Integer.parseInt(st.nextToken());
-			bookList.add(bookService.getBook(bookId));
+			bookList.add(bookService.getBookById(bookId));
 		}
 
 		Date expectedEndDate = bookService.getExpectedEndDate(tempUser, bookList.get(0));
 		String employeeName = session.getAttribute("userLastName") + " " + session.getAttribute("userFirstName");
-		File tempFile = pdfService.generateBorrowedBookConfirmation(bookList, tempUser, expectedEndDate, employeeName);
+		File tempFile = pdfService.generateConfirmationForBorrowedBook(bookList, tempUser, expectedEndDate,
+				employeeName);
 
 		HttpHeaders responseHeaders = new HttpHeaders();
 		responseHeaders.setContentType(MediaType.APPLICATION_PDF);
@@ -367,15 +662,26 @@ public class BorrowBookController {
 		return new ResponseEntity<InputStreamResource>(isr, responseHeaders, HttpStatus.OK);
 	}
 
+	/**
+	 * Clears search parameters and session attribute "isUserAbleToBorrow" and
+	 * redirects to the view of "main"
+	 * 
+	 * @param request
+	 *            The HttpServletRequest containing the HttpSession
+	 * @return The String representing the name of the view
+	 */
 	@RequestMapping("/cancel-borrowed-book")
 	public String cancelBorrowedBook(HttpServletRequest request) {
 
+		// Get user's session and check whether the user is permitted to see this view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
+		// Set session attribute isUserAbleToBorrow to FALSE
 		session.setAttribute("isUserAbleToBorrow", false);
 
+		// Clear search parameters
 		String[] searchParametersName = { "borrowBookSelectedUserId", "borrowBookFirstName", "borrowBookLastName",
 				"borrowBookEmail", "borrowBookPesel", "borrowBookStartResult", "borrowBookStartResult", "tempBookList",
 				"borrowBookChooseBookStartResult", "title", "id", "author" };

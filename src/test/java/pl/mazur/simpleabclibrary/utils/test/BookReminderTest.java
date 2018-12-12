@@ -7,12 +7,25 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import pl.mazur.simpleabclibrary.service.BookService;
+import pl.mazur.simpleabclibrary.service.MessageService;
+import pl.mazur.simpleabclibrary.service.UserService;
 import pl.mazur.simpleabclibrary.utils.BookReminder;
 
 class BookReminderTest {
 
-	BookReminder bookReminder = new BookReminder();
+	@Autowired
+	private BookService bookService;
+
+	@Autowired
+	private MessageService messageService;
+
+	@Autowired
+	private UserService userService;
+
+	BookReminder bookReminder = new BookReminder(bookService, messageService, userService);
 
 	@Test
 	void shouldReturnTrueIfBorrowedBookIsExpiredTest1() {

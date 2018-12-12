@@ -5,11 +5,16 @@ import org.springframework.stereotype.Component;
 import pl.mazur.simpleabclibrary.entity.LoggedInUser;
 import pl.mazur.simpleabclibrary.entity.User;
 
+/**
+ * Utility class used to controlling the access level of the user
+ * @author Marcin
+ *
+ */
 @Component
 public class AccessLevelControlImpl implements AccessLevelControl {
 
 	@Override
-	public boolean loginCheck(Integer userId) {
+	public boolean isIdNotNull(Integer userId) {
 
 		if (userId != null)
 			return true;
@@ -63,9 +68,9 @@ public class AccessLevelControlImpl implements AccessLevelControl {
 	@Override
 	public String getUserAccessLevel(User tempUser) {
 
-		if (tempUser.isAdmin())
+		if (tempUser.getIsAdmin())
 			return "Administrator";
-		else if (!tempUser.isAdmin() && tempUser.isEmployee())
+		else if (!tempUser.getIsAdmin() && tempUser.getIsEmployee())
 			return "Employee";
 		else
 			return "Customer";
@@ -76,7 +81,7 @@ public class AccessLevelControlImpl implements AccessLevelControl {
 		
 		if(loggedInUser==null)
 			return false;
-		if (isCustomer(loggedInUser.getUserAccessLevel()) && loginCheck(loggedInUser.getUserId()))
+		if (isCustomer(loggedInUser.getUserAccessLevel()) && isIdNotNull(loggedInUser.getUserId()))
 			return true;
 		else
 			return false;
@@ -86,7 +91,7 @@ public class AccessLevelControlImpl implements AccessLevelControl {
 	public boolean isEmployee(LoggedInUser loggedInUser) {
 		if(loggedInUser==null)
 			return false;
-		if (isEmployee(loggedInUser.getUserAccessLevel()) && loginCheck(loggedInUser.getUserId()))
+		if (isEmployee(loggedInUser.getUserAccessLevel()) && isIdNotNull(loggedInUser.getUserId()))
 			return true;
 		else
 			return false;
@@ -96,7 +101,7 @@ public class AccessLevelControlImpl implements AccessLevelControl {
 	public boolean isAdmin(LoggedInUser loggedInUser) {
 		if(loggedInUser==null)
 			return false;
-		if (isAdmin(loggedInUser.getUserAccessLevel()) && loginCheck(loggedInUser.getUserId()))
+		if (isAdmin(loggedInUser.getUserAccessLevel()) && isIdNotNull(loggedInUser.getUserId()))
 			return true;
 		else
 			return false;

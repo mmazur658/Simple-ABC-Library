@@ -7,12 +7,26 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import pl.mazur.simpleabclibrary.service.MessageService;
+import pl.mazur.simpleabclibrary.service.ReservationService;
+import pl.mazur.simpleabclibrary.service.UserService;
 import pl.mazur.simpleabclibrary.utils.ReservationControl;
 
 class ReservationControlTest {
 
-	ReservationControl reservationControl = new ReservationControl();
+	@Autowired
+	private MessageService messageService;
+
+	@Autowired
+	private UserService userService;
+
+	@Autowired
+	private ReservationService reservationService;
+
+	ReservationControl reservationControl = new ReservationControl(messageService, userService, reservationService);
+
 	Calendar theCal = Calendar.getInstance();
 
 	@Test
@@ -26,10 +40,9 @@ class ReservationControlTest {
 
 	@Test
 	void shouldReturnFalseIfReservationIsNotExpired() {
-		
+
 		theCal.add(Calendar.DATE, -1);
-		Date theDate = theCal.getTime()
-				;
+		Date theDate = theCal.getTime();
 		assertFalse(reservationControl.isReservationExpired(theDate));
 	}
 

@@ -1,0 +1,9 @@
+pl.mazur.simpleabclibrary.controller
+pl.mazur.simpleabclibrary.dao
+pl.mazur.simpleabclibrary.entity
+pl.mazur.simpleabclibrary.service
+pl.mazur.simpleabclibrary.service.utils
+pl.mazur.simpleabclibrary.service.utils.test
+pl.mazur.simpleabclibrary.utils
+pl.mazur.simpleabclibrary.utils.pdf
+pl.mazur.simpleabclibrary.utils.test

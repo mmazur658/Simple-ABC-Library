@@ -12,16 +12,29 @@ import org.krysalis.barcode4j.impl.code39.Code39Bean;
 import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 import org.krysalis.barcode4j.tools.UnitConv;
 
+/**
+ * Helper class used to generate bar codes.
+ * 
+ * @author Marcin Mazur
+ *
+ */
 public class BarcodeGenerator {
 
+	/**
+	 * Generates the bar code for given value
+	 * 
+	 * @param barcodeValue
+	 *            The String containing the value
+	 * @return A byte[] representing the generated bar code
+	 */
 	public static byte[] generateBarcode(String barcodeValue) {
 
-		final int dpi = 60; 
+		final int dpi = 60;
 		Code39Bean code39Bean = new Code39Bean();
-		code39Bean.setModuleWidth(UnitConv.in2mm(2.0f / dpi)); // width of barcode
+		code39Bean.setModuleWidth(UnitConv.in2mm(2.0f / dpi)); // width of the bar code
 		code39Bean.setWideFactor(3);
 		code39Bean.doQuietZone(false);
-		code39Bean.setMsgPosition(HumanReadablePlacement.HRP_NONE); // no desc under the barcode
+		code39Bean.setMsgPosition(HumanReadablePlacement.HRP_NONE); // no description under the bar code
 		File tempFile = null;
 		try {
 			tempFile = File.createTempFile("barcode", ".png");

@@ -34,6 +34,12 @@ import com.opensymphony.xwork2.util.ClassLoaderUtil;
 import pl.mazur.simpleabclibrary.entity.Book;
 import pl.mazur.simpleabclibrary.entity.User;
 
+/**
+ * Utility class used to generate PDF files containing confirmations.
+ * 
+ * @author Marcin
+ *
+ */
 @Component
 public class PdfDocumentGeneratorImpl implements PdfDocumentGenerator {
 

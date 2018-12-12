@@ -19,7 +19,7 @@ class LoginAndAccessLevelCheckImplTest {
 		
 		userId = new Integer("5");
 		
-		assertTrue(loginAndAccessLevelCheckImpl.loginCheck(userId));
+		assertTrue(loginAndAccessLevelCheckImpl.isIdNotNull(userId));
 	}
 
 	@Test
@@ -27,7 +27,7 @@ class LoginAndAccessLevelCheckImplTest {
 		
 		userId = null;
 		
-		assertFalse(loginAndAccessLevelCheckImpl.loginCheck(userId));
+		assertFalse(loginAndAccessLevelCheckImpl.isIdNotNull(userId));
 	}
 
 	@Test

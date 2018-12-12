@@ -1,8 +1,5 @@
 package pl.mazur.simpleabclibrary.service.utils.test;
 
-import static org.junit.Assert.assertFalse;
-
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
@@ -11,7 +8,7 @@ import org.springframework.core.env.Environment;
 
 import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.service.utils.UserServiceUtilsImpl;
-import pl.mazur.simpleabclibrary.utils.PasswordUtilImpl;
+import pl.mazur.simpleabclibrary.utils.PasswordUtilsImpl;
 import pl.mazur.simpleabclibrary.utils.PasswordUtils;
 import pl.mazur.simpleabclibrary.utils.PeselValidator;
 import pl.mazur.simpleabclibrary.utils.PeselValidatorImpl;
@@ -19,7 +16,7 @@ import pl.mazur.simpleabclibrary.utils.PeselValidatorImpl;
 @PropertySource("classpath:messages.properties")
 class UserServiceUtilsImplTest {
 
-	private PasswordUtils passwordUtils = new PasswordUtilImpl();
+	private PasswordUtils passwordUtils = new PasswordUtilsImpl();
 	private Environment env;
 	private PeselValidator peselValidator = new PeselValidatorImpl();
 	private UserServiceUtilsImpl userServiceUtilsImpl = new UserServiceUtilsImpl(passwordUtils, peselValidator, env);
@@ -33,15 +30,15 @@ class UserServiceUtilsImplTest {
 		expectedUser.setPassword("Admin123");
 
 		tempUser = new User();
-		tempUser.setActive(true);
-		tempUser.setAdmin(false);
-		tempUser.setEmployee(false);
+		tempUser.setIsActive(true);
+		tempUser.setIsAdmin(false);
+		tempUser.setIsEmployee(false);
 
 		userServiceUtilsImpl.setAdditionalUserData(expectedUser);
 
-		assertEquals(tempUser.isActive(), expectedUser.isActive());
-		assertEquals(tempUser.isAdmin(), expectedUser.isAdmin());
-		assertEquals(tempUser.isEmployee(), expectedUser.isEmployee());
+		assertEquals(tempUser.getIsActive(), expectedUser.getIsActive());
+		assertEquals(tempUser.getIsAdmin(), expectedUser.getIsAdmin());
+		assertEquals(tempUser.getIsEmployee(), expectedUser.getIsEmployee());
 
 	}
 

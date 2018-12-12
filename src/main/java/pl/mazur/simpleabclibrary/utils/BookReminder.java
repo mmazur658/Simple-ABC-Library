@@ -16,19 +16,61 @@ import pl.mazur.simpleabclibrary.service.BookService;
 import pl.mazur.simpleabclibrary.service.MessageService;
 import pl.mazur.simpleabclibrary.service.UserService;
 
+/**
+ * Utility class used to managing reminders.
+ * 
+ * @author Marcin Mazur
+ *
+ */
 @Component
 @EnableScheduling
 public class BookReminder {
 
-	@Autowired
-	BookService bookService;
+	/**
+	 * The BookServiceinterface
+	 */
+	private BookService bookService;
 
-	@Autowired
-	MessageService messageService;
+	/**
+	 * The MessageService interface
+	 */
+	private MessageService messageService;
 
-	@Autowired
-	UserService userService;
+	/**
+	 * The UserService interface
+	 */
+	private UserService userService;
 
+	/**
+	 * Constructs a BookReminder with the BookService, MessageService and
+	 * UserService.
+	 * 
+	 * @param bookService
+	 *            The BookServiceinterface
+	 * @param messageService
+	 *            The MessageService interface
+	 * @param userService
+	 *            The UserService interface
+	 */
+	@Autowired
+	public BookReminder(BookService bookService, MessageService messageService, UserService userService) {
+		this.bookService = bookService;
+		this.messageService = messageService;
+		this.userService = userService;
+	}
+
+	/**
+	 * Creates and saves a Message with given parameters.
+	 * 
+	 * @param theUser
+	 *            The User containing the recipient
+	 * @param bookTitle
+	 *            The String containing the title of the book
+	 * @param hourLimit
+	 *            The int containing the number of hours
+	 * @param expectedEndDate
+	 *            The Date containing the expected end date
+	 */
 	public void createAndSendNewMessage(User theUser, String bookTitle, int hourLimit, Date expectedEndDate) {
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -37,7 +79,7 @@ public class BookReminder {
 		theMessage.setRecipient(theUser);
 		theMessage.setRecipientIsActive(true);
 		theMessage.setRecipientIsRead(false);
-		theMessage.setSender(userService.getUser(1));
+		theMessage.setSender(userService.getUserById(1));
 		theMessage.setSenderIsActive(false);
 		theMessage.setSenderIsRead(true);
 		theMessage.setStartDate(new Date());
@@ -52,6 +94,16 @@ public class BookReminder {
 		messageService.sendMessage(theMessage);
 	}
 
+	/**
+	 * Returns TRUE if the expected end date plus given number of hours is smaller
+	 * then present time and bigger then present time minus 1 hour.
+	 * 
+	 * @param getExpectedEndDate
+	 *            The Date containing the expected end date
+	 * @param hourLimit
+	 *            The int containing the number of hours
+	 * @return A boolean representing the result
+	 */
 	public boolean isBorrowedBookExpired(Date getExpectedEndDate, int hourLimit) {
 
 		Long currentTimeMillis = System.currentTimeMillis();
@@ -71,13 +123,18 @@ public class BookReminder {
 			return false;
 	}
 
-	@Scheduled(fixedRate = 1000 * 60 * 60) // 1 hour
+	/**
+	 * Gets the list of all borrowed books and check if they should be returned in
+	 * the next 24 hours.
+	 */
+	@Scheduled(fixedRate = 1000 * 60 * 60)
 	public void twentyFourHoursToReturnBookReminder() {// 24h
 
-		List<BorrowedBook> borrowedBookList = bookService.getAllBorrowedBookList();
+		// Get the list of all borrowed book
+		List<BorrowedBook> borrowedBookList = bookService.getListOfAllBorrowedBooks();
 
+		// Check if the expected end date is bigger then (present date + 24 hours)
 		for (BorrowedBook borrowedBook : borrowedBookList) {
-
 			if (isBorrowedBookExpired(borrowedBook.getExpectedEndDate(), 24))
 				createAndSendNewMessage(borrowedBook.getUser(), borrowedBook.getBook().getTitle(), 24,
 						borrowedBook.getExpectedEndDate());
@@ -85,13 +142,18 @@ public class BookReminder {
 		}
 	}
 
+	/**
+	 * Gets the list of all borrowed books and check if they should be returned in
+	 * the next 6 hours.
+	 */
 	@Scheduled(fixedRate = 1000 * 60 * 60) // 1 hour
 	public void sixHoursToReturnBookReminder() { // 6h
 
-		List<BorrowedBook> borrowedBookList = bookService.getAllBorrowedBookList();
+		// Get the list of all borrowed book
+		List<BorrowedBook> borrowedBookList = bookService.getListOfAllBorrowedBooks();
 
+		// Check if the expected end date is bigger then (present date + 6 hours)
 		for (BorrowedBook borrowedBook : borrowedBookList) {
-
 			if (isBorrowedBookExpired(borrowedBook.getExpectedEndDate(), 6)) {
 				createAndSendNewMessage(borrowedBook.getUser(), borrowedBook.getBook().getTitle(), 6,
 						borrowedBook.getExpectedEndDate());
@@ -100,11 +162,17 @@ public class BookReminder {
 		}
 	}
 
+	/**
+	 * Gets the list of all borrowed books and check if they should be returned
+	 * immediately.
+	 */
 	@Scheduled(fixedRate = 1000 * 60 * 60 * 24)
 	public void expiredBookReminder() {
 
-		List<BorrowedBook> borrowedBookList = bookService.getAllBorrowedBookList();
+		// Get the list of all borrowed book
+		List<BorrowedBook> borrowedBookList = bookService.getListOfAllBorrowedBooks();
 
+		// Check if the expected end date is bigger then present date
 		for (BorrowedBook borrowedBook : borrowedBookList) {
 			if (isBorrowedBookExpired(borrowedBook.getExpectedEndDate(), 0)) {
 				createAndSendNewMessage(borrowedBook.getUser(), borrowedBook.getBook().getTitle(), 0,

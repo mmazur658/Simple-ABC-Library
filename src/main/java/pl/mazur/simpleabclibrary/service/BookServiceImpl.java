@@ -20,43 +20,91 @@ import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.service.utils.BookServiceUtils;
 import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 
+/**
+ * Service class for managing Book and BorrowedBook objects.
+ * 
+ * @author Marcin Mazur
+ *
+ */
 @Service
 @PropertySource("classpath:systemMessages.properties")
 public class BookServiceImpl implements BookService {
 
-	@Autowired
+	/**
+	 * The BookDAO interface
+	 */
 	private BookDAO bookDAO;
 
-	@Autowired
+	/**
+	 * The Environment interface
+	 */
 	private Environment env;
 
-	@Autowired
+	/**
+	 * The ReservationService interface
+	 */
 	private ReservationService reservationService;
 
-	@Autowired
+	/**
+	 * The UserService interface
+	 */
 	private UserService userService;
 
-	@Autowired
+	/**
+	 * The SearchEngineUtils interface
+	 */
 	private SearchEngineUtils searchEngineUtils;
 
-	@Autowired
+	/**
+	 * The BookServiceUtils interface
+	 */
 	private BookServiceUtils bookServiceUtils;
 
-	@Override
-	@Transactional
-	public List<Book> getAllBooks(int startResult) {
-		return bookDAO.getAllBooks(startResult);
+	/**
+	 * Constructs a BookServiceImpl with the BookDAO, Environment,
+	 * ReservationService, UserService, SearchEngineUtils and BookServiceUtils.
+	 * 
+	 * @param bookDAO
+	 *            The BookDAO interface
+	 * @param env
+	 *            The Environment interface
+	 * @param reservationService
+	 *            The ReservationService interface
+	 * @param userService
+	 *            The UserService interface
+	 * @param searchEngineUtils
+	 *            The SearchEngineUtils interface
+	 * @param bookServiceUtils
+	 *            The BookServiceUtils interface
+	 */
+	@Autowired
+	public BookServiceImpl(BookDAO bookDAO, Environment env, ReservationService reservationService,
+			UserService userService, SearchEngineUtils searchEngineUtils, BookServiceUtils bookServiceUtils) {
+
+		this.bookDAO = bookDAO;
+		this.env = env;
+		this.reservationService = reservationService;
+		this.userService = userService;
+		this.searchEngineUtils = searchEngineUtils;
+		this.bookServiceUtils = bookServiceUtils;
+
 	}
 
 	@Override
 	@Transactional
-	public List<Book> bookSearchResult(String[] searchParameters, int startResult) {
+	public List<Book> getListOfAllBooks(int startResult) {
+		return bookDAO.getListOfBooks(null, startResult);
+	}
+
+	@Override
+	@Transactional
+	public List<Book> getListOfBooksForGivenSearchParams(String[] searchParameters, int startResult) {
 
 		String searchType = "from Book where ";
 		String[] fieldsName = { "title", "author", "publisher", "isbn", "id" };
 		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(searchParameters, searchType, fieldsName);
 
-		return bookDAO.bookSearchResult(hql, startResult);
+		return bookDAO.getListOfBooks(hql, startResult);
 	}
 
 	@Override
@@ -69,14 +117,14 @@ public class BookServiceImpl implements BookService {
 
 	@Override
 	@Transactional
-	public Book getBook(int bookId) {
-		return bookDAO.getBook(bookId);
+	public Book getBookById(int bookId) {
+		return bookDAO.getBookById(bookId);
 	}
 
 	@Override
 	@Transactional
 	public void updateBook(Book book) {
-		Book tempBook = getBook(book.getId());
+		Book tempBook = getBookById(book.getId());
 		bookServiceUtils.prepareBookToUpdate(tempBook, book);
 
 	}
@@ -85,7 +133,7 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	public void deleteBook(Book tempBook) {
 		tempBook.setIsActive(false);
-		bookDAO.deleteBook(tempBook);
+		bookDAO.updateBook(tempBook);
 	}
 
 	@Override
@@ -94,13 +142,13 @@ public class BookServiceImpl implements BookService {
 
 		BorrowedBook borrowedBook = bookServiceUtils.createBorrowedBook(tempBook, tempUser);
 		bookDAO.updateBook(tempBook);
-		bookDAO.borrowBook(borrowedBook);
+		bookDAO.saveBorrowedBook(borrowedBook);
 	}
 
 	@Override
 	@Transactional
-	public List<BorrowedBook> getUserBorrowedBookList(int userId) {
-		return bookDAO.getUserBorrowedBookList(userId);
+	public List<BorrowedBook> getListOfBorrowedBooksByUserId(int userId) {
+		return bookDAO.getListOfBorrowedBookByUserId(userId);
 	}
 
 	@Override
@@ -113,56 +161,48 @@ public class BookServiceImpl implements BookService {
 	@Override
 	@Transactional
 	public void closeBorrowedBook(Book book) {
-		bookDAO.closeBorrowedBook(book);
+
+		BorrowedBook borrowedBook = bookDAO.getBorrowedBookByBookId(book.getId());
+		borrowedBook.setStopDate(new Date());
+
 	}
 
 	@Override
 	@Transactional
-	public BorrowedBook getBorrowedBook(int borrowedBookId) {
-		return bookDAO.getBorrowedBook(borrowedBookId);
+	public BorrowedBook getBorrowedBookById(int borrowedBookId) {
+		return bookDAO.getBorrowedBookById(borrowedBookId);
 	}
 
 	@Override
 	@Transactional
-	public Date getExpectedEndDate(User tempUser, Book book) {
-		return bookDAO.getExpectedEndDate(tempUser, book);
+	public Date getExpectedEndDate(User user, Book book) {
+
+		BorrowedBook borrowedBook = bookDAO.getBorrowedBookByBookIdAndUserId(book.getId(), user.getId());
+		return borrowedBook.getExpectedEndDate();
 	}
 
 	@Override
 	@Transactional
-	public long getAmountOfSearchResult(String[] searchParameters) {
-
-		String searchType = "select count(*) from Book where ";
-		String[] fieldsName = { "title", "author", "publisher", "isbn", "id" };
-		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(searchParameters, searchType, fieldsName);
-
-		return bookDAO.getAmountOfSearchResult(hql);
-	}
-
-	@Override
-	@Transactional
-	public long getAmountOfAllBooks() {
-		return bookDAO.getAmountOfAllBooks();
-	}
-
-	@Override
-	@Transactional
-	public List<BorrowedBook> getAllBorrowedBookList() {
-		return bookDAO.getAllBorrowedBookList();
+	public List<BorrowedBook> getListOfAllBorrowedBooks() {
+		return bookDAO.getListOfAllBorrowedBook();
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void addAllBorrowedBookToLiest(HttpSession session) {
+	public void addAllBorrowedBookToList(HttpSession session) {
 
+		// Get the lists from the session
 		List<BorrowedBook> userBorrowedBooksList = (List<BorrowedBook>) session.getAttribute("userBorrowedBooksList");
 		List<Book> tempReturnedBookList = (List<Book>) session.getAttribute("tempReturnedBookList");
 
+		// Add all books from userBorrowedBooksList to tempReturnedBookList, then clear
+		// userBorrowedBooksList
 		for (int index = 0; index < userBorrowedBooksList.size(); index++) {
 			tempReturnedBookList.add(userBorrowedBooksList.get(index).getBook());
 		}
 		userBorrowedBooksList.clear();
 
+		// Set the new lists as a session attribute
 		session.setAttribute("tempReturnedBookList", tempReturnedBookList);
 		session.setAttribute("userBorrowedBooksList", userBorrowedBooksList);
 
@@ -172,9 +212,11 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public void addReturnedBookToList(HttpSession session, int bookId) {
 
+		// Get the lists from the session
 		List<BorrowedBook> userBorrowedBooksList = (List<BorrowedBook>) session.getAttribute("userBorrowedBooksList");
 		List<Book> tempReturnedBookList = (List<Book>) session.getAttribute("tempReturnedBookList");
 
+		// Add a book to tempReturnedBookList and remove it form userBorrowedBooksList.
 		for (int index = 0; index < userBorrowedBooksList.size(); index++) {
 			if (userBorrowedBooksList.get(index).getBook().getId() == bookId) {
 				tempReturnedBookList.add(userBorrowedBooksList.get(index).getBook());
@@ -182,6 +224,8 @@ public class BookServiceImpl implements BookService {
 				break;
 			}
 		}
+
+		// Set the new lists as a session attribute
 		session.setAttribute("tempReturnedBookList", tempReturnedBookList);
 		session.setAttribute("userBorrowedBooksList", userBorrowedBooksList);
 
@@ -192,16 +236,20 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	public void deleteReturnedBookFromList(HttpSession session, int bookId) {
 
+		// Get the lists from the session
 		List<BorrowedBook> userBorrowedBooksList = (List<BorrowedBook>) session.getAttribute("userBorrowedBooksList");
 		List<Book> tempReturnedBookList = (List<Book>) session.getAttribute("tempReturnedBookList");
 
+		// Find the book with given id and remove it from the tempReturnedBookList
 		for (int index = 0; index < tempReturnedBookList.size(); index++) {
 			if (tempReturnedBookList.get(index).getId() == bookId) {
 				tempReturnedBookList.remove(index);
-				userBorrowedBooksList.add(bookDAO.getBorrowedBook(bookId));
+				userBorrowedBooksList.add(bookDAO.getBorrowedBookById(bookId));
 				break;
 			}
 		}
+
+		// Set the new lists as a session attribute
 		session.setAttribute("tempReturnedBookList", tempReturnedBookList);
 		session.setAttribute("userBorrowedBooksList", userBorrowedBooksList);
 	}
@@ -211,12 +259,13 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	public String returnBooks(HttpSession session) {
 
+		// Get the list from the session
 		List<Book> tempReturnedBookList = (List<Book>) session.getAttribute("tempReturnedBookList");
 
+		// Build the message
 		StringBuilder sb = new StringBuilder();
 		sb.append((int) session.getAttribute("selectedUserId"));
 		sb.append(" ");
-
 		for (Book book : tempReturnedBookList) {
 			book.setIsAvailable(true);
 			returnBook(book);
@@ -224,6 +273,7 @@ public class BookServiceImpl implements BookService {
 			sb.append(book.getId());
 			sb.append(" ");
 		}
+
 		return sb.toString();
 	}
 
@@ -231,7 +281,10 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public void deleteBookFromList(HttpSession session, int bookId) {
 
+		// Get the list from the session
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
+
+		// Find the book with given id and remove it from the tempBookList
 		for (int index = 0; index < tempBookList.size(); index++) {
 			if (tempBookList.get(index).getId() == bookId) {
 				tempBookList.remove(index);
@@ -245,8 +298,11 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	public String addBookToList(HttpSession session, int bookId, Locale locale) {
 
+		// Get the list from the session
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
-		Book theBook = bookDAO.getBook(bookId);
+
+		// Get the Book with given id and check if the book is already on the list
+		Book theBook = bookDAO.getBookById(bookId);
 		boolean isAllreadyOnTheList = false;
 
 		for (Book tempBook : tempBookList) {
@@ -254,8 +310,12 @@ public class BookServiceImpl implements BookService {
 				isAllreadyOnTheList = true;
 		}
 
+		// Return a message informing that the book is already on the list.
 		if (isAllreadyOnTheList)
 			return env.getProperty(locale.getLanguage() + ".service.BookServiceImpl.addBookToList.error.1");
+
+		// Add book to the list, set new lists as a session attribute and return a
+		// message informing that the book has been added to the list.
 		else {
 			tempBookList.add(theBook);
 			session.setAttribute("tempBookList", tempBookList);
@@ -267,18 +327,26 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public String addReservedBookToList(HttpSession session, int reservationId, Locale locale) {
 
+		// Get the list from the session
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
-		Reservation reservation = reservationService.getReservation(reservationId);
-		Book theBook = reservation.getBook();
 
+		// Get the Reservation
+		Reservation reservation = reservationService.getReservationById(reservationId);
+
+		// Get the Book with given id and check if the book is already on the list
+		Book theBook = reservation.getBook();
 		boolean isAllreadyOnTheList = false;
 		for (Book tempBook : tempBookList) {
 			if (tempBook.getId() == theBook.getId())
 				isAllreadyOnTheList = true;
 		}
-
+		// Return a message informing that the book is already on the list
 		if (isAllreadyOnTheList) {
 			return env.getProperty(locale.getLanguage() + ".service.BookServiceImpl.addReservedBookToList.error.1");
+
+			// Delete the Reservation, add book to the list, set new lists as a session
+			// attribute and return a message informing that the book has been added to the
+			// list.
 		} else {
 			reservationService.deleteReservationInOrderToCreateBorrowedBook(reservation);
 			tempBookList.add(theBook);
@@ -292,10 +360,12 @@ public class BookServiceImpl implements BookService {
 	@Transactional
 	public String borrowBooks(HttpSession session) {
 
-		User tempUser = userService.getUser(Integer.valueOf((String) session.getAttribute("selectedUserId")));
+		// Get the list from the session
 		List<Book> tempBookList = (List<Book>) session.getAttribute("tempBookList");
-		StringBuilder sb = new StringBuilder();
 
+		// Get the user with given id and build a message
+		User tempUser = userService.getUserById(Integer.valueOf((String) session.getAttribute("selectedUserId")));
+		StringBuilder sb = new StringBuilder();
 		sb.append(tempUser.getId());
 		sb.append(" ");
 

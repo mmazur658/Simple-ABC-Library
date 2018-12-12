@@ -9,6 +9,12 @@ import pl.mazur.simpleabclibrary.entity.Book;
 import pl.mazur.simpleabclibrary.entity.BorrowedBook;
 import pl.mazur.simpleabclibrary.entity.User;
 
+/**
+ * Utility class used to perform operations for book service classes.
+ * 
+ * @author Marcin Mazur
+ *
+ */
 @Component
 public class BookServiceUtilsImpl implements BookServiceUtils {
 

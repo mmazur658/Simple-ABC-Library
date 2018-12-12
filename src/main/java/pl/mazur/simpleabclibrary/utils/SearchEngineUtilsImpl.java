@@ -5,11 +5,25 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Utility class used to perform operations for service classes.
+ * @author Marcin
+ *
+ */
 @Component
 public class SearchEngineUtilsImpl implements SearchEngineUtils {
 
+	/**
+	 * The ForbiddenWords interface
+	 */
 	private ForbiddenWords forbiddenWords;
 
+	/**
+	 * Constructs a SearchEngineUtilsImpl with the ForbiddenWords.
+	 * 
+	 * @param forbiddenWords
+	 *            The ForbiddenWords interface
+	 */
 	@Autowired
 	public SearchEngineUtilsImpl(ForbiddenWords forbiddenWords) {
 		this.forbiddenWords = forbiddenWords;
@@ -67,7 +81,7 @@ public class SearchEngineUtilsImpl implements SearchEngineUtils {
 		for (int i = 0; i <= searchParametersValue.length - 1; i++) {
 
 			if (searchParametersValue[i] != null)
-				session.setAttribute(searchParametersName[i], searchParametersValue[i]);		
+				session.setAttribute(searchParametersName[i], searchParametersValue[i]);
 
 			if ((searchParametersValue[i] == null) && !(session.getAttribute(searchParametersName[i]) == null)) {
 				searchParametersValue[i] = (String) session.getAttribute(searchParametersName[i]);

@@ -1,44 +1,112 @@
 package pl.mazur.simpleabclibrary.dao;
 
-import java.util.Date;
 import java.util.List;
 
 import pl.mazur.simpleabclibrary.entity.Book;
-import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.entity.BorrowedBook;
 
+/**
+ * Interface for performing database operations on Message objects.
+ * 
+ * @author Marcin Mazur
+ *
+ */
 public interface BookDAO {
 
-	public List<Book> getAllBooks(int startResult);
+	/**
+	 * Returns the list of the Book objects for given HQL and startResult. Returns
+	 * all books if HQL is null or blank. The startResult specifies the range of the
+	 * results.
+	 * 
+	 * @param startResult
+	 *            The int containing the value that specifies the range of the
+	 *            results.
+	 * @param hql
+	 *            The String containing the HQL Statement
+	 * 
+	 * @return A List&lt;Book&gt; representing the list of the Book objects.
+	 */
+	public List<Book> getListOfBooks(String hql, int startResult);
 
-	public List<Book> bookSearchResult(String hql, int startResult);
+	/**
+	 * Saves a Book object in the database
+	 * 
+	 * @param book
+	 *            The Book object to be saved
+	 */
+	public void saveBook(Book book);
 
-	public void saveBook(Book tempBook);
+	/**
+	 * Returns the Book object with given id.
+	 * 
+	 * @param bookId
+	 *            The int containing the id of the Book
+	 * @return A Book representing the Book with given id
+	 */
+	public Book getBookById(int bookId);
 
-	public Book getBook(int bookId);
-
-	public void setBookActive(Book book);
-
+	/**
+	 * Updates the Book object.
+	 * 
+	 * @param book
+	 *            The Book containing the Book to be updated
+	 */
 	public void updateBook(Book book);
 
-	public void deleteBook(Book tempBook);
+	/**
+	 * Saves the BorrowedBook object in the database.
+	 * 
+	 * @param borrowedBook
+	 *            The BorrowedBook containing the BorrowedBook object to be saved
+	 */
+	public void saveBorrowedBook(BorrowedBook borrowedBook);
 
-	public void borrowBook(BorrowedBook borrowedBook);
+	/**
+	 * Returns the list of BorrowedBook objects for given userId
+	 * 
+	 * @param userId
+	 *            The int containing the id of the user
+	 * @return The List of BorrowedBook objects
+	 */
+	public List<BorrowedBook> getListOfBorrowedBookByUserId(int userId);
 
-	public List<BorrowedBook> getUserBorrowedBookList(int userId);
+	/**
+	 * Returns the BorrowedBook object with given id.
+	 * 
+	 * @param borrowedBookId
+	 *            The int containing the id of the BorrowedBook
+	 * @return A BorrowedBook representing the BorrowedBook with given id
+	 */
+	public BorrowedBook getBorrowedBookById(int borrowedBookId);
 
-	public void closeBorrowedBook(Book book);
+	/**
+	 * Returns the BorrowedBook object for given id of the book
+	 * 
+	 * @param bookId
+	 *            The int containing the id of the Book
+	 * @return A BorrowedBook representing the BorrowedBook associated with given
+	 *         book id
+	 */
+	public BorrowedBook getBorrowedBookByBookId(int bookId);
 
-	public BorrowedBook getBorrowedBook(int borrowedBookId);
+	/**
+	 * Returns BorrowedBook object for given Book id and User id
+	 * 
+	 * @param bookId
+	 *            The int containing the id of the Book
+	 * @param userId
+	 *            The int containing the id of the User
+	 * @return A BorrowedBook representing the BorrowedBook with given ids
+	 */
+	public BorrowedBook getBorrowedBookByBookIdAndUserId(int bookId, int userId);
 
-	public Date getExpectedEndDate(User tempUser, Book book);
-
-	public long getAmountOfSearchResult(String hql);
-
-	public long getAmountOfAllBooks();
-
-	public List<BorrowedBook> getAllBorrowedBookList();
-
-	public void setBookActive(int reservationId);
+	/**
+	 * Returns the list of all BorrowedBook objects
+	 * 
+	 * @return A List&lt;BorrowedBook&gt; representing the list of BorrowedBook
+	 *         objects
+	 * 
+	 */
+	public List<BorrowedBook> getListOfAllBorrowedBook();
 
 }

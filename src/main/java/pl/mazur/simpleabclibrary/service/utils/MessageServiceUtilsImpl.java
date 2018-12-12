@@ -7,6 +7,12 @@ import org.springframework.stereotype.Component;
 import pl.mazur.simpleabclibrary.entity.Message;
 import pl.mazur.simpleabclibrary.entity.User;
 
+/**
+ * Utility class used to perform operations for message service classes.
+ * 
+ * @author Marcin Mazur
+ *
+ */
 @Component
 public class MessageServiceUtilsImpl implements MessageServiceUtils {
 

@@ -12,64 +12,99 @@ import pl.mazur.simpleabclibrary.entity.Message;
 import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.service.utils.MessageServiceUtils;
 
+/**
+ * Service class for managing Message objects.
+ * 
+ * @author Marcin Mazur
+ *
+ */
 @Service
 public class MessageServiceImpl implements MessageService {
 
-	@Autowired
+	/**
+	 * The MessageDAO interface
+	 */
 	private MessageDAO messageDAO;
 
-	@Autowired
+	/**
+	 * The UserDAO interface
+	 */
 	private UserDAO userDAO;
 
-	@Autowired
+	/**
+	 * The MessageServiceUtils interface
+	 */
 	private MessageServiceUtils messageServiceUtils;
 
-	@Override
-	@Transactional
-	public List<Message> getAllUserMessages(int userId, int messageInboxStartResult) {
-		return messageDAO.getAllUserMessages(userId, messageInboxStartResult);
+	/**
+	 * Constructs a MessageServiceImpl with the MessageDAO, UserDAO and
+	 * MessageServiceUtils.
+	 * 
+	 * @param messageDAO
+	 *            The MessageDAO interface
+	 * @param userDAO
+	 *            The UserDAO interface
+	 * @param messageServiceUtils
+	 *            The MessageServiceUtils interface
+	 */
+	@Autowired
+	public MessageServiceImpl(MessageDAO messageDAO, UserDAO userDAO, MessageServiceUtils messageServiceUtils) {
+		this.messageDAO = messageDAO;
+		this.userDAO = userDAO;
+		this.messageServiceUtils = messageServiceUtils;
 	}
 
 	@Override
 	@Transactional
-	public Message getMessage(int messageId) {
-		return messageDAO.getMessage(messageId);
+	public List<Message> getListOfInboxMessagesByUserId(int userId, int messageInboxStartResult) {
+		return messageDAO.getListOfAllMessages(userId, messageInboxStartResult);
+	}
+
+	@Override
+	@Transactional
+	public Message getMessageById(int messageId) {
+		return messageDAO.getMessageById(messageId);
 	}
 
 	@Override
 	@Transactional
 	public void changeReadStatus(int messageId, String boxType) {
 
-		Message message = messageDAO.getMessage(messageId);
+		Message message = messageDAO.getMessageById(messageId);
 		messageServiceUtils.changeReadStatus(message, boxType);
 
-		messageDAO.updateMessage(message);
 	}
 
 	@Override
 	@Transactional
-	public void setReadStatusTrue(int messageId, String boxType) {
+	public void setIsReadStatusToTrue(int messageId, String boxType) {
 
-		Message message = messageDAO.getMessage(messageId);
+		Message message = messageDAO.getMessageById(messageId);
 		messageServiceUtils.setReadStatusTrue(message, boxType);
 
-		messageDAO.updateMessage(message);
 	}
 
 	@Override
 	@Transactional
-	public void setReadStatusFalse(int messageId, String boxType) {
+	public void setIsReadStatusToFalse(int messageId, String boxType) {
 
-		Message message = messageDAO.getMessage(messageId);
+		Message message = messageDAO.getMessageById(messageId);
 		messageServiceUtils.setReadStatusFalse(message, boxType);
 
-		messageDAO.updateMessage(message);
 	}
 
 	@Override
 	@Transactional
 	public void deleteMessage(int messageId, String boxType) {
-		messageDAO.deleteMessage(messageId, boxType);
+
+		Message message = messageDAO.getMessageById(messageId);
+
+		if (boxType.equals("sent")) {
+			message.setSenderIsActive(false);
+		} else {
+			message.setRecipientIsActive(false);
+		}
+
 	}
 
 	@Override
@@ -80,34 +115,22 @@ public class MessageServiceImpl implements MessageService {
 
 	@Override
 	@Transactional
-	public List<Message> getAllUserSentMessages(int userId, int messageSentStartResult) {
+	public List<Message> getListOfSentMessagesByUserId(int userId, int messageSentStartResult) {
 		return messageDAO.getAllUserSentMessages(userId, messageSentStartResult);
 	}
 
 	@Override
 	@Transactional
-	public long countUnreadMessages(int userId) {
-		return messageDAO.countUnreadMessages(userId);
-	}
-
-	@Override
-	@Transactional
-	public long getAmountOfAllInboxMessages(int userId) {
-		return messageDAO.getAmountOfAllInboxMessages(userId);
-	}
-
-	@Override
-	@Transactional
-	public long getAmountOfAllSentMessages(int userId) {
-		return messageDAO.getAmountOfAllSentMessages(userId);
+	public long getNumberOfUnreadMessages(int userId) {
+		return messageDAO.getNumberOfUnreadMessages(userId);
 	}
 
 	@Override
 	@Transactional
 	public void sendMessage(int senderID, String recipientEmail, String subject, String text) {
 
-		User sender = userDAO.getUser(senderID);
-		User recipient = userDAO.getUser(recipientEmail);
+		User sender = userDAO.getUserById(senderID);
+		User recipient = userDAO.getUserByEmail(recipientEmail);
 		Message message = messageServiceUtils.createNewMessage(sender, recipient, subject, text);
 
 		messageDAO.sendMessage(message);

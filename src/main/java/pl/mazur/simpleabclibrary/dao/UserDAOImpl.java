@@ -12,14 +12,38 @@ import org.springframework.stereotype.Repository;
 import pl.mazur.simpleabclibrary.entity.User;
 import pl.mazur.simpleabclibrary.utils.PasswordUtils;
 
+/**
+ * Repository class for performing database operations on User objects.
+ * 
+ * @author Marcin Mazur
+ *
+ */
 @Repository
 public class UserDAOImpl implements UserDAO {
 
-	@Autowired
+	/**
+	 * The SessionFactory interface
+	 */
 	private SessionFactory sessionFactory;
 
-	@Autowired
+	/**
+	 * The PasswordUtils interface
+	 */
 	private PasswordUtils passwordUtils;
+
+	/**
+	 * Constructs a UserDAOImpl with the SessionFactory and PasswordUtils.
+	 * 
+	 * @param sessionFactory
+	 *            The SessionFactory interface
+	 * @param passwordUtils
+	 *            The PasswordUtils interface
+	 */
+	@Autowired
+	public UserDAOImpl(SessionFactory sessionFactory, PasswordUtils passwordUtils) {
+		this.sessionFactory = sessionFactory;
+		this.passwordUtils = passwordUtils;
+	}
 
 	protected Session currentSession() {
 		return sessionFactory.getCurrentSession();
@@ -31,26 +55,26 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public User getUser(int theId) {
+	public User getUserById(int theId) {
 		return currentSession().get(User.class, theId);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public User getUser(String email) {
+	public User getUserByEmail(String email) {
 
 		String hql = "select id from User where email=:email";
 		Query<Integer> theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("email", email);
 		int theId = (int) theQuery.getSingleResult();
-		User tempUser = getUser(theId);
+		User tempUser = getUserById(theId);
 
 		return tempUser;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean checkEmailIsExist(String email) {
+	public boolean isEmailUnique(String email) {
 
 		String hql = "select count(*) from User where email=:email";
 		Query<Long> theQuery = currentSession().createQuery(hql);
@@ -64,19 +88,18 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public boolean authenticatePassword(String thePasswordFromForm, String theEncryptedPasswordFromDatabase) {
-		return passwordUtils.checkPassword(thePasswordFromForm, theEncryptedPasswordFromDatabase);
+	public boolean isPasswordCorrect(String thePasswordFromForm, String theEncryptedPasswordFromDatabase) {
+		return passwordUtils.isPasswordCorrect(thePasswordFromForm, theEncryptedPasswordFromDatabase);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean verificationAndAuthentication(String email, String thePasswordFromForm) {
+	public boolean isEmailAndPasswordCorrect(String email, String thePasswordFromForm) {
 
 		String hql = "select isActive from User where email=:email";
 		Query<Boolean> theIsActiveQuery = currentSession().createQuery(hql);
 		theIsActiveQuery.setParameter("email", email.trim());
 		boolean isActive = (boolean) theIsActiveQuery.getSingleResult();
-		System.out.println("userDAO: " + isActive);
 
 		if (isActive) {
 
@@ -84,7 +107,7 @@ public class UserDAOImpl implements UserDAO {
 			Query<String> theQuery = currentSession().createQuery(hql);
 			theQuery.setParameter("email", email.trim());
 			String theEncryptedPasswordFromDatabase = (String) theQuery.getSingleResult();
-			return authenticatePassword(thePasswordFromForm, theEncryptedPasswordFromDatabase);
+			return isPasswordCorrect(thePasswordFromForm, theEncryptedPasswordFromDatabase);
 
 		} else {
 			return false;
@@ -92,23 +115,9 @@ public class UserDAOImpl implements UserDAO {
 
 	}
 
-	@Override
-	public void updateUser(User theUser) {
-		currentSession().update(theUser);
-	}
-
-	@Override
-	public void changePassword(int userId, String newPassword) {
-
-		User tempUser = currentSession().get(User.class, userId);
-		tempUser.setPassword(passwordUtils.encryptPassword(newPassword));
-
-		currentSession().update(tempUser);
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<User> getAllUsers(int startResult) {
+	public List<User> getListOfAllUsers(int startResult) {
 
 		List<User> usersList = new ArrayList<>();
 		String hql = "from User where isActive = true ORDER BY id ASC";
@@ -122,7 +131,7 @@ public class UserDAOImpl implements UserDAO {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<User> getUserSearchResult(String hql, int startResult) {
+	public List<User> getListOfUserForGivenSearchParams(String hql, int startResult) {
 
 		List<User> userList = new ArrayList<>();
 
@@ -138,27 +147,6 @@ public class UserDAOImpl implements UserDAO {
 			e.printStackTrace();
 			return null;
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public long getAmountOfSearchResult(String hql) {
-
-		Query<Long> theQuery = currentSession().createQuery(hql);
-		Long count = (Long) theQuery.uniqueResult();
-
-		return count;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public long getAmountOfAllUsers() {
-
-		String hql = "select count(*) from User WHERE isActive = true ORDER BY id ASC";
-		Query<Long> theQuery = currentSession().createQuery(hql);
-		Long count = (Long) theQuery.uniqueResult();
-
-		return count;
 	}
 
 }
