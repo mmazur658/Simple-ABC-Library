@@ -136,4 +136,17 @@ public class MessageServiceImpl implements MessageService {
 		messageDAO.sendMessage(message);
 	}
 
+	@Override
+	public long getNumberOfAllMessages(int userId, String boxType) {
+
+		String hql = null;
+		if (boxType.equals("sent")) {
+			hql = "SELECT COUNT(*) FROM Message WHERE sender=" + userId + " and senderIsActive=true";
+		} else if (boxType.equals("inbox")) {
+			hql = "SELECT COUNT(*) FROM Message WHERE recipient=" + userId + " and recipientIsActive=true";
+		}
+
+		return messageDAO.getNumberOfMessagesForGivenHql(hql);
+	}
+
 }

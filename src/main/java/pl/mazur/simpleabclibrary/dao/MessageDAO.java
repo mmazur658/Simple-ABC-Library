@@ -58,5 +58,14 @@ public interface MessageDAO {
 	 * @return A long representing the number of unread messages
 	 */
 	long getNumberOfUnreadMessages(int userId);
+	
+	/**
+	 * Returns the number of messages for given HQL statement
+	 * 
+	 * @param hql
+	 *            The String containing the HQL to be executed
+	 * @return A long representing the number of messages
+	 */
+	public long getNumberOfMessagesForGivenHql(String hql);
 
 }

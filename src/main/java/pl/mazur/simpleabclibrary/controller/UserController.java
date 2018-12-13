@@ -68,6 +68,18 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 public class UserController {
 
 	/**
+	 * The array containing the names of user search parameters
+	 */
+	private final String[] NAMES_OF_USER_SEARCH_PARAMETERS = { "userManagementSelectedUserId",
+			"userManagementFirstName", "userManagementLastName", "userManagementEmail", "userManagementPesel" };
+
+	/**
+	 * The array containing the names of user management search parameters
+	 */
+	private final String[] NAMES_OF_USER_MANAGEMENT_SEARCH_PARAMETERS = { "userManagementStartResult",
+			"userManagementSelectedUserId", "userManagementFirstName", "userManagementLastName", "userManagementEmail",
+			"userManagementPesel" };
+	/**
 	 * The UserService interface
 	 */
 	private UserService userService;
@@ -683,14 +695,13 @@ public class UserController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		// The Arrays containing the name and values of search parameters
-		String[] searchParametersName = { "userManagementSelectedUserId", "userManagementFirstName",
-				"userManagementLastName", "userManagementEmail", "userManagementPesel" };
+		// The Arrays containing the values of search parameters
+
 		String[] searchParametersValue = { userManagementUserId, userManagementFirstName, userManagementLastName,
 				userManagementEmail, userManagementPesel };
 
 		// The Array containing the search parameters ready to search
-		String[] userSearchParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
+		String[] userSearchParameters = searchEngineUtils.prepareTableToSearch(session, NAMES_OF_USER_SEARCH_PARAMETERS,
 				searchParametersValue);
 
 		// Get the userManagementStartResult from the session. If session doesn't
@@ -707,7 +718,8 @@ public class UserController {
 		List<User> usersList = hasAnyParameters
 				? userService.getListOfUserByGivenSearchParams(userSearchParameters, userManagementStartResult)
 				: userService.getListOfAllUsers(userManagementStartResult);
-		long amountOfResults = usersList.size();
+		long amountOfResults = hasAnyParameters ? userService.getNumberOfUsersForGivenSearchParams(userSearchParameters)
+				: userService.getNumberOfAllUsers();
 
 		// Get showMoreLinkValue, resultRange and showLessLinkValue
 		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
@@ -874,9 +886,7 @@ public class UserController {
 			return "redirect:/user/logout";
 
 		// Clear search parameters
-		String[] searchParametersName = { "userManagementStartResult", "userManagementSelectedUserId",
-				"userManagementFirstName", "userManagementLastName", "userManagementEmail", "userManagementPesel" };
-		searchEngineUtils.clearSearchParameters(session, searchParametersName);
+		searchEngineUtils.clearSearchParameters(session, NAMES_OF_USER_MANAGEMENT_SEARCH_PARAMETERS);
 
 		return "redirect:/user/user-management";
 	}

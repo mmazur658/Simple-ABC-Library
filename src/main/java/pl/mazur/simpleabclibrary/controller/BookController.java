@@ -64,9 +64,9 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 public class BookController {
 
 	/**
-	 * 
+	 * The names of the search parameters
 	 */
-	private final String[] SEARCH_PARAMETERS_NAME = { "bookSearchParamTitle", "bookSearchParamAuthor",
+	private final String[] NAMES_OF_SEARCH_PARAMETERS = { "bookSearchParamTitle", "bookSearchParamAuthor",
 			"bookSearchParamPublisher", "bookSearchParamIsbn", "bookSearchParamId" };
 
 	/**
@@ -183,7 +183,7 @@ public class BookController {
 		String[] searchParametersValue = { title, author, publisher, isbn, bookId };
 
 		// The Array containing the search parameters ready to search
-		String[] searchBookParameters = searchEngineUtils.prepareTableToSearch(session, SEARCH_PARAMETERS_NAME,
+		String[] searchBookParameters = searchEngineUtils.prepareTableToSearch(session, NAMES_OF_SEARCH_PARAMETERS,
 				searchParametersValue);
 
 		// Get the startResult from the session. If session doesn't contain that
@@ -200,7 +200,9 @@ public class BookController {
 		List<Book> booksList = hasAnyParameters
 				? bookService.getListOfBooksForGivenSearchParams(searchBookParameters, startResult)
 				: bookService.getListOfAllBooks(startResult);
-		long amountOfResults = booksList.size();
+		long amountOfResults = hasAnyParameters
+				? bookService.getNumberOfBooksForGivenSearchParams(searchBookParameters)
+				: bookService.getNumberOfAllBooks();
 
 		// Get showMoreLinkValue, resultRange and showLessLinkValue
 		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
@@ -245,7 +247,7 @@ public class BookController {
 			return "redirect:/user/logout";
 
 		// Clean search parameters
-		searchEngineUtils.clearSearchParameters(session, SEARCH_PARAMETERS_NAME);
+		searchEngineUtils.clearSearchParameters(session, NAMES_OF_SEARCH_PARAMETERS);
 
 		return "redirect:/book/main-bookstore";
 	}

@@ -109,4 +109,13 @@ public interface BookDAO {
 	 */
 	public List<BorrowedBook> getListOfAllBorrowedBook();
 
+	/**
+	 * Returns the number of books for given HQL statement
+	 * 
+	 * @param hql
+	 *            The String containing the HQL to be executed
+	 * @return A long representing the number of books
+	 */
+	public long getNumberOfBookForGivenHql(String hql);
+
 }

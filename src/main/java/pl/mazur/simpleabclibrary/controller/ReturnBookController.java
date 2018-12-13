@@ -61,6 +61,17 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 public class ReturnBookController {
 
 	/**
+	 * The arrays containing the names of session attributes to clean
+	 */
+	private final String[] NAMES_OF_SESSION_ATTRIBUTES_TO_CLEAN = { "returnBookSelectedUserId", "returnBookFirstName",
+			"returnBookLastName", "returnBookEmail", "returnBookPesel", "returnBookStartResult", "tempBookList",
+			"selectedUserId", "userBorrowedBooksList", "tempReturnedBookList" };
+	/**
+	 * The arrays containing the names of book search parameters
+	 */
+	private final String[] NAMES_OF_BOOK_SEARCH_PARAMETERS = { "returnBookSelectedUserId", "returnBookFirstName",
+			"returnBookLastName", "returnBookEmail", "returnBookPesel" };
+	/**
 	 * The BookService interface
 	 */
 	private BookService bookService;
@@ -166,13 +177,12 @@ public class ReturnBookController {
 			return "redirect:/user/logout";
 
 		// The Arrays containing the names and values of search parameters
-		String[] searchParametersName = { "returnBookSelectedUserId", "returnBookFirstName", "returnBookLastName",
-				"returnBookEmail", "returnBookPesel" };
+
 		String[] searchParametersValue = { returnBookSelectedUserId, returnBookFirstName, returnBookLastName,
 				returnBookEmail, returnBookPesel };
 
 		// The Array containing the search parameters ready to search
-		String[] userSearchParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
+		String[] userSearchParameters = searchEngineUtils.prepareTableToSearch(session, NAMES_OF_BOOK_SEARCH_PARAMETERS,
 				searchParametersValue);
 
 		// Get the returnBookStartResult from the session. If session doesn't contain
@@ -190,7 +200,8 @@ public class ReturnBookController {
 		List<User> usersList = hasAnyParameters
 				? userService.getListOfUserByGivenSearchParams(userSearchParameters, returnBookStartResult)
 				: userService.getListOfAllUsers(returnBookStartResult);
-		long amountOfResults = usersList.size();
+		long amountOfResults = hasAnyParameters ? userService.getNumberOfUsersForGivenSearchParams(userSearchParameters)
+				: userService.getNumberOfAllUsers();
 
 		// Get showMoreLinkValue, resultRange and showLessLinkValue
 		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
@@ -526,10 +537,7 @@ public class ReturnBookController {
 			return "redirect:/user/logout";
 
 		// Clear search parameters
-		String[] searchParametersName = { "returnBookSelectedUserId", "returnBookFirstName", "returnBookLastName",
-				"returnBookEmail", "returnBookPesel", "returnBookStartResult", "tempBookList", "selectedUserId",
-				"userBorrowedBooksList", "tempReturnedBookList" };
-		searchEngineUtils.clearSearchParameters(session, searchParametersName);
+		searchEngineUtils.clearSearchParameters(session, NAMES_OF_SESSION_ATTRIBUTES_TO_CLEAN);
 
 		return "redirect:/user/main";
 	}

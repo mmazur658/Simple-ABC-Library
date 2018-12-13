@@ -27,6 +27,12 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 public class ReservationServiceImpl implements ReservationService {
 
 	/**
+	 * The array containing the names of reservation fields
+	 */
+	private final String[] NAMES_OF_RESERVATION_FIELDS = { "user.id", "user.firstName", "user.lastName", "user.pesel",
+			"book.id", "book.title" };
+
+	/**
 	 * The ReservationDAO interface
 	 */
 	private ReservationDAO reservationDAO;
@@ -112,7 +118,7 @@ public class ReservationServiceImpl implements ReservationService {
 		reservationDAO.updateReservation(reservation);
 
 		// Get the Book from the reservation and change its status, then update
-		reservation.getBook().setIsAvailable(true);		
+		reservation.getBook().setIsAvailable(true);
 		bookDAO.updateBook(reservation.getBook());
 	}
 
@@ -158,11 +164,12 @@ public class ReservationServiceImpl implements ReservationService {
 
 		// Get the Reservation by given id
 		Reservation reservation = reservationDAO.getReservationById(reservationId);
-		
+
 		// Get the MASTER USER
 		User adminUser = userDAO.getUserById(1);
-		
-		// Create and save a Message informing the user that the reservation has been deleted
+
+		// Create and save a Message informing the user that the reservation has been
+		// deleted
 		Message message = reservationServiceUtils.prepareReservationToDeleteAndCreateNewMessage(reservation, adminUser);
 		messageDAO.sendMessage(message);
 
@@ -184,9 +191,9 @@ public class ReservationServiceImpl implements ReservationService {
 			Integer startResult) {
 
 		String searchType = "from Reservation where ";
-		String[] fieldsName = { "user.id", "user.firstName", "user.lastName", "user.pesel", "book.id", "book.title" };
+
 		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(reservationSearchParameters, searchType,
-				fieldsName);
+				NAMES_OF_RESERVATION_FIELDS);
 
 		return reservationDAO.getListOfReservationForGivenSearchParams(hql, startResult);
 	}
@@ -215,6 +222,24 @@ public class ReservationServiceImpl implements ReservationService {
 
 		bookDAO.updateBook(tempBook);
 		reservationDAO.createReservation(reservation);
+	}
+
+	@Override
+	public long getNumberOfReservationsForGivenSearchParams(String[] searchParameters) {
+
+		String searchType = "SELECT COUNT(*) FROM Reservation WHERE ";
+		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(searchParameters, searchType,
+				NAMES_OF_RESERVATION_FIELDS);
+
+		return reservationDAO.getNumberOfReservationsForGivenHql(hql);
+	}
+
+	@Override
+	public long getNumberOfAllReservations() {
+
+		String hql = "SELECT COUNT(*) FROM Reservation";
+
+		return reservationDAO.getNumberOfReservationsForGivenHql(hql);
 	}
 
 }

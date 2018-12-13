@@ -21,6 +21,11 @@ import pl.mazur.simpleabclibrary.entity.Reservation;
 public class ReservationDAOImpl implements ReservationDAO {
 
 	/**
+	 * The number of results to be returned
+	 */
+	private final int RESULT_LIMIT = 10;
+	
+	/**
 	 * The SessionFactory interface
 	 */
 	private SessionFactory sessionFactory;
@@ -84,7 +89,7 @@ public class ReservationDAOImpl implements ReservationDAO {
 		String hql = "from Reservation where isActive = true ORDER BY id ASC";
 		Query<Reservation> theQuery = currentSession().createQuery(hql);
 		theQuery.setFirstResult(startResult);
-		theQuery.setMaxResults(10);
+		theQuery.setMaxResults(RESULT_LIMIT);
 		reservationList = theQuery.getResultList();
 
 		return reservationList;
@@ -98,7 +103,7 @@ public class ReservationDAOImpl implements ReservationDAO {
 		try {
 			Query<Reservation> theQuery = currentSession().createQuery(hql);
 			theQuery.setFirstResult(startResult);
-			theQuery.setMaxResults(10);
+			theQuery.setMaxResults(RESULT_LIMIT);
 			reservationList = theQuery.getResultList();
 			return reservationList;
 		} catch (Exception e) {
@@ -111,5 +116,15 @@ public class ReservationDAOImpl implements ReservationDAO {
 	public void updateReservation(Reservation reservation) {
 		currentSession().update(reservation);
 
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public long getNumberOfReservationsForGivenHql(String hql) {
+
+		Query<Long> theQuery = currentSession().createQuery(hql);
+		Long count = (Long) theQuery.uniqueResult();
+
+		return count;
 	}
 }

@@ -45,6 +45,18 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 public class ReservationController {
 
 	/**
+	 * The array containing the names of session attributes to clean
+	 */
+	private final String[] NAMES_OF_SESSION_ATTRIBUTES_TO_CLEAN = { "reservationCustomerId",
+			"reservationCustomerFirstName", "reservationCustomerLastName", "reservationCustomerPesel",
+			"reservationManagementBookId", "reservationBookTitle" };
+	/**
+	 * The array containing the names of search parameters
+	 */
+	private final String[] NAMES_OF_RESERVATION_SEARCH_PARAMETERS = { "reservationCustomerId",
+			"reservationCustomerFirstName", "reservationCustomerLastName", "reservationCustomerPesel",
+			"reservationManagementBookId", "reservationBookTitle" };
+	/**
 	 * The AccessLevelControl interface
 	 */
 	private AccessLevelControl accessLevelControl;
@@ -139,16 +151,13 @@ public class ReservationController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		// The Arrays containing the names and values of search parameters
-		String[] searchParametersName = { "reservationCustomerId", "reservationCustomerFirstName",
-				"reservationCustomerLastName", "reservationCustomerPesel", "reservationManagementBookId",
-				"reservationBookTitle" };
+		// The Arrays containing the values of search parameters
 		String[] searchParametersValue = { reservationCustomerId, reservationCustomerFirstName,
 				reservationCustomerLastName, reservationCustomerPesel, reservationBookId, reservationBookTitle };
 
 		// The Array containing the search parameters ready to search
-		String[] reservationSearchParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
-				searchParametersValue);
+		String[] reservationSearchParameters = searchEngineUtils.prepareTableToSearch(session,
+				NAMES_OF_RESERVATION_SEARCH_PARAMETERS, searchParametersValue);
 
 		// Get the reservationStartResult from the session. If session doesn't contain
 		// that attribute set default value
@@ -165,7 +174,9 @@ public class ReservationController {
 				? reservationService.getListOfReservationForGivenSearchParams(reservationSearchParameters,
 						reservationStartResult)
 				: reservationService.getListOfAllReservations(reservationStartResult);
-		long amountOfResults = reservationList.size();
+		long amountOfResults = hasAnyParameters
+				? reservationService.getNumberOfReservationsForGivenSearchParams(reservationSearchParameters)
+				: reservationService.getNumberOfAllReservations();
 
 		// Get showMoreLinkValue, resultRange and showLessLinkValue
 		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
@@ -205,10 +216,7 @@ public class ReservationController {
 			return "redirect:/user/logout";
 
 		// Clear search parameters
-		String[] searchParametersName = { "reservationCustomerId", "reservationCustomerFirstName",
-				"reservationCustomerLastName", "reservationCustomerPesel", "reservationManagementBookId",
-				"reservationBookTitle" };
-		searchEngineUtils.clearSearchParameters(session, searchParametersName);
+		searchEngineUtils.clearSearchParameters(session, NAMES_OF_SESSION_ATTRIBUTES_TO_CLEAN);
 
 		return "redirect:/reservation/reservation-management";
 	}

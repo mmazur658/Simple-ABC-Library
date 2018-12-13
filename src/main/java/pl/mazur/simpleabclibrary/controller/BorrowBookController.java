@@ -64,6 +64,26 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 public class BorrowBookController {
 
 	/**
+	 * The array containing the names of book search parameters
+	 */
+	private final String[] NAMES_OF_BOOK_SEARCH_PARAMETERS = { "borrowBookSelectedUserId", "borrowBookFirstName",
+			"borrowBookLastName", "borrowBookEmail", "borrowBookPesel" };
+
+	/**
+	 * The array containing the names of borrowed book search parameters
+	 */
+	private final String[] NAMES_OF_BORROW_BOOK_SEARCH_PARAMETERS = { "borrowBookSeachParamTitle",
+			"borrowBookSeachParamId", "borrowBookSeachParamAuthor", "borrowBookSeachParamIsbn",
+			"borrowBookSeachParamPublisher" };
+
+	/**
+	 * The array containing the names of session attributes to clean
+	 */
+	private final String[] NAMES_OF_SESSION_ATTRIBUTES_TO_CLEAN = { "borrowBookSelectedUserId", "borrowBookFirstName",
+			"borrowBookLastName", "borrowBookEmail", "borrowBookPesel", "borrowBookStartResult",
+			"borrowBookStartResult", "tempBookList", "borrowBookChooseBookStartResult", "title", "id", "author" };
+
+	/**
 	 * The BookService interface
 	 */
 	private BookService bookService;
@@ -177,14 +197,12 @@ public class BorrowBookController {
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
 
-		// The Arrays containing the names and values of search parameters
-		String[] searchParametersName = { "borrowBookSelectedUserId", "borrowBookFirstName", "borrowBookLastName",
-				"borrowBookEmail", "borrowBookPesel" };
+		// The Arrays containing the values of search parameters
 		String[] searchParametersValue = { borrowBookSelectedUserId, borrowBookFirstName, borrowBookLastName,
 				borrowBookEmail, borrowBookPesel };
 
 		// The Array containing the search parameters ready to search
-		String[] userSearchParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
+		String[] userSearchParameters = searchEngineUtils.prepareTableToSearch(session, NAMES_OF_BOOK_SEARCH_PARAMETERS,
 				searchParametersValue);
 
 		// Get the borrowBookStartResult from the session. If session doesn't contain
@@ -201,7 +219,8 @@ public class BorrowBookController {
 		List<User> usersList = hasAnyParameters
 				? userService.getListOfUserByGivenSearchParams(userSearchParameters, borrowBookStartResult)
 				: userService.getListOfAllUsers(borrowBookStartResult);
-		long amountOfResults = usersList.size();
+		long amountOfResults = hasAnyParameters ? userService.getNumberOfUsersForGivenSearchParams(userSearchParameters)
+				: userService.getNumberOfAllUsers();
 
 		// Get showMoreLinkValue, resultRange and showLessLinkValue
 		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
@@ -381,14 +400,12 @@ public class BorrowBookController {
 			}
 		}
 
-		// The Arrays containing the name and the values of search parameters
-		String[] searchParametersName = { "borrowBookSeachParamTitle", "borrowBookSeachParamId",
-				"borrowBookSeachParamAuthor", "borrowBookSeachParamIsbn", "borrowBookSeachParamPublisher" };
+		// The Arrays containing the values of search parameters
 		String[] searchParametersValue = { title, bookId, author, isbn, publisher };
 
 		// The Array containing the search parameters ready to search
-		String[] searchBookParameters = searchEngineUtils.prepareTableToSearch(session, searchParametersName,
-				searchParametersValue);
+		String[] searchBookParameters = searchEngineUtils.prepareTableToSearch(session,
+				NAMES_OF_BORROW_BOOK_SEARCH_PARAMETERS, searchParametersValue);
 
 		// Check whether the searchBookParameters array contains any parameters and get
 		// the results and number of the results.
@@ -396,7 +413,8 @@ public class BorrowBookController {
 		List<Book> booksList = hasAnyParameters
 				? bookService.getListOfBooksForGivenSearchParams(searchBookParameters, borrowBookChooseBookStartResult)
 				: bookService.getListOfAllBooks(borrowBookChooseBookStartResult);
-		long amountOfResults = booksList.size();
+		long amountOfResults = hasAnyParameters ? bookService.getNumberOfBooksForGivenSearchParams(searchBookParameters)
+				: bookService.getNumberOfAllBooks();
 
 		// Get showMoreLinkValue, resultRange and showLessLinkValue
 		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit"));
@@ -682,10 +700,7 @@ public class BorrowBookController {
 		session.setAttribute("isUserAbleToBorrow", false);
 
 		// Clear search parameters
-		String[] searchParametersName = { "borrowBookSelectedUserId", "borrowBookFirstName", "borrowBookLastName",
-				"borrowBookEmail", "borrowBookPesel", "borrowBookStartResult", "borrowBookStartResult", "tempBookList",
-				"borrowBookChooseBookStartResult", "title", "id", "author" };
-		searchEngineUtils.clearSearchParameters(session, searchParametersName);
+		searchEngineUtils.clearSearchParameters(session, NAMES_OF_SESSION_ATTRIBUTES_TO_CLEAN);
 
 		return "redirect:/user/main";
 	}

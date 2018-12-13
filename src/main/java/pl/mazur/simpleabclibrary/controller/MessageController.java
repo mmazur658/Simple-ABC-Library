@@ -147,7 +147,7 @@ public class MessageController {
 
 		// Get the list of all messages with the given user id
 		List<Message> userMessagesList = messageService.getListOfInboxMessagesByUserId(userId, messageInboxStartResult);
-		long amountOfResults = userMessagesList.size();
+		long amountOfResults = messageService.getNumberOfAllMessages(userId, "inbox");
 
 		// Get showMoreLinkValue, resultRange and showLessLinkValue
 		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit.messages"));
@@ -217,7 +217,7 @@ public class MessageController {
 		// Get the list of all messages with the given user id
 		List<Message> userSentMessagesList = messageService.getListOfSentMessagesByUserId(userId,
 				messageSentStartResult);
-		long amountOfResults = userSentMessagesList.size();
+		long amountOfResults = messageService.getNumberOfAllMessages(userId, "sent");
 
 		// Get showMoreLinkValue, resultRange and showLessLinkValue
 		int searchResultLimit = Integer.valueOf(env.getProperty("search.result.limit.messages"));

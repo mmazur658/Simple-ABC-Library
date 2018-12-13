@@ -25,6 +25,11 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 public class UserServiceImpl implements UserService {
 
 	/**
+	 * The array containing the names of user fields
+	 */
+	private final String[] NAMES_OF_USER_FIELDS = { "id", "firstName", "lastName", "email", "pesel" };
+
+	/**
 	 * The UserDAO interface
 	 */
 	private UserDAO userDAO;
@@ -147,8 +152,8 @@ public class UserServiceImpl implements UserService {
 	public List<User> getListOfUserByGivenSearchParams(String[] userSearchParameters, int startResult) {
 
 		String searchType = "from User where ";
-		String[] fieldsName = { "id", "firstName", "lastName", "email", "pesel" };
-		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(userSearchParameters, searchType, fieldsName);
+		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(userSearchParameters, searchType,
+				NAMES_OF_USER_FIELDS);
 
 		return userDAO.getListOfUserForGivenSearchParams(hql, startResult);
 	}
@@ -176,5 +181,23 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public String getUserAccessLevel(User theUser) {
 		return accessLevelControl.getUserAccessLevel(theUser);
+	}
+
+	@Override
+	public long getNumberOfUsersForGivenSearchParams(String[] userSearchParameters) {
+
+		String searchType = "SELECT COUNT(*) FROM User WHERE ";
+		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(userSearchParameters, searchType,
+				NAMES_OF_USER_FIELDS);
+
+		return userDAO.getNumberOfUsersForGivenHql(hql);
+	}
+
+	@Override
+	public long getNumberOfAllUsers() {
+
+		String hql = "SELECT COUNT(*) FROM User";
+
+		return userDAO.getNumberOfUsersForGivenHql(hql);
 	}
 }

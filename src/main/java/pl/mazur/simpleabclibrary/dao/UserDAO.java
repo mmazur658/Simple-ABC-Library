@@ -89,4 +89,12 @@ public interface UserDAO {
 	 */
 	public List<User> getListOfUserForGivenSearchParams(String hql, int startResult);
 
+	/**
+	 * Returns the number of users for given HQL statement
+	 * 
+	 * @param hql
+	 *            The String containing the HQL to be executed
+	 * @return A long representing the number of users
+	 */
+	public long getNumberOfUsersForGivenHql(String hql);
 }

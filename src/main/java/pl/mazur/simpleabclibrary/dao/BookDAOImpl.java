@@ -34,7 +34,8 @@ public class BookDAOImpl implements BookDAO {
 	/**
 	 * Constructs a BookDAOImpl with the SessionFactory.
 	 * 
-	 * @param sessionFactory The SessionFactory interface
+	 * @param sessionFactory
+	 *            The SessionFactory interface
 	 */
 	@Autowired
 	public BookDAOImpl(SessionFactory sessionFactory) {
@@ -146,6 +147,16 @@ public class BookDAOImpl implements BookDAO {
 		BorrowedBook borrowedBook = (BorrowedBook) theQuery.getSingleResult();
 
 		return borrowedBook;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public long getNumberOfBookForGivenHql(String hql) {
+
+		Query<Long> theQuery = currentSession().createQuery(hql);
+		Long count = (Long) theQuery.uniqueResult();
+		
+		return count;
 	}
 
 }

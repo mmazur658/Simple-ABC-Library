@@ -21,6 +21,11 @@ import pl.mazur.simpleabclibrary.entity.Message;
 public class MessageDAOImpl implements MessageDAO {
 
 	/**
+	 * The number of results to be returned
+	 */
+	private final int RESULT_LIMIT = 20;
+	
+	/**
 	 * The SessionFactory interface
 	 */
 	private SessionFactory sessionFactory;
@@ -48,7 +53,7 @@ public class MessageDAOImpl implements MessageDAO {
 		String hql = "FROM Message WHERE recipient.id=:id AND recipientIsActive=true ORDER BY startDate DESC";
 		Query<Message> theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("id", userId);
-		theQuery.setMaxResults(20);
+		theQuery.setMaxResults(RESULT_LIMIT);
 		theQuery.setFirstResult(messageInboxStartResult);
 		userMessagesList = theQuery.getResultList();
 
@@ -88,7 +93,7 @@ public class MessageDAOImpl implements MessageDAO {
 		String hql = "FROM Message WHERE sender.id=:id AND senderIsActive=true ORDER BY startDate DESC";
 		Query<Message> theQuery = currentSession().createQuery(hql);
 		theQuery.setParameter("id", userId);
-		theQuery.setMaxResults(20);
+		theQuery.setMaxResults(RESULT_LIMIT);
 		theQuery.setFirstResult(messageSentStartResult);
 		userSentMessagesList = theQuery.getResultList();
 
@@ -104,6 +109,16 @@ public class MessageDAOImpl implements MessageDAO {
 		theQuery.setParameter("id", userId);
 		Long count = (Long) theQuery.uniqueResult();
 
+		return count;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public long getNumberOfMessagesForGivenHql(String hql) {
+
+		Query<Long> theQuery = currentSession().createQuery(hql);
+		Long count = (Long) theQuery.uniqueResult();
+		
 		return count;
 	}
 

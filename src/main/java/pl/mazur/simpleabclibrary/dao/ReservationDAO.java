@@ -73,5 +73,14 @@ public interface ReservationDAO {
 	 *            The Reservation containing the Reservation to be updated
 	 */
 	void updateReservation(Reservation reservation);
+	
+	/**
+	 * Returns the number of reservations for given HQL statement
+	 * 
+	 * @param hql
+	 *            The String containing the HQL to be executed
+	 * @return A long representing the number of reservations
+	 */
+	public long getNumberOfReservationsForGivenHql(String hql);
 
 }

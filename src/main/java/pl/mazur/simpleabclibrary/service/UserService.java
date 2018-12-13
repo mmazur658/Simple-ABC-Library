@@ -141,4 +141,20 @@ public interface UserService {
 	 */
 	public String getUserAccessLevel(User theUser);
 
+	/**
+	 * Returns the number of users for given search parameters
+	 * 
+	 * @param searchParameters
+	 *            The String[] containing the search parameters
+	 * @return A long representing the number of users
+	 */
+	public long getNumberOfUsersForGivenSearchParams(String[] searchParameters);
+
+	/**
+	 * Returns the number of all users.
+	 * 
+	 * @return A long representing the number of all users
+	 */
+	public long getNumberOfAllUsers();
+
 }

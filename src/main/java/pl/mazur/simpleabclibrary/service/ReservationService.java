@@ -132,4 +132,20 @@ public interface ReservationService {
 	 */
 	public void createReservation(Book tempBook, int userId);
 
+	/**
+	 * Returns the number of reservations for given search parameters
+	 * 
+	 * @param searchParameters
+	 *            The String[] containing the search parameters
+	 * @return A long representing the number of reservations
+	 */
+	public long getNumberOfReservationsForGivenSearchParams(String[] searchParameters);
+
+	/**
+	 * Returns the number of all reservations.
+	 * 
+	 * @return A long representing the number of all reservations
+	 */
+	public long getNumberOfAllReservations();
+
 }

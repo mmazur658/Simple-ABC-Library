@@ -243,4 +243,19 @@ public interface BookService {
 	 */
 	public String borrowBooks(HttpSession session);
 
+	/**
+	 * Returns the number of books for given search parameters
+	 * 
+	 * @param searchBookParameters
+	 *            The String[] containing the search parameters
+	 * @return A long representing the number of books
+	 */
+	public long getNumberOfBooksForGivenSearchParams(String[] searchBookParameters);
+
+	/**
+	 * Returns the number of all books.
+	 * 
+	 * @return A long representing the number of all books
+	 */
+	public long getNumberOfAllBooks();
 }

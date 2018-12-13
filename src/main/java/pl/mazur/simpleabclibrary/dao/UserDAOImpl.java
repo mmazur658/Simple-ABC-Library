@@ -22,6 +22,11 @@ import pl.mazur.simpleabclibrary.utils.PasswordUtils;
 public class UserDAOImpl implements UserDAO {
 
 	/**
+	 * The number of results to be returned
+	 */
+	private final int RESULT_LIMIT = 10;
+	
+	/**
 	 * The SessionFactory interface
 	 */
 	private SessionFactory sessionFactory;
@@ -123,7 +128,7 @@ public class UserDAOImpl implements UserDAO {
 		String hql = "from User where isActive = true ORDER BY id ASC";
 		Query<User> theQuery = currentSession().createQuery(hql);
 		theQuery.setFirstResult(startResult);
-		theQuery.setMaxResults(10);
+		theQuery.setMaxResults(RESULT_LIMIT);
 		usersList = theQuery.getResultList();
 
 		return usersList;
@@ -138,7 +143,7 @@ public class UserDAOImpl implements UserDAO {
 		try {
 			Query<User> theQuery = currentSession().createQuery(hql);
 			theQuery.setFirstResult(startResult);
-			theQuery.setMaxResults(10);
+			theQuery.setMaxResults(RESULT_LIMIT);
 			userList = theQuery.getResultList();
 
 			return userList;
@@ -147,6 +152,16 @@ public class UserDAOImpl implements UserDAO {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public long getNumberOfUsersForGivenHql(String hql) {
+
+		Query<Long> theQuery = currentSession().createQuery(hql);
+		Long count = (Long) theQuery.uniqueResult();
+		
+		return count;
 	}
 
 }

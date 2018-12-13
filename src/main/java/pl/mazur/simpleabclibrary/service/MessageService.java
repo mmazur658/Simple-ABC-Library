@@ -119,5 +119,14 @@ public interface MessageService {
 	 *            The String containing the text of the message
 	 */
 	void sendMessage(int senderID, String recipientEmail, String subject, String text);
+	
+	/**
+	 * Returns the number of  messages for given parameters.
+	 * @param boxType The String containing the name of the box (inbox - sent)
+	 * @param userId The int containing the id of the user
+	 * 
+	 * @return A long representing the number of all messages
+	 */
+	public long getNumberOfAllMessages(int userId, String boxType);
 
 }

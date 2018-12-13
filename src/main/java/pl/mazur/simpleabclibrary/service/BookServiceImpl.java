@@ -31,6 +31,11 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 public class BookServiceImpl implements BookService {
 
 	/**
+	 * The array containing the names of book fields
+	 */
+	private final String[] NAMES_OF_BOOK_FIELDS = { "title", "author", "publisher", "isbn", "id" };
+
+	/**
 	 * The BookDAO interface
 	 */
 	private BookDAO bookDAO;
@@ -101,8 +106,8 @@ public class BookServiceImpl implements BookService {
 	public List<Book> getListOfBooksForGivenSearchParams(String[] searchParameters, int startResult) {
 
 		String searchType = "from Book where ";
-		String[] fieldsName = { "title", "author", "publisher", "isbn", "id" };
-		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(searchParameters, searchType, fieldsName);
+		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(searchParameters, searchType,
+				NAMES_OF_BOOK_FIELDS);
 
 		return bookDAO.getListOfBooks(hql, startResult);
 	}
@@ -376,6 +381,26 @@ public class BookServiceImpl implements BookService {
 		}
 
 		return sb.toString();
+	}
+
+	@Override
+	@Transactional
+	public long getNumberOfBooksForGivenSearchParams(String[] searchBookParameters) {
+
+		String searchType = "SELECT COUNT(*) FROM Book WHERE ";
+		String hql = searchEngineUtils.prepareHqlUsingSearchParameters(searchBookParameters, searchType,
+				NAMES_OF_BOOK_FIELDS);
+
+		return bookDAO.getNumberOfBookForGivenHql(hql);
+	}
+
+	@Override
+	@Transactional
+	public long getNumberOfAllBooks() {
+
+		String hql = "SELECT COUNT(*) FROM Book";
+
+		return bookDAO.getNumberOfBookForGivenHql(hql);
 	}
 
 }
