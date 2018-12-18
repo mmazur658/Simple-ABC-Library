@@ -9,7 +9,7 @@ Administrator can change the level of user access, check errors and history of t
 
 * * * * Main features * * * *
 
-New account form – The form is checked before sign in: No field can be empty, the email address must be unique, the password must follow gieven rules. After creating an account user can generate and print confirmation
+New account form – The form is checked before sign in: No field can be empty, the email address must be unique, the password must follow given rules. After creating an account user can generate and print confirmation
 
 Borrowing books: First step - select a user. You can use search form to find a specific user. Second step - select books that user wants to borrow. Next step - Confirm operation. Before borrowing user are checked if he has books he should return or he has reached the limit
 
@@ -25,4 +25,4 @@ Book reminder: The User receives a message if he has a book that he should retur
 
 Search engine - user can use this tool to find a specific book, user or reservation
 
-The webpage is available in Polish and English.
+The web page is available in Polish and English.
