@@ -146,7 +146,8 @@ public class ReservationController {
 			@RequestParam(required = false, name = "startResult") Integer reservationStartResult,
 			HttpServletRequest request, Model theModel) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -210,7 +211,8 @@ public class ReservationController {
 	@RequestMapping("/clearReservationSearchParameters")
 	public String clearReservationSearchParameters(HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -242,7 +244,8 @@ public class ReservationController {
 	public String deleteReservation(@RequestParam("reservationId") int reservationId, HttpServletRequest request,
 			RedirectAttributes redirectAttributes, Locale locale) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -277,7 +280,8 @@ public class ReservationController {
 	public String increaseExpDate(@RequestParam("reservationId") int reservationId, HttpServletRequest request,
 			RedirectAttributes redirectAttributes, Locale locale) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";

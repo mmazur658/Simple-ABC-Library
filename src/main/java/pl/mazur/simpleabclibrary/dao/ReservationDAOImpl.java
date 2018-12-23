@@ -41,6 +41,11 @@ public class ReservationDAOImpl implements ReservationDAO {
 		this.sessionFactory = sessionFactory;
 	}
 
+	/**
+	 * Returns a session object.
+	 * 
+	 * @return A Session representing the current session
+	 */
 	protected Session currentSession() {
 		return sessionFactory.getCurrentSession();
 	}
@@ -115,7 +120,6 @@ public class ReservationDAOImpl implements ReservationDAO {
 	@Override
 	public void updateReservation(Reservation reservation) {
 		currentSession().update(reservation);
-
 	}
 
 	@SuppressWarnings("unchecked")

@@ -110,17 +110,14 @@ public class BookReminder {
 		Long expTimeMillis = getExpectedEndDate.getTime();
 
 		if (hourLimit == 0) {
-			if (expTimeMillis < currentTimeMillis)
-				return true;
-			else
-				return false;
+			boolean isBorrowedBookExpired = (expTimeMillis < currentTimeMillis) ? true : false;
+			return isBorrowedBookExpired;
 		}
 
-		if (expTimeMillis - (1000 * 60 * 60 * hourLimit) < currentTimeMillis
-				&& expTimeMillis - (1000 * 60 * 60 * (hourLimit - 1)) > currentTimeMillis)
-			return true;
-		else
-			return false;
+		boolean isBorrowedBookExpired = (expTimeMillis - (1000 * 60 * 60 * hourLimit) < currentTimeMillis
+				&& expTimeMillis - (1000 * 60 * 60 * (hourLimit - 1)) > currentTimeMillis) ? true : false;
+
+		return isBorrowedBookExpired;
 	}
 
 	/**

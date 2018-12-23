@@ -129,7 +129,8 @@ public class MessageController {
 			@RequestParam(required = false, name = "systemMessage") String systemMessage,
 			@RequestParam(required = false, name = "messageInboxStartResult") Integer messageInboxStartResult) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -198,7 +199,8 @@ public class MessageController {
 			@RequestParam(required = false, name = "systemMessage") String systemMessage,
 			@RequestParam(required = false, name = "messageStartResult") Integer messageSentStartResult) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -262,7 +264,8 @@ public class MessageController {
 	public String deleteMessage(@RequestParam("messageId") int messageId, @RequestParam("boxType") String boxType,
 			HttpServletRequest request, RedirectAttributes redirectAttributes, Locale locale) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -302,7 +305,8 @@ public class MessageController {
 	public String readUnreadMessage(@RequestParam("messageId") int messageId, @RequestParam("boxType") String boxType,
 			HttpServletRequest request, RedirectAttributes redirectAttributes, Locale locale) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -345,7 +349,8 @@ public class MessageController {
 			Model theModel, @RequestParam(required = false, name = "systemMessage") String systemMessage,
 			HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -378,7 +383,8 @@ public class MessageController {
 	public String closeMessageAndSetStatusUnread(@RequestParam("messageId") int messageId,
 			@RequestParam("boxType") String boxType, HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -399,7 +405,8 @@ public class MessageController {
 	@RequestMapping("/create-new-message")
 	public String createNewMessage(HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -426,7 +433,8 @@ public class MessageController {
 	public String showReplyMessage(@RequestParam("messageId") int messageId, Model theModel,
 			HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -466,7 +474,8 @@ public class MessageController {
 			Locale locale, @RequestParam("textArea") String text, RedirectAttributes redirectAttributes,
 			HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";

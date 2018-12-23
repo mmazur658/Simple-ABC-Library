@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Utility class used to perform operations for service classes.
+ * 
  * @author Marcin
  *
  */
@@ -41,29 +42,28 @@ public class SearchEngineUtilsImpl implements SearchEngineUtils {
 
 	@Override
 	public long generateShowLessLinkValue(Integer startResult, int range) {
-		if ((startResult - range) < 0) {
-			return 0;
-		} else {
-			return startResult - range;
-		}
+
+		long showLessLinkValue = ((startResult - range) < 0) ? 0 : (startResult - range);
+		return showLessLinkValue;
+
 	}
 
 	@Override
 	public long generateShowMoreLinkValue(Integer startResult, long amountOfResults, int range) {
-		if ((startResult + range) > amountOfResults) {
-			return startResult;
-		} else {
-			return startResult + range;
-		}
+
+		long showMoreLinkValue = ((startResult + range) > amountOfResults) ? startResult : (startResult + range);
+		return showMoreLinkValue;
+
 	}
 
 	@Override
 	public String generateResultRange(Integer startResult, long amountOfResults, long showMoreLinkValue, int range) {
-		if ((startResult + range) > amountOfResults) {
-			return "Wyniki od " + (startResult + 1) + " do " + amountOfResults;
-		} else {
-			return "Wyniki od " + (startResult + 1) + " do " + showMoreLinkValue;
-		}
+
+		String resultRange = ((startResult + range) > amountOfResults)
+				? ("Wyniki od " + (startResult + 1) + " do " + amountOfResults)
+				: ("Wyniki od " + (startResult + 1) + " do " + showMoreLinkValue);
+
+		return resultRange;
 	}
 
 	@Override
@@ -88,6 +88,7 @@ public class SearchEngineUtilsImpl implements SearchEngineUtils {
 			}
 			searchParameters[i] = (searchParametersValue[i] == null) ? "" : searchParametersValue[i];
 		}
+		
 		for (int i = 0; i < searchParameters.length - 1; i++) {
 			if (forbiddenWords.findForbiddenWords(searchParameters[i]))
 				searchParameters[i] = "";
@@ -106,6 +107,7 @@ public class SearchEngineUtilsImpl implements SearchEngineUtils {
 			sb.append(fieldsName[0] + " like '%" + searchParameters[0] + "%'");
 			isContent = true;
 		}
+		
 		for (int i = 1; i <= fieldsName.length - 1; i++) {
 			if (!searchParameters[i].equals("")) {
 				if (isContent) {

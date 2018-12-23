@@ -16,7 +16,7 @@ public class ErrorController {
 	public String showTestPage() {
 		return "test-page2";
 	}
-	
+
 	@RequestMapping("/error")
 	public String showErrorPage(HttpServletRequest request, Model theModel) {
 

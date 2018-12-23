@@ -24,7 +24,7 @@ public class MessageDAOImpl implements MessageDAO {
 	 * The number of results to be returned
 	 */
 	private final int RESULT_LIMIT = 20;
-	
+
 	/**
 	 * The SessionFactory interface
 	 */
@@ -65,21 +65,6 @@ public class MessageDAOImpl implements MessageDAO {
 		return currentSession().get(Message.class, messageId);
 	}
 
-	/*
-	 * @Override public void updateMessage(Message message) {
-	 * currentSession().update(message); }
-	 */
-
-	/*
-	 * @Override public void deleteMessage(int messageId, String boxType) {
-	 * 
-	 * Message message = currentSession().get(Message.class, messageId); if
-	 * (boxType.equals("sent")) { message.setSenderIsActive(false); } else {
-	 * message.setRecipientIsActive(false); }
-	 * 
-	 * currentSession().update(message); }
-	 */
-
 	@Override
 	public void sendMessage(Message message) {
 		currentSession().save(message);
@@ -118,7 +103,7 @@ public class MessageDAOImpl implements MessageDAO {
 
 		Query<Long> theQuery = currentSession().createQuery(hql);
 		Long count = (Long) theQuery.uniqueResult();
-		
+
 		return count;
 	}
 

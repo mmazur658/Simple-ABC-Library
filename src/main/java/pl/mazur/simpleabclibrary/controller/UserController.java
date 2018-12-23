@@ -177,7 +177,8 @@ public class UserController {
 			@RequestParam(required = false, name = "incorrectPasswordMessage") String incorrectPasswordMessage,
 			Model theModel, HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		theModel.addAttribute("incorrectPasswordMessage", incorrectPasswordMessage);
 
@@ -268,7 +269,8 @@ public class UserController {
 	public String showMainPage(@RequestParam(required = false, name = "systemMessage") String systemMessage,
 			HttpServletRequest request, Model theModel, RedirectAttributes redirectAttributes) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -403,7 +405,8 @@ public class UserController {
 	public String showUserUpdateForm(@RequestParam(required = false, name = "systemMessage") String systemMessage,
 			Model theModel, HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -445,7 +448,8 @@ public class UserController {
 			@RequestParam(required = false, name = "systemMessage") String systemMessage, Model theModel,
 			HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -484,7 +488,8 @@ public class UserController {
 	public String updateUser(@ModelAttribute("user") User theUser, HttpServletRequest request, Model theModel,
 			RedirectAttributes redirectAttributes, Locale locale) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -539,7 +544,8 @@ public class UserController {
 	public String showChangePasswordForm(@RequestParam(required = false, name = "systemMessage") String systemMessage,
 			Model theModel, HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -575,7 +581,8 @@ public class UserController {
 			@RequestParam("password") String newPassword, HttpServletRequest request,
 			RedirectAttributes redirectAttributes, Locale locale) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -616,7 +623,8 @@ public class UserController {
 	@RequestMapping("/admin-panel")
 	public String showAdministratorPanel(HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isAdmin((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -690,7 +698,8 @@ public class UserController {
 			@RequestParam(required = false, name = "userManagementPesel") String userManagementPesel,
 			@RequestParam(required = false, name = "userManagementStartResult") Integer userManagementStartResult) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -761,7 +770,8 @@ public class UserController {
 	public String showUserDetails(@RequestParam(required = false, name = "systemMessage") String systemMessage,
 			Model theModel, HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -806,7 +816,8 @@ public class UserController {
 			@RequestParam(required = false, name = "systemMessage") String systemMessage, Model theModel,
 			HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -850,7 +861,8 @@ public class UserController {
 	public String showUsersBooks(@RequestParam(required = false, name = "systemMessage") String systemMessage,
 			HttpServletRequest request, Model theModel) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isCustomer((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -880,7 +892,8 @@ public class UserController {
 	@RequestMapping("/clearUserSearchParameters")
 	public String clearReservationSearchParameters(HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -912,7 +925,8 @@ public class UserController {
 	public String increaseAccessLevel(@RequestParam("increaseAccessLevelUserId") int increaseAccessLevelUserId,
 			RedirectAttributes redirectAttributes, HttpServletRequest request, Locale locale) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isAdmin((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -946,7 +960,8 @@ public class UserController {
 	public String decreaseAccessLevel(@RequestParam("decreaseAccessLevelUserId") int decreaseAccessLevelUserId,
 			RedirectAttributes redirectAttributes, HttpServletRequest request, Locale locale) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isAdmin((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";

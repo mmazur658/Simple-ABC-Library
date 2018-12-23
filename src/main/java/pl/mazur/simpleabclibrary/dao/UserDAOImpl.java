@@ -25,7 +25,7 @@ public class UserDAOImpl implements UserDAO {
 	 * The number of results to be returned
 	 */
 	private final int RESULT_LIMIT = 10;
-	
+
 	/**
 	 * The SessionFactory interface
 	 */
@@ -86,10 +86,10 @@ public class UserDAOImpl implements UserDAO {
 		theQuery.setParameter("email", email);
 		Long count = (Long) theQuery.uniqueResult();
 
-		if (count > 0)
-			return true;
-		else
-			return false;
+		boolean isEmailUnique = (count > 0) ? true : false;
+
+		return isEmailUnique;
+
 	}
 
 	@Override
@@ -160,7 +160,7 @@ public class UserDAOImpl implements UserDAO {
 
 		Query<Long> theQuery = currentSession().createQuery(hql);
 		Long count = (Long) theQuery.uniqueResult();
-		
+
 		return count;
 	}
 

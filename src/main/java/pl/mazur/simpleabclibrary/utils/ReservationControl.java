@@ -97,10 +97,10 @@ public class ReservationControl {
 
 		Long currentTimeMillis = System.currentTimeMillis();
 		Long expTimeMillis = reservationStartDate.getTime() + (1000 * 60 * 60 * 48);
-		if (currentTimeMillis > expTimeMillis)
-			return true;
-		else
-			return false;
+
+		boolean isReservationExpired = (currentTimeMillis > expTimeMillis) ? true : false;
+		return isReservationExpired;
+
 	}
 
 	/**

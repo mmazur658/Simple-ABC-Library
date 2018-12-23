@@ -21,7 +21,6 @@ public class PasswordUtilsImpl implements PasswordUtils {
 	public String encryptPassword(String thePassword) {
 
 		String encryptedPassword = theStrongPasswordEncryptor.encryptPassword(thePassword);
-
 		return encryptedPassword;
 	}
 

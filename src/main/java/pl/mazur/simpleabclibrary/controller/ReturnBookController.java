@@ -171,7 +171,8 @@ public class ReturnBookController {
 			@RequestParam(required = false, name = "returnBookPesel") String returnBookPesel,
 			@RequestParam(required = false, name = "returnBookStartResult") Integer returnBookStartResult) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -234,7 +235,8 @@ public class ReturnBookController {
 	@RequestMapping("/clearReturnBookUserSearchParameters")
 	public String clearReservationSearchParameters(HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -261,7 +263,8 @@ public class ReturnBookController {
 	public String returnBookPreparation(@RequestParam(required = false, name = "userId") int selectedUserId,
 			HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -304,7 +307,8 @@ public class ReturnBookController {
 	public String showReturnBookChooseBooks(HttpServletRequest request, Model theModel, Locale locale,
 			@RequestParam(required = false, name = "systemMessage") String systemMessage) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -349,7 +353,8 @@ public class ReturnBookController {
 	public String deleteReturnedBookFromList(@RequestParam("bookId") int bookId, HttpServletRequest request,
 			RedirectAttributes redirectAttributes, Locale locale) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -385,7 +390,8 @@ public class ReturnBookController {
 	public String addReturnedBookToList(@RequestParam("bookId") int bookId, HttpServletRequest request,
 			RedirectAttributes redirectAttributes, Locale locale) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -419,7 +425,8 @@ public class ReturnBookController {
 	public String addAllBorrowedBookToList(HttpServletRequest request, RedirectAttributes redirectAttributes,
 			Locale locale) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -455,7 +462,8 @@ public class ReturnBookController {
 	public String returnBook(HttpServletRequest request, RedirectAttributes redirectAttributes, Model theModel,
 			Locale locale) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";
@@ -531,7 +539,8 @@ public class ReturnBookController {
 	@RequestMapping("/cancel-book-returning")
 	public String cancelBookReturning(HttpServletRequest request) {
 
-		// Get user's session and check whether the user is permitted to see this view
+		// Get the user's session and check whether the user is permitted to see this
+		// view
 		HttpSession session = request.getSession();
 		if (!accessLevelControl.isEmployee((LoggedInUser) session.getAttribute("loggedInUser")))
 			return "redirect:/user/logout";

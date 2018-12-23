@@ -18,35 +18,41 @@ public class MessageServiceUtilsImpl implements MessageServiceUtils {
 
 	@Override
 	public void changeReadStatus(Message message, String boxType) {
+
 		if (boxType.equals("sent")) {
 			if (message.getSenderIsRead())
 				message.setSenderIsRead(false);
 			else
 				message.setSenderIsRead(true);
+
 		} else {
+
 			if (message.getRecipientIsRead())
 				message.setRecipientIsRead(false);
 			else
 				message.setRecipientIsRead(true);
+
 		}
 	}
 
 	@Override
 	public void setReadStatusTrue(Message message, String boxType) {
-		if (boxType.equals("sent")) {
+
+		if (boxType.equals("sent"))
 			message.setSenderIsRead(true);
-		} else {
+		else
 			message.setRecipientIsRead(true);
-		}
+
 	}
 
 	@Override
 	public void setReadStatusFalse(Message message, String boxType) {
-		if (boxType.equals("sent")) {
+		
+		if (boxType.equals("sent"))
 			message.setSenderIsRead(false);
-		} else {
+		else
 			message.setRecipientIsRead(false);
-		}
+
 	}
 
 	@Override
