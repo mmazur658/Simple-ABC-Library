@@ -61,13 +61,13 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 public class ReturnBookController {
 
 	/**
-	 * The arrays containing the names of session attributes to clean
+	 * The array containing the names of session attributes to clean
 	 */
 	private final String[] NAMES_OF_SESSION_ATTRIBUTES_TO_CLEAN = { "returnBookSelectedUserId", "returnBookFirstName",
 			"returnBookLastName", "returnBookEmail", "returnBookPesel", "returnBookStartResult", "tempBookList",
 			"selectedUserId", "userBorrowedBooksList", "tempReturnedBookList" };
 	/**
-	 * The arrays containing the names of book search parameters
+	 * The array containing the names of book search parameters
 	 */
 	private final String[] NAMES_OF_BOOK_SEARCH_PARAMETERS = { "returnBookSelectedUserId", "returnBookFirstName",
 			"returnBookLastName", "returnBookEmail", "returnBookPesel" };

@@ -389,7 +389,7 @@ public class BorrowBookController {
 					locale.getLanguage() + ".controller.BorrowBookController.borrowBookChooseBooks.success.1"
 							+ (borrowedBookLimit - borrowedBookList.size() - tempBookList.size()));
 
-		// Check whether the user has book expired book
+		// Check whether the user has expired book
 		if (isAbleToBorrow) {
 			for (BorrowedBook borrowedBook : borrowedBookList) {
 				Long currentTimeMillis = System.currentTimeMillis();

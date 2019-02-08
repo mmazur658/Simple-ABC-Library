@@ -3,6 +3,8 @@ package pl.mazur.simpleabclibrary.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.NoResultException;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -24,7 +26,7 @@ public class BookDAOImpl implements BookDAO {
 	/**
 	 * Determines the number of results returned from the database
 	 */
-	final int RESULT_LIMIT = 10;
+	private final int RESULT_LIMIT = 10;
 
 	/**
 	 * The SessionFactory interface
@@ -67,8 +69,9 @@ public class BookDAOImpl implements BookDAO {
 			booksList = theQuery.getResultList();
 			return booksList;
 
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (NoResultException exception) {
+			System.err.println("No results");
+			exception.printStackTrace();
 			return null;
 		}
 

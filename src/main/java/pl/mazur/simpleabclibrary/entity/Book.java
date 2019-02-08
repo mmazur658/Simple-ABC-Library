@@ -144,19 +144,19 @@ public class Book {
 	}
 
 	/**
-	 * Gets the isbn number of the Book
+	 * Gets the ISBN number of the Book
 	 * 
-	 * @return A String representing the isbn number of the Book
+	 * @return A String representing the ISBN number of the Book
 	 */
 	public String getIsbn() {
 		return isbn;
 	}
 
 	/**
-	 * Sets the isbn number of the Book
+	 * Sets the ISBN number of the Book
 	 * 
 	 * @param isbn
-	 *            A String containing the isbn number of the Book
+	 *            A String containing the ISBN number of the Book
 	 */
 	public void setIsbn(String isbn) {
 		this.isbn = isbn;
@@ -284,8 +284,8 @@ public class Book {
 	}
 
 	/**
-	 * Constructs a Book with the title, author, isbn number, isActive status,
-	 * isAvailable status, name of publisher, lanngauge, number of pages and date of
+	 * Constructs a Book with the title, author, ISBN number, isActive status,
+	 * isAvailable status, name of publisher, language, number of pages and date of
 	 * added.
 	 * 
 	 * @param title

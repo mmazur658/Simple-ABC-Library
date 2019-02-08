@@ -204,7 +204,7 @@ public class ReservationServiceImpl implements ReservationService {
 
 		// Change the status of reservation, then update
 		reservation.setIsActive(false);
-		reservation.setStatus("Rezerwacja usuniêta przez u¿ytkownika.");
+		reservation.setStatus("Rezerwacja usuniÄ™ta przez uÅ¼ytkownika.");
 		reservationDAO.updateReservation(reservation);
 
 		// Get the Book from the reservation and change its status, then update

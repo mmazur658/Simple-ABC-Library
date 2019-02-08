@@ -43,7 +43,7 @@ public class Reservation {
 	private Book book;
 
 	/**
-	 * The isActive status of reservetion
+	 * The isActive status of reservation
 	 */
 	@Column(name = "is_active")
 	private boolean isActive;
@@ -218,7 +218,7 @@ public class Reservation {
 	 * @param book
 	 *            The book which has been reserved.
 	 * @param isActive
-	 *            The isActive status of reservetion
+	 *            The isActive status of reservation
 	 * @param status
 	 *            The description of the current state of the reservation
 	 * @param startDate

@@ -32,11 +32,13 @@ public class SearchEngineUtilsImpl implements SearchEngineUtils {
 
 	@Override
 	public boolean hasTableAnyParameters(String[] searchParameters) {
+		
 		boolean hasAnyParameters = false;
 		for (int i = 0; i < searchParameters.length; i++) {
 			if (searchParameters[i] != "")
 				hasAnyParameters = true;
 		}
+		
 		return hasAnyParameters;
 	}
 
@@ -44,6 +46,7 @@ public class SearchEngineUtilsImpl implements SearchEngineUtils {
 	public long generateShowLessLinkValue(Integer startResult, int range) {
 
 		long showLessLinkValue = ((startResult - range) < 0) ? 0 : (startResult - range);
+		
 		return showLessLinkValue;
 
 	}
@@ -52,6 +55,7 @@ public class SearchEngineUtilsImpl implements SearchEngineUtils {
 	public long generateShowMoreLinkValue(Integer startResult, long amountOfResults, int range) {
 
 		long showMoreLinkValue = ((startResult + range) > amountOfResults) ? startResult : (startResult + range);
+		
 		return showMoreLinkValue;
 
 	}
@@ -68,8 +72,10 @@ public class SearchEngineUtilsImpl implements SearchEngineUtils {
 
 	@Override
 	public void clearSearchParameters(HttpSession session, String[] searchParametersName) {
+		
 		for (String paramName : searchParametersName)
 			session.setAttribute(paramName, null);
+		
 	}
 
 	@Override
@@ -99,6 +105,7 @@ public class SearchEngineUtilsImpl implements SearchEngineUtils {
 
 	@Override
 	public String prepareHqlUsingSearchParameters(String[] searchParameters, String searchType, String[] fieldsName) {
+		
 		boolean isContent = false;
 
 		StringBuilder sb = new StringBuilder();

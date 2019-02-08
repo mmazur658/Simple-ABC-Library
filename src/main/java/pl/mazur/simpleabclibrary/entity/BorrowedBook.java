@@ -124,7 +124,7 @@ public class BorrowedBook {
 	}
 
 	/**
-	 * Gets the date od added of the BorrowedBook
+	 * Gets the date of added of the BorrowedBook
 	 * 
 	 * @return A Date representing the date od added of the BorrowedBook
 	 */
@@ -133,7 +133,7 @@ public class BorrowedBook {
 	}
 
 	/**
-	 * Sets the date od added of the BorrowedBook
+	 * Sets the date of added of the BorrowedBook
 	 * 
 	 * @param startDate
 	 *            A Date containing the date od added of the BorrowedBook

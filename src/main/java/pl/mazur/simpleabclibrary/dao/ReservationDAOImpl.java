@@ -3,6 +3,8 @@ package pl.mazur.simpleabclibrary.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.NoResultException;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -105,14 +107,18 @@ public class ReservationDAOImpl implements ReservationDAO {
 	public List<Reservation> getListOfReservationForGivenSearchParams(String hql, Integer startResult) {
 
 		List<Reservation> reservationList = new ArrayList<>();
+		
 		try {
+			
 			Query<Reservation> theQuery = currentSession().createQuery(hql);
 			theQuery.setFirstResult(startResult);
 			theQuery.setMaxResults(RESULT_LIMIT);
 			reservationList = theQuery.getResultList();
 			return reservationList;
-		} catch (Exception e) {
-			e.printStackTrace();
+			
+		} catch (NoResultException exception) {
+			System.err.println("No results");
+			exception.printStackTrace();
 			return null;
 		}
 	}

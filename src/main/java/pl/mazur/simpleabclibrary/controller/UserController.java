@@ -228,7 +228,7 @@ public class UserController {
 			return "redirect:/user/login-page";
 		}
 
-		// If login jest OK then check the password
+		// If login is OK then check the password
 		if (isLoginOK) {
 			User tempUser = userService.getUserByEmail(email);
 			LoggedInUser loggedInUser = new LoggedInUser(tempUser.getId(), userService.getUserAccessLevel(tempUser));

@@ -64,7 +64,7 @@ import pl.mazur.simpleabclibrary.utils.SearchEngineUtils;
 public class BookController {
 
 	/**
-	 * The names of the search parameters
+	 * The array containing the names of book search parameters
 	 */
 	private final String[] NAMES_OF_SEARCH_PARAMETERS = { "bookSearchParamTitle", "bookSearchParamAuthor",
 			"bookSearchParamPublisher", "bookSearchParamIsbn", "bookSearchParamId" };

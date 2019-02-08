@@ -1,8 +1,5 @@
 package pl.mazur.simpleabclibrary.entity;
 
-/**
- * @author Marcin Mazur
- */
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -55,7 +52,7 @@ public class User {
 	private Date startDate;
 
 	/**
-	 * The pesel number of the user. This is the national identification number used
+	 * The PESEL number of the user. This is the national identification number used
 	 * in Poland. It always has 11 digits.
 	 */
 	@Column(name = "pesel")
@@ -433,9 +430,9 @@ public class User {
 	}
 
 	/**
-	 * Constructs a User with the first and last name, last name, emial, date of
-	 * added, pesel number, street, house number, city, postal code, password,
-	 * isActive status, isEmployee status, isAdmin satus, sex and date of birth.
+	 * Constructs a User with the first and last name, last name, email, date of
+	 * added, PESEL number, street, house number, city, postal code, password,
+	 * isActive status, isEmployee status, isAdmin status, sex and date of birth.
 	 * 
 	 * @param firstName
 	 *            The first name of the user
@@ -446,7 +443,7 @@ public class User {
 	 * @param startDate
 	 *            The date of added
 	 * @param pesel
-	 *            The pesel number of the user
+	 *            The PESEL number of the user
 	 * @param street
 	 *            The street of the user
 	 * @param houseNumber

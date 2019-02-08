@@ -30,7 +30,7 @@ public class LoggedInUser {
 	 * Sets the user's access level of the LoggedInUser
 	 * 
 	 * @param userAccessLevel
-	 *            A String containings the user's access level of the LoggedInUser
+	 *            A String containing the user's access level of the LoggedInUser
 	 */
 	public void setUserAccessLevel(String userAccessLevel) {
 		this.userAccessLevel = userAccessLevel;
@@ -49,7 +49,7 @@ public class LoggedInUser {
 	 * Sets the user's id of the LoggedInUser
 	 * 
 	 * @param userId
-	 *            An int containings the user's id of the LoggedInUser
+	 *            An int containing the user's id of the LoggedInUser
 	 */
 	public void setUserId(int userId) {
 		this.userId = userId;

@@ -3,6 +3,8 @@ package pl.mazur.simpleabclibrary.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.NoResultException;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -86,9 +88,7 @@ public class UserDAOImpl implements UserDAO {
 		theQuery.setParameter("email", email);
 		Long count = (Long) theQuery.uniqueResult();
 
-		boolean isEmailUnique = (count > 0) ? true : false;
-
-		return isEmailUnique;
+		return (count > 0);
 
 	}
 
@@ -148,8 +148,9 @@ public class UserDAOImpl implements UserDAO {
 
 			return userList;
 
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (NoResultException exception) {
+			exception.printStackTrace();
+			System.err.println("No results");
 			return null;
 		}
 	}
