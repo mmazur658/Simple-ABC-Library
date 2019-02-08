@@ -21,6 +21,9 @@ import pl.mazur.simpleabclibrary.service.utils.MessageServiceUtils;
 @Service
 public class MessageServiceImpl implements MessageService {
 
+	private final String BOX_TYPE_SENT = "sent";
+	private final String BOX_TYPE_INBOX = "inbox";
+	
 	/**
 	 * The MessageDAO interface
 	 */
@@ -99,7 +102,7 @@ public class MessageServiceImpl implements MessageService {
 
 		Message message = messageDAO.getMessageById(messageId);
 
-		if (boxType.equals("sent"))
+		if (boxType.equals(BOX_TYPE_SENT))
 			message.setSenderIsActive(false);
 		else
 			message.setRecipientIsActive(false);
@@ -139,9 +142,9 @@ public class MessageServiceImpl implements MessageService {
 	public long getNumberOfAllMessages(int userId, String boxType) {
 
 		String hql = null;
-		if (boxType.equals("sent")) 
+		if (boxType.equals(BOX_TYPE_SENT)) 
 			hql = "SELECT COUNT(*) FROM Message WHERE sender=" + userId + " and senderIsActive=true";
-		else if (boxType.equals("inbox"))
+		else if (boxType.equals(BOX_TYPE_INBOX))
 			hql = "SELECT COUNT(*) FROM Message WHERE recipient=" + userId + " and recipientIsActive=true";
 
 		return messageDAO.getNumberOfMessagesForGivenHql(hql);

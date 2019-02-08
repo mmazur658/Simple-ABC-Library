@@ -19,6 +19,10 @@ import pl.mazur.simpleabclibrary.entity.User;
  */
 @Component
 public class ReservationServiceUtilsImpl implements ReservationServiceUtils {
+	
+	private final int RESERVATION_DAYS_LIMIT = 2;
+	private final int RESERVATION_CONTINUATION = 1;
+	private final String BASIC_DATE_FORMAT = "dd-MM-yyyy HH:mm:ss";
 
 	@Override
 	public Reservation createReservation(Book tempBook, User theUser) {
@@ -30,11 +34,11 @@ public class ReservationServiceUtilsImpl implements ReservationServiceUtils {
 		reservation.setStartDate(new Date());
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(reservation.getStartDate());
-		calendar.add(Calendar.DATE, 2);
+		calendar.add(Calendar.DATE, RESERVATION_DAYS_LIMIT);
 		reservation.setEndDate(calendar.getTime());
-		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		SimpleDateFormat sdf = new SimpleDateFormat(BASIC_DATE_FORMAT);
 		String date = sdf.format(calendar.getTime());
-		reservation.setStatus("Rezerwacja wa¿na do " + date);
+		reservation.setStatus("Rezerwacja waÅ¼na do " + date);
 		tempBook.setIsAvailable(false);
 
 		return reservation;
@@ -43,7 +47,7 @@ public class ReservationServiceUtilsImpl implements ReservationServiceUtils {
 	@Override
 	public Message prepareReservationToDeleteAndCreateNewMessage(Reservation reservation, User adminUser) {
 
-		reservation.setStatus("Rezerwacja usuniêta przez pracownika biblioteki.");
+		reservation.setStatus("Rezerwacja usuniÄ™ta przez pracownika biblioteki.");
 		reservation.setIsActive(false);
 
 		Message message = new Message();
@@ -55,9 +59,9 @@ public class ReservationServiceUtilsImpl implements ReservationServiceUtils {
 		message.setSenderIsRead(true);
 		message.setStartDate(new Date());
 		message.setSubject(
-				"Rzerwacja ksi¹¿ki " + reservation.getBook().getTitle() + " zosta³a usuniêta przez pracownika");
-		message.setText("Z przykroœci¹ informujemy, ¿e twoja rezerwacja ksi¹¿ki " + reservation.getBook().getTitle()
-				+ " zosta³a usuniêta przez pracownika biblioteki.");
+				"Rezerwacja ksiÄ…Å¼ki " + reservation.getBook().getTitle() + " zostaÅ‚a usuniÄ™ta przez pracownika");
+		message.setText("Z przykroÅ›ciÄ… informujemy, Å¼e twoja rezerwacja ksiÄ…Å¼ki " + reservation.getBook().getTitle()
+				+ " zostaÅ‚a usuniÄ™ta przez pracownika biblioteki.");
 
 		return message;
 
@@ -65,12 +69,12 @@ public class ReservationServiceUtilsImpl implements ReservationServiceUtils {
 
 	@Override
 	public void increaseExpirationDate(Reservation reservation) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		SimpleDateFormat sdf = new SimpleDateFormat(BASIC_DATE_FORMAT);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(reservation.getEndDate());
-		calendar.add(Calendar.DATE, 1); // 24h
+		calendar.add(Calendar.DATE, RESERVATION_CONTINUATION); 
 		reservation.setEndDate(calendar.getTime());
-		reservation.setStatus("Rezerwacja wa¿na do " + sdf.format(reservation.getEndDate()));
+		reservation.setStatus("Rezerwacja waÅ¼na do " + sdf.format(reservation.getEndDate()));
 	}
 
 }

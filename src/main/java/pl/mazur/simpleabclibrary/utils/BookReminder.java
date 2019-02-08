@@ -26,6 +26,9 @@ import pl.mazur.simpleabclibrary.service.UserService;
 @EnableScheduling
 public class BookReminder {
 
+	private final long ONE_HOUR = (1000 * 60 * 60);
+	private final long TWENTY_FOUR_HOURS = (1000 * 60 * 60 * 24);
+
 	/**
 	 * The BookServiceinterface
 	 */
@@ -83,12 +86,12 @@ public class BookReminder {
 		theMessage.setSenderIsActive(false);
 		theMessage.setSenderIsRead(true);
 		theMessage.setStartDate(new Date());
-		theMessage.setSubject("Przypomnienie o zwrocie ksi¹¿ki: " + bookTitle);
+		theMessage.setSubject("Przypomnienie o zwrocie ksiÄ…Å¼ki: " + bookTitle);
 		if (hourLimit == 0) {
-			theMessage.setText("Posiadasz ksi¹¿kê, która powinna zostaæ zwrócona do " + sdf.format(expectedEndDate)
-					+ ". Prosimy o mo¿liwie najszybszy zwrot ksi¹¿ki.");
+			theMessage.setText("Posiadasz ksiÄ…Å¼kÄ™, ktÃ³ra powinna zostaÄ‡ zwrÃ³cona do " + sdf.format(expectedEndDate)
+					+ ". Prosimy o moÅ¼liwie najszybszy zwrot ksiÄ…Å¼ki.");
 		} else {
-			theMessage.setText("Pozosta³o mniej ni¿ " + hourLimit + "h na zwrot ksi¹¿ki: " + bookTitle
+			theMessage.setText("PozostaÅ‚o mniej niÅ¼ " + hourLimit + "h na zwrot ksiaÅ¼ki: " + bookTitle
 					+ ". Prosimy o terminowy zwrot.");
 		}
 		messageService.sendMessage(theMessage);
@@ -114,8 +117,8 @@ public class BookReminder {
 			return isBorrowedBookExpired;
 		}
 
-		boolean isBorrowedBookExpired = (expTimeMillis - (1000 * 60 * 60 * hourLimit) < currentTimeMillis
-				&& expTimeMillis - (1000 * 60 * 60 * (hourLimit - 1)) > currentTimeMillis) ? true : false;
+		boolean isBorrowedBookExpired = (expTimeMillis - (ONE_HOUR * hourLimit) < currentTimeMillis
+				&& expTimeMillis - (ONE_HOUR * (hourLimit - 1)) > currentTimeMillis) ? true : false;
 
 		return isBorrowedBookExpired;
 	}
@@ -124,8 +127,8 @@ public class BookReminder {
 	 * Gets the list of all borrowed books and check if they should be returned in
 	 * the next 24 hours.
 	 */
-	@Scheduled(fixedRate = 1000 * 60 * 60)
-	public void twentyFourHoursToReturnBookReminder() {// 24h
+	@Scheduled(fixedRate = ONE_HOUR)
+	public void twentyFourHoursToReturnBookReminder() {
 
 		// Get the list of all borrowed book
 		List<BorrowedBook> borrowedBookList = bookService.getListOfAllBorrowedBooks();
@@ -143,7 +146,7 @@ public class BookReminder {
 	 * Gets the list of all borrowed books and check if they should be returned in
 	 * the next 6 hours.
 	 */
-	@Scheduled(fixedRate = 1000 * 60 * 60) // 1 hour
+	@Scheduled(fixedRate = ONE_HOUR) // 1 hour
 	public void sixHoursToReturnBookReminder() { // 6h
 
 		// Get the list of all borrowed book
@@ -163,7 +166,7 @@ public class BookReminder {
 	 * Gets the list of all borrowed books and check if they should be returned
 	 * immediately.
 	 */
-	@Scheduled(fixedRate = 1000 * 60 * 60 * 24)
+	@Scheduled(fixedRate = TWENTY_FOUR_HOURS)
 	public void expiredBookReminder() {
 
 		// Get the list of all borrowed book

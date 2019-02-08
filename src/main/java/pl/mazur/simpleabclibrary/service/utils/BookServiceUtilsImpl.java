@@ -18,6 +18,8 @@ import pl.mazur.simpleabclibrary.entity.User;
 @Component
 public class BookServiceUtilsImpl implements BookServiceUtils {
 
+	private final int DAYS_TO_RETURN = 14;
+
 	@Override
 	public BorrowedBook createBorrowedBook(Book tempBook, User tempUser) {
 
@@ -27,7 +29,7 @@ public class BookServiceUtilsImpl implements BookServiceUtils {
 		borrowedBook.setStartDate(new Date());
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(borrowedBook.getStartDate());
-		calendar.add(Calendar.DATE, 14);
+		calendar.add(Calendar.DATE, DAYS_TO_RETURN);
 		borrowedBook.setExpectedEndDate(calendar.getTime());
 		tempBook.setIsAvailable(false);
 

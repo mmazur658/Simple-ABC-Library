@@ -20,6 +20,7 @@ public class MessageServiceUtilsImpl implements MessageServiceUtils {
 	public void changeReadStatus(Message message, String boxType) {
 
 		if (boxType.equals("sent")) {
+			
 			if (message.getSenderIsRead())
 				message.setSenderIsRead(false);
 			else

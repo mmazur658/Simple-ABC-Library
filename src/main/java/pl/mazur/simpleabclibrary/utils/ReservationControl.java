@@ -24,6 +24,9 @@ import pl.mazur.simpleabclibrary.service.UserService;
 @Component
 @EnableScheduling
 public class ReservationControl {
+	
+	private final long FOURTY_EIGHT_HOURS = (1000 * 60 * 60 * 48);
+	private final long ONE_HOUR = (1000 * 60 * 60);
 
 	/**
 	 * The MessageService interface
@@ -78,9 +81,9 @@ public class ReservationControl {
 		theMessage.setSenderIsActive(false);
 		theMessage.setSenderIsRead(true);
 		theMessage.setStartDate(new Date());
-		theMessage.setSubject("Rzerwacja ksi¹¿ki " + bookTitle.trim() + " zosta³a usuniêta");
-		theMessage.setText("Z przykroœci¹ informuajemy, ¿e twoja rezerwacja na ksi¹¿kê " + bookTitle.trim()
-				+ " zosta³a usuniêta ze wzglêdu na przekroczony termin odbioru");
+		theMessage.setSubject("Rzerwacja ksiÄ…Å¼ki " + bookTitle.trim() + " zostaÅ‚a usuniÄ™ta");
+		theMessage.setText("Z przykroÅ›ciÄ… informujemy, Å¼e twoja rezerwacja na ksiÄ…Å¼kÄ™ " + bookTitle.trim()
+				+ " zostaÅ‚a usuniÄ™ta ze wzglÄ™du na przekroczony termin odbioru");
 		return theMessage;
 
 	}
@@ -96,7 +99,7 @@ public class ReservationControl {
 	public boolean isReservationExpired(Date reservationStartDate) {
 
 		Long currentTimeMillis = System.currentTimeMillis();
-		Long expTimeMillis = reservationStartDate.getTime() + (1000 * 60 * 60 * 48);
+		Long expTimeMillis = reservationStartDate.getTime() + FOURTY_EIGHT_HOURS;
 
 		boolean isReservationExpired = (currentTimeMillis > expTimeMillis) ? true : false;
 		return isReservationExpired;
@@ -107,7 +110,7 @@ public class ReservationControl {
 	 * Gets the list of all active reservations and check, if they are expired.
 	 * 
 	 */
-	@Scheduled(fixedRate = 1000 * 60 * 60) // 1h // Milliseconds * seconds * minutes * hour * day
+	@Scheduled(fixedRate = ONE_HOUR)
 	public void checkReservations() {
 
 		// Get the list of all borrowed book

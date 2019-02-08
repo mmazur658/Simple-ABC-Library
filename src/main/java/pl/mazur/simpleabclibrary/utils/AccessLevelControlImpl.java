@@ -14,54 +14,44 @@ import pl.mazur.simpleabclibrary.entity.User;
 @Component
 public class AccessLevelControlImpl implements AccessLevelControl {
 
+	private final String ADMINISTRATOR = "Administrator";
+	private final String EMPLOYEE = "Employee";
+	private final String CUSTOMER = "Customer";
+
 	@Override
 	public boolean isIdNotNull(Integer userId) {
-
-		boolean isIdNotNull = (userId != null) ? true : false;
-		return isIdNotNull;
+		return (userId != null);
 
 	}
 
 	@Override
 	public boolean isAdmin(String userAccessLevel) {
 
-		if (userAccessLevel != null) {
-			if (userAccessLevel.equals("Administrator"))
-				return true;
-			else
-				return false;
-		} else {
+		if (userAccessLevel != null)
+			return userAccessLevel.equals(ADMINISTRATOR);
+		else
 			return false;
-		}
 
 	}
 
 	@Override
 	public boolean isEmployee(String userAccessLevel) {
 
-		if (userAccessLevel != null) {
-			if (userAccessLevel.equals("Employee") || userAccessLevel.equals("Administrator"))
-				return true;
-			else
-				return false;
-		} else {
+		if (userAccessLevel != null)
+			return (userAccessLevel.equals(EMPLOYEE) || userAccessLevel.equals(ADMINISTRATOR));
+		else
 			return false;
-		}
 
 	}
 
 	@Override
 	public boolean isCustomer(String userAccessLevel) {
 
-		if (userAccessLevel != null) {
-			if (userAccessLevel.equals("Customer") || userAccessLevel.equals("Employee")
-					|| userAccessLevel.equals("Administrator"))
-				return true;
-			else
-				return false;
-		} else {
+		if (userAccessLevel != null)
+			return (userAccessLevel.equals(CUSTOMER) || userAccessLevel.equals(EMPLOYEE)
+					|| userAccessLevel.equals(ADMINISTRATOR));
+		else
 			return false;
-		}
 
 	}
 
@@ -69,11 +59,11 @@ public class AccessLevelControlImpl implements AccessLevelControl {
 	public String getUserAccessLevel(User tempUser) {
 
 		if (tempUser.getIsAdmin())
-			return "Administrator";	
+			return ADMINISTRATOR;
 		else if (!tempUser.getIsAdmin() && tempUser.getIsEmployee())
-			return "Employee";
+			return EMPLOYEE;
 		else
-			return "Customer";
+			return CUSTOMER;
 	}
 
 	@Override
@@ -81,34 +71,28 @@ public class AccessLevelControlImpl implements AccessLevelControl {
 
 		if (loggedInUser == null)
 			return false;
-		
-		if (isCustomer(loggedInUser.getUserAccessLevel()) && isIdNotNull(loggedInUser.getUserId()))
-			return true;
-		else
-			return false;
+
+		return isCustomer(loggedInUser.getUserAccessLevel()) && isIdNotNull(loggedInUser.getUserId());
+
 	}
 
 	@Override
 	public boolean isEmployee(LoggedInUser loggedInUser) {
-		
+
 		if (loggedInUser == null)
 			return false;
-		
-		if (isEmployee(loggedInUser.getUserAccessLevel()) && isIdNotNull(loggedInUser.getUserId()))
-			return true;
-		else
-			return false;
+
+		return isEmployee(loggedInUser.getUserAccessLevel()) && isIdNotNull(loggedInUser.getUserId());
+
 	}
 
 	@Override
 	public boolean isAdmin(LoggedInUser loggedInUser) {
-				
+
 		if (loggedInUser == null)
 			return false;
-		
-		if (isAdmin(loggedInUser.getUserAccessLevel()) && isIdNotNull(loggedInUser.getUserId()))
-			return true;
-		else
-			return false;
+
+		return isAdmin(loggedInUser.getUserAccessLevel()) && isIdNotNull(loggedInUser.getUserId());
+
 	}
 }
